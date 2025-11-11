@@ -80,6 +80,7 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
         jLabel20 = new javax.swing.JLabel();
         editTechnicianIDField = new javax.swing.JTextField();
         editEnterBtn = new javax.swing.JButton();
+        jLabel21 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -391,10 +392,10 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
             }
         });
 
-        jLabel17.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
+        jLabel17.setFont(new java.awt.Font("Monospaced", 0, 10)); // NOI18N
         jLabel17.setForeground(new java.awt.Color(255, 255, 255));
         jLabel17.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel17.setText("Old password:");
+        jLabel17.setText("Leave the password fields blank, to keep it the same");
 
         oldPasswordField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -446,12 +447,17 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
             }
         });
 
+        jLabel21.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
+        jLabel21.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel21.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel21.setText("Old password:");
+
         javax.swing.GroupLayout editPanelLayout = new javax.swing.GroupLayout(editPanel);
         editPanel.setLayout(editPanelLayout);
         editPanelLayout.setHorizontalGroup(
             editPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, editPanelLayout.createSequentialGroup()
-                .addContainerGap(23, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(editPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(editPanelLayout.createSequentialGroup()
                         .addGroup(editPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -466,12 +472,14 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
                         .addGroup(editPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(editPanelLayout.createSequentialGroup()
                                 .addGap(47, 47, 47)
-                                .addComponent(jLabel17)
+                                .addComponent(jLabel21)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(oldPasswordField, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(editPanelLayout.createSequentialGroup()
                                 .addGap(18, 18, 18)
-                                .addComponent(editEnterBtn))))
+                                .addComponent(editEnterBtn)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel17))))
                     .addGroup(editPanelLayout.createSequentialGroup()
                         .addGap(16, 16, 16)
                         .addGroup(editPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -492,7 +500,7 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
                             .addGroup(editPanelLayout.createSequentialGroup()
                                 .addGap(6, 6, 6)
                                 .addComponent(editConfirmBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 281, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addGap(24, 24, 24))
+                .addGap(18, 18, 18))
         );
         editPanelLayout.setVerticalGroup(
             editPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -501,13 +509,14 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
                 .addGroup(editPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(editTechnicianIDField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(editEnterBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(editEnterBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(editPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(editFirstNameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(oldPasswordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(editPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, editPanelLayout.createSequentialGroup()
@@ -717,6 +726,7 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
+    private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;

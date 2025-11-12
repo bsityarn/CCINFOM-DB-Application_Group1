@@ -201,9 +201,31 @@ public class Technician {
     }
 
     public static String delete(String technicianID) {
+        StringBuilder query = new StringBuilder();
+        query.append(" DELETE FROM technicians               ");
+        query.append(" WHERE   technicianID = ? ");
 
         if (technicianID.isBlank()) {
             return "Empty";
+        } else {
+            try {
+                // Establish connection to DB
+                Connection conn = MySQLConnector.connectDB();
+
+                // Prepare SQL statement to be executed
+                PreparedStatement statement = conn.prepareStatement(query.toString());
+
+                statement.setString(1, technicianID);
+
+                statement.executeUpdate();
+//TODO add code logic for checking if a technician exists
+                statement.close();
+                conn.close();
+
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+                return "Invalid";
+            }
         }
         return "Valid";
     }

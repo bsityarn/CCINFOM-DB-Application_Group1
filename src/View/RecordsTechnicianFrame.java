@@ -684,6 +684,28 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
 
     private void editConfirmBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editConfirmBtnActionPerformed
         // TODO add your handling code here:
+        String firstName = editFirstNameField.getText();
+        String lastName = editLastNameField.getText();
+        String email = editEmailField.getText();
+        String position = (String) editTechnicianPositionComboBox.getSelectedItem();
+        String currentPassword = oldPasswordField.getText();
+        String newPassword = editPasswordField.getText();
+
+        if (Technician.edit(firstName, lastName, email, position, currentPassword, newPassword) == "Valid") {
+            //Makes the textfields blank again
+            editTechnicianIDField.setText("");
+            editFirstNameField.setText("");
+            editLastNameField.setText("");
+            editEmailField.setText("");
+            editTechnicianPositionComboBox.setSelectedItem(1);
+            oldPasswordField.setText("");
+            editPasswordField.setText("");
+            
+            JOptionPane.showMessageDialog(this, "Technician edited successfully!", "Edited Technician", JOptionPane.INFORMATION_MESSAGE);
+            System.out.println("EDIT: Technician " + firstName + " " + lastName + "edited");
+        }
+
+
     }//GEN-LAST:event_editConfirmBtnActionPerformed
 
     private void oldPasswordFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_oldPasswordFieldActionPerformed
@@ -706,15 +728,19 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
         // This function will fill up the text fields with the current Info depending on the technician ID inputted
         String technicianID = editTechnicianIDField.getText();
+        Technician technician = new Technician();
+        technician = Technician.getInfo(technicianID);
 
-        if (Technician.getInfo(technicianID) != null) {
+        if (technician.getTechnicianID() != "Not found") {
             Technician currentInfo = new Technician(); //Initialize a currentInfo Technician variable
             currentInfo = Technician.getInfo(technicianID); //Gets the information from the getInfo function
             editFirstNameField.setText(currentInfo.getFirstName());
             editLastNameField.setText(currentInfo.getLastName());
             editEmailField.setText(currentInfo.getEmail());
             editTechnicianPositionComboBox.setSelectedItem(currentInfo.getPosition());
-            System.out.println("EDIT: Technician ID" + currentInfo.getTechnicianID() + "current info retrieved");
+            System.out.println("EDIT: Technician ID " + currentInfo.getTechnicianID() + "current info retrieved");
+        } else {
+            JOptionPane.showMessageDialog(this, "Technician ID not found", "Error", JOptionPane.ERROR_MESSAGE);
         }
 
     }//GEN-LAST:event_editEnterBtnActionPerformed

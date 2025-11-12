@@ -37,11 +37,11 @@ public class Technician {
 
             // 1. Use executeQuery() and get the ResultSet
             ResultSet rs = statement.executeQuery();
-            
-            if (rs.next()){//This command will return true when AT LEAST 1 record is found. Hence, duplicate is true
+
+            if (rs.next()) {//This command will return true when AT LEAST 1 record is found. Hence, duplicate is true
                 duplicateResult = true;
             }
-            
+
             //Closing the connections to avoid DB app slow down in performance
             rs.close();
             statement.close();
@@ -50,8 +50,7 @@ public class Technician {
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
         }
-        
-        
+
         return duplicateResult;
     }
 
@@ -61,6 +60,43 @@ public class Technician {
         query.append(" VALUES (?, ?, ?, ?, ?)");
 
         //TODO - Check for email duplicates
+        if (firstName.isBlank() || lastName.isBlank() || email.isBlank() || password.isBlank()) {//Checker for when the User leaves a Field blank
+            return "Empty";
+        } else if (checkEmailDuplicates(email) == true) {//Checker for email duplicates
+            return "Duplicate Email";
+        } else {
+            try {
+                // Establish connection to DB
+                Connection conn = MySQLConnector.connectDB();
+
+                // Prepare SQL statement to be executed
+                PreparedStatement statement = conn.prepareStatement(query.toString());
+
+                statement.setString(1, firstName);
+                statement.setString(2, lastName);
+                statement.setString(3, position);
+                statement.setString(4, email);
+                statement.setString(5, password);
+
+                statement.executeUpdate();
+
+                statement.close();
+                conn.close();
+
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+                return "Invalid";
+            }
+        }
+        return "Valid";
+    }
+    
+     public static String edit(String firstName, String lastName, String email, String position, String currentPassword, String newPassword) {
+        StringBuilder query = new StringBuilder();
+        query.append(" INSERT INTO technician (firstName, lastName, position, email, password) ");
+        query.append(" VALUES (?, ?, ?, ?, ?)");
+
+        
         if (firstName.isBlank() || lastName.isBlank() || email.isBlank() || password.isBlank()) {//Checker for when the User leaves a Field blank
             return "Empty";
         } else if (checkEmailDuplicates(email) == true) {//Checker for email duplicates
@@ -101,10 +137,45 @@ public class Technician {
     }
 
     public static Technician getInfo(String technicianID) {
-        Technician technician = new Technician();
+        StringBuilder query = new StringBuilder();
+        query.append(" SELECT  *               ");
+        query.append(" FROM    technicians ");
+        query.append(" WHERE   technicianID = ? ");
+        Technician resultTechnician = new Technician();
+
+        try {
+            // Establish connection to DB
+            Connection conn = MySQLConnector.connectDB();
+
+            PreparedStatement statement = conn.prepareStatement(query.toString());
+
+            statement.setString(1, technicianID);
+
+            // 1. Use executeQuery() and get the ResultSet
+            ResultSet rs = statement.executeQuery();
+
+            if (rs.next()) {//"if (rs.next)" will return true when AT LEAST 1 record is found. Hence, the technician is found
+                resultTechnician.setID(rs.getString("technicianID"));
+                resultTechnician.setFirstName(rs.getString("firstName"));
+                resultTechnician.setLastName(rs.getString("lastName"));
+                resultTechnician.setEmail(rs.getString("email"));
+                resultTechnician.setPosition(rs.getString("position"));
+            } else {//this is the resultTechnician's value when no technician is found
+                resultTechnician.setID("Not found");
+            }
+
+            //Closing the connections to avoid DB app slow down in performance
+            rs.close();
+            statement.close();
+            conn.close();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+
         //TODO: Code logic for retrieving a record
         //TODO: Code setting of attributes for technician to be returned
-        return technician;
+        return resultTechnician;
     }
 
     // --- Getters ---
@@ -137,6 +208,10 @@ public class Technician {
     }
 
     // --- Setters ---
+    public void setID(String technicianID) {
+        this.technicianID = technicianID;
+    }
+
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }

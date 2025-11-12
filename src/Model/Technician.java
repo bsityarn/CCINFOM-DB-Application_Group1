@@ -4,6 +4,8 @@
  */
 package Model;
 
+import java.sql.*;
+
 /**
  *
  * @author marcquizon
@@ -18,10 +20,74 @@ public class Technician {
     private String currentPassword;
     private String newPassword;
 
+    public static boolean checkEmailDuplicates(String email) {
+        StringBuilder query = new StringBuilder();
+        query.append(" SELECT  *               ");
+        query.append(" FROM    technicians ");
+        query.append(" WHERE   email = ? ");
+        Boolean duplicateResult = false;
+
+        try {
+            // Establish connection to DB
+            Connection conn = MySQLConnector.connectDB();
+
+            PreparedStatement statement = conn.prepareStatement(query.toString());
+
+            statement.setString(1, email);
+
+            // 1. Use executeQuery() and get the ResultSet
+            ResultSet rs = statement.executeQuery();
+            
+            if (rs.next()){//This command will return true when AT LEAST 1 record is found. Hence, duplicate is true
+                duplicateResult = true;
+            }
+            
+            //Closing the connections to avoid DB app slow down in performance
+            rs.close();
+            statement.close();
+            conn.close();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        
+        
+        return duplicateResult;
+    }
+
     public static String add(String firstName, String lastName, String email, String position, String password) {
+        StringBuilder query = new StringBuilder();
+        query.append(" INSERT INTO technician (firstName, lastName, position, email, password) ");
+        query.append(" VALUES (?, ?, ?, ?, ?)");
+
         //TODO - Check for email duplicates
-        if (firstName.isBlank() || lastName.isBlank() || email.isBlank() || password.isBlank()) {
+        if (firstName.isBlank() || lastName.isBlank() || email.isBlank() || password.isBlank()) {//Checker for when the User leaves a Field blank
             return "Empty";
+        } else if (checkEmailDuplicates(email) == true) {//Checker for email duplicates
+            return "Duplicate Email";
+        } else {
+            try {
+                // Establish connection to DB
+                Connection conn = MySQLConnector.connectDB();
+
+                // Prepare SQL statement to be executed
+                PreparedStatement statement = conn.prepareStatement(query.toString());
+
+                statement.setString(1, firstName);
+                statement.setString(2, lastName);
+                statement.setString(3, position);
+                statement.setString(4, email);
+                statement.setString(5, password);
+
+                statement.executeUpdate();
+
+                statement.close();
+                conn.close();
+
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+                return "Invalid";
+            }
         }
         return "Valid";
     }
@@ -45,7 +111,7 @@ public class Technician {
     public String getTechnicianID() {
         return technicianID;
     }
-    
+
     public String getFirstName() {
         return firstName;
     }

@@ -644,6 +644,7 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
         String password = addPasswordField.getText();
 
         if (Technician.add(firstName, lastName, email, position, password) == "Valid") {
+            //Makes the textfields blank again
             addFirstNameField.setText("");
             addLastNameField.setText("");
             addEmailField.setText("");
@@ -653,7 +654,11 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Technician added successfully!", "Added Technician", JOptionPane.INFORMATION_MESSAGE);
             System.out.println("ADD: Technician " + firstName + " " + lastName + "added");
         } else if (Technician.add(firstName, lastName, email, position, password) == "Empty") {
+            //This is an error when the User leaves a certain field blank
             JOptionPane.showMessageDialog(this, "Please fill in the information", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (Technician.add(firstName, lastName, email, position, password) == "Duplicate Email") {
+            //This is an error when the User inputs a duplicate email
+            JOptionPane.showMessageDialog(this, "Duplicate email found, please change", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_addTechnicianBtnActionPerformed
 

@@ -54,6 +54,43 @@ public class Technician {
         return duplicateResult;
     }
 
+    public static boolean checkMatchCurrentPassword(String technicianID, String passwordFromInput) {
+        StringBuilder query = new StringBuilder();
+        query.append(" SELECT  password               ");
+        query.append(" FROM    technicians ");
+        query.append(" WHERE   technicianID = ? ");
+        Boolean matchResult = false;
+
+        try {
+            // Establish connection to DB
+            Connection conn = MySQLConnector.connectDB();
+
+            PreparedStatement statement = conn.prepareStatement(query.toString());
+
+            statement.setString(1, technicianID);
+
+            // 1. Use executeQuery() and get the ResultSet
+            ResultSet rs = statement.executeQuery();
+
+            if (rs.next()) {//This command will return true when AT LEAST 1 record is found.
+                String passwordFromDB = rs.getString("password");//We get the password from the database
+                if (passwordFromDB.equals(passwordFromInput)) {//We compare them and ensure they match
+                    matchResult = true;
+                }
+            }
+
+            //Closing the connections to avoid DB app slow down in performance
+            rs.close();
+            statement.close();
+            conn.close();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+
+        return matchResult;
+    }
+
     public static String add(String firstName, String lastName, String email, String position, String password) {
         StringBuilder query = new StringBuilder();
         query.append(" INSERT INTO technician (firstName, lastName, position, email, password) ");
@@ -90,40 +127,75 @@ public class Technician {
         }
         return "Valid";
     }
-    
-     public static String edit(String firstName, String lastName, String email, String position, String currentPassword, String newPassword) {
-        StringBuilder query = new StringBuilder();
-        query.append(" INSERT INTO technician (firstName, lastName, position, email, password) ");
-        query.append(" VALUES (?, ?, ?, ?, ?)");
 
+    public static String edit(String technicianID, String firstName, String lastName, String email, String position, String currentPassword, String newPassword) {
+        StringBuilder query1 = new StringBuilder();//This command is used when the user wants to keep the password the same
+        query1.append("UPDATE technicians");
+        query1.append("SET firstName = ?, lastName = ?, position = ?, email = ?");
+        query1.append("WHERE technicianID = ?");
         
-        if (firstName.isBlank() || lastName.isBlank() || email.isBlank() || password.isBlank()) {//Checker for when the User leaves a Field blank
+        StringBuilder query2 = new StringBuilder();//This command is used when the user want to change their password
+        query2.append("UPDATE technicians");
+        query2.append("SET firstName = ?, lastName = ?, position = ?, email = ?, password = ?");
+        query2.append("WHERE technicianID = ?"); 
+
+        //Checker for when the User leaves a Field blank
+        //We allow the currentPassword and newPassword field to BOTH be blank, but we do not allow ONLY 1 of them to be blank
+        if (firstName.isBlank() || lastName.isBlank() || email.isBlank()
+                || (currentPassword.isBlank() && !newPassword.isBlank()) || (!currentPassword.isBlank() && newPassword.isBlank())) {
             return "Empty";
         } else if (checkEmailDuplicates(email) == true) {//Checker for email duplicates
             return "Duplicate Email";
-        } else {
+        } else if (currentPassword.isBlank() && newPassword.isBlank()) {
             try {
                 // Establish connection to DB
                 Connection conn = MySQLConnector.connectDB();
 
                 // Prepare SQL statement to be executed
-                PreparedStatement statement = conn.prepareStatement(query.toString());
+                PreparedStatement statement1 = conn.prepareStatement(query1.toString());
 
-                statement.setString(1, firstName);
-                statement.setString(2, lastName);
-                statement.setString(3, position);
-                statement.setString(4, email);
-                statement.setString(5, password);
+                statement1.setString(1, firstName);
+                statement1.setString(2, lastName);
+                statement1.setString(3, position);
+                statement1.setString(4, email);
+                statement1.setString(5, technicianID);
+                
 
-                statement.executeUpdate();
+                statement1.executeUpdate();
 
-                statement.close();
+                statement1.close();
+                conn.close();
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+                return "Invalid";
+            }
+        } else if (checkMatchCurrentPassword(technicianID, currentPassword) == true) {
+            try {
+                // Establish connection to DB
+                Connection conn = MySQLConnector.connectDB();
+
+                // Prepare SQL statement to be executed
+                PreparedStatement statement2 = conn.prepareStatement(query2.toString());
+
+                statement2.setString(1, firstName);
+                statement2.setString(2, lastName);
+                statement2.setString(3, position);
+                statement2.setString(4, email);
+                statement2.setString(5, newPassword);
+                statement2.setString(6, technicianID);
+
+
+                statement2.executeUpdate();
+
+                statement2.close();
                 conn.close();
 
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
                 return "Invalid";
             }
+        } else if (checkMatchCurrentPassword(technicianID, currentPassword) == false){
+            return "Wrong password";
         }
         return "Valid";
     }
@@ -160,9 +232,7 @@ public class Technician {
                 resultTechnician.setLastName(rs.getString("lastName"));
                 resultTechnician.setEmail(rs.getString("email"));
                 resultTechnician.setPosition(rs.getString("position"));
-            } else {//this is the resultTechnician's value when no technician is found
-                resultTechnician.setID("Not found");
-            }
+            } 
 
             //Closing the connections to avoid DB app slow down in performance
             rs.close();

@@ -45,5 +45,10 @@ public class AppController {
         }
         return false;
     }
+    
+//    public static Technician editTechnician(Technician technician) {
+//        
+//        return techni
+//    }
 
 }

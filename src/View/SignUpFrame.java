@@ -20,7 +20,6 @@ public class SignUpFrame extends javax.swing.JFrame {
         this.setResizable(false);
         technicianPositionLabel.setVisible(false);
         technicianPositionComboBox.setVisible(false);
-        //TODO technicianPositionComboBox.addActionListener(this);
     }
 
     /**
@@ -47,10 +46,10 @@ public class SignUpFrame extends javax.swing.JFrame {
         roleComboBox = new javax.swing.JComboBox<>();
         technicianPositionLabel = new javax.swing.JLabel();
         technicianPositionComboBox = new javax.swing.JComboBox<>();
-        jLabel10 = new javax.swing.JLabel();
-        firstNameField1 = new javax.swing.JTextField();
-        jLabel11 = new javax.swing.JLabel();
-        lastNameField1 = new javax.swing.JTextField();
+        firstNameLabel = new javax.swing.JLabel();
+        firstNameField = new javax.swing.JTextField();
+        lastNameLabel = new javax.swing.JLabel();
+        lastNameField = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -95,26 +94,26 @@ public class SignUpFrame extends javax.swing.JFrame {
         jLabel7.setForeground(new java.awt.Color(255, 255, 255));
         jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel7.setText("Sign up as:");
-        mainPanel.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(31, 158, 164, 28));
+        mainPanel.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 160, 164, 28));
 
         jLabel8.setFont(new java.awt.Font("Monospaced", 0, 18)); // NOI18N
         jLabel8.setForeground(new java.awt.Color(255, 255, 255));
         jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel8.setText("Email:");
-        mainPanel.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 270, 150, 28));
+        mainPanel.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 270, 150, 28));
 
         jLabel9.setFont(new java.awt.Font("Monospaced", 0, 18)); // NOI18N
         jLabel9.setForeground(new java.awt.Color(255, 255, 255));
         jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel9.setText("Password:");
-        mainPanel.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 300, 150, 28));
+        mainPanel.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 300, 150, 28));
 
         passwordField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 passwordFieldActionPerformed(evt);
             }
         });
-        mainPanel.add(passwordField, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 300, 256, -1));
+        mainPanel.add(passwordField, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 300, 256, -1));
 
         signUpBtn.setFont(new java.awt.Font("Krungthep", 0, 18)); // NOI18N
         signUpBtn.setText("Sign Up");
@@ -125,8 +124,8 @@ public class SignUpFrame extends javax.swing.JFrame {
                 signUpBtnActionPerformed(evt);
             }
         });
-        mainPanel.add(signUpBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(497, 232, 331, 87));
-        mainPanel.add(emailField, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 270, 256, -1));
+        mainPanel.add(signUpBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 260, 331, 87));
+        mainPanel.add(emailField, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 270, 256, -1));
 
         roleComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Tester", "Technician" }));
         roleComboBox.addActionListener(new java.awt.event.ActionListener() {
@@ -134,13 +133,13 @@ public class SignUpFrame extends javax.swing.JFrame {
                 roleComboBoxActionPerformed(evt);
             }
         });
-        mainPanel.add(roleComboBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(201, 162, 256, -1));
+        mainPanel.add(roleComboBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 160, 256, -1));
 
         technicianPositionLabel.setFont(new java.awt.Font("Monospaced", 0, 18)); // NOI18N
         technicianPositionLabel.setForeground(new java.awt.Color(255, 255, 255));
         technicianPositionLabel.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         technicianPositionLabel.setText("Position:");
-        mainPanel.add(technicianPositionLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 330, 111, 28));
+        mainPanel.add(technicianPositionLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 330, 111, 28));
 
         technicianPositionComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Desktop Support", "Network Admin", "System Admin" }));
         technicianPositionComboBox.addActionListener(new java.awt.event.ActionListener() {
@@ -148,33 +147,33 @@ public class SignUpFrame extends javax.swing.JFrame {
                 technicianPositionComboBoxActionPerformed(evt);
             }
         });
-        mainPanel.add(technicianPositionComboBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 330, 256, -1));
+        mainPanel.add(technicianPositionComboBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 330, 256, -1));
 
-        jLabel10.setFont(new java.awt.Font("Monospaced", 0, 18)); // NOI18N
-        jLabel10.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel10.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel10.setText("First name:");
-        mainPanel.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 190, 132, 28));
+        firstNameLabel.setFont(new java.awt.Font("Monospaced", 0, 18)); // NOI18N
+        firstNameLabel.setForeground(new java.awt.Color(255, 255, 255));
+        firstNameLabel.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        firstNameLabel.setText("First name:");
+        mainPanel.add(firstNameLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 200, 132, 28));
 
-        firstNameField1.addActionListener(new java.awt.event.ActionListener() {
+        firstNameField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                firstNameField1ActionPerformed(evt);
+                firstNameFieldActionPerformed(evt);
             }
         });
-        mainPanel.add(firstNameField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 200, 256, -1));
+        mainPanel.add(firstNameField, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 200, 256, -1));
 
-        jLabel11.setFont(new java.awt.Font("Monospaced", 0, 18)); // NOI18N
-        jLabel11.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel11.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel11.setText("Last name:");
-        mainPanel.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 230, 132, 28));
+        lastNameLabel.setFont(new java.awt.Font("Monospaced", 0, 18)); // NOI18N
+        lastNameLabel.setForeground(new java.awt.Color(255, 255, 255));
+        lastNameLabel.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lastNameLabel.setText("Last name:");
+        mainPanel.add(lastNameLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 240, 132, 28));
 
-        lastNameField1.addActionListener(new java.awt.event.ActionListener() {
+        lastNameField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                lastNameField1ActionPerformed(evt);
+                lastNameFieldActionPerformed(evt);
             }
         });
-        mainPanel.add(lastNameField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 230, 256, -1));
+        mainPanel.add(lastNameField, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 240, 256, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -219,6 +218,7 @@ public class SignUpFrame extends javax.swing.JFrame {
         } else {
             technicianPositionLabel.setVisible(false);
             technicianPositionComboBox.setVisible(false);
+
         }
 
         // Refresh layout (optional but recommended)
@@ -227,17 +227,17 @@ public class SignUpFrame extends javax.swing.JFrame {
 
     }//GEN-LAST:event_roleComboBoxActionPerformed
 
-    private void firstNameField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_firstNameField1ActionPerformed
+    private void firstNameFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_firstNameFieldActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_firstNameField1ActionPerformed
-
-    private void lastNameField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lastNameField1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_lastNameField1ActionPerformed
+    }//GEN-LAST:event_firstNameFieldActionPerformed
 
     private void technicianPositionComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_technicianPositionComboBoxActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_technicianPositionComboBoxActionPerformed
+
+    private void lastNameFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lastNameFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_lastNameFieldActionPerformed
 
     /**
      * @param args the command line arguments
@@ -267,17 +267,17 @@ public class SignUpFrame extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton backBtn;
     private javax.swing.JTextField emailField;
-    private javax.swing.JTextField firstNameField1;
+    private javax.swing.JTextField firstNameField;
+    private javax.swing.JLabel firstNameLabel;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JTextField lastNameField1;
+    private javax.swing.JTextField lastNameField;
+    private javax.swing.JLabel lastNameLabel;
     private javax.swing.JPanel mainPanel;
     private javax.swing.JTextField passwordField;
     private javax.swing.JComboBox<String> roleComboBox;

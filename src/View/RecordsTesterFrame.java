@@ -5,7 +5,8 @@
 package View;
 
 import java.awt.CardLayout;
-
+import java.util.ArrayList;
+import javax.swing.JOptionPane;
 /**
  *
  * @author marcquizon
@@ -630,6 +631,27 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
 
     private void SearchBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SearchBtnActionPerformed
         // TODO add your handling code here:
+        String testerID = searchIDField.getText();
+        
+        // if there's no testerID inputted, it just prompts again
+        if (testerID.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Enter a tester ID to search");
+        }
+        
+        else {
+            // a failsafe action just in case
+            try {
+                
+                // placeholder since need to declare a method in Model for searching database
+                ArrayList<String> matches = Tester.searchTester(testerID);
+               
+                System.out.println("Found " + matches.size() + " matches.");
+            }
+            catch (Exception ex) {
+                System.out.println("Error during search: " + ex.getMessage());
+            }
+        }
+
     }//GEN-LAST:event_SearchBtnActionPerformed
 
     private void actionComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionComboBoxActionPerformed
@@ -671,6 +693,48 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
 
     private void addtesterBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addtesterBtnActionPerformed
         // TODO add your handling code here:
+        String firstName = addFirstNameField.getText();
+        String lastName = addLastNameField.getText();
+        String email = addEmailField.getText();
+        String password = addPasswordField.getText();
+        
+        // if there's no testerID inputted, it just prompts again
+        if (firstName.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "missing first Name; input one first");
+        }
+        else if (lastName.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "missing last Name; input one first");
+        }
+        else if (email.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "missing email; input one first");
+        }
+        else if (password.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "missing password; input one first");
+        }
+        else {
+            // a failsafe action just in case
+            try {
+                
+               boolean success = Tester.addTester(firstName, lastName, email, password);
+               
+               if (success) {
+                   JOptionPane.showMessageDialog(this, "Tester added successfully!");
+                   
+                   // clears the fields again
+                   addFirstNameField.setText("");
+                   addLastNameField.setText("");
+                   addEmailField.setText("");
+                   addPasswordField.setText("");
+               }
+               else {
+                   JOptionPane.showMessageDialog(this, "Failed to add tester.");
+               }
+            }
+            catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
+            }
+        }
+
     }//GEN-LAST:event_addtesterBtnActionPerformed
 
     private void editFirstNameFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editFirstNameFieldActionPerformed
@@ -687,6 +751,23 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
 
     private void editConfirmBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editConfirmBtnActionPerformed
         // TODO add your handling code here:
+        String testerID = editTesterIDField.getText();
+        String firstName = editFirstNameField.getText();
+        String lastName = editLastNameField.getText();
+        String email = editEmailField.getText();
+        String password = editPasswordField.getText();
+        
+        Tester tester = new Tester();
+        
+        boolean success = tester.updateTester(testerID, firstName, lastName, email, password);
+        
+        if (success) {
+            JOptionPane.showMessageDialog(this, "Tester updated successfully!");
+        }
+        else {
+            JOptionPane.showMessageDialog(this, "Failed to update Tester info");
+        }
+
     }//GEN-LAST:event_editConfirmBtnActionPerformed
 
     private void addUsernameField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addUsernameField1ActionPerformed
@@ -711,6 +792,29 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
 
     private void deleteTesterBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteTesterBtnActionPerformed
         // TODO add your handling code here:
+        // loop through the array of a specific user input, then delete
+        String testerID = deleteUserIDField.getText();
+        
+        if (testerID.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Enter a tester ID to delete");
+        }
+        else {
+            try {
+                // Need to code Tester Model Class to complete
+                boolean success = Tester.deleteTester(testerID);
+                
+                if (success) {
+                    JOptionPane.showMessageDialog(this, "Tester Deleted");
+                }
+                else {
+                    JOptionPane.showMessageDialog(this, "Tester not found.");
+                }
+            }
+            catch (Exception Ex) {
+                System.out.println("Error: " + Ex.getMessage());
+            }
+        }
+
     }//GEN-LAST:event_deleteTesterBtnActionPerformed
 
     private void editPasswordFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editPasswordFieldActionPerformed
@@ -723,6 +827,40 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
 
     private void editEnterBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editEnterBtnActionPerformed
         // TODO add your handling code here:
+         String testerID = editTesterIDField.getText();
+        
+        if (testerID.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Enter tester ID");
+            
+        }
+        else {
+            try {
+                Tester tester = Tester.getTesterByID(testerID);
+                
+                if (tester != null) {
+                    // populates the input boxes of the default info
+                    editFirstNameField.setText(tester.getFirstName());
+                    editLastNameField.setText(tester.getLastName());
+                    editEmailField.setText(tester.getEmail());
+                    editPasswordField.setText(tester.getPassword());
+
+                    // lets the user edit the provided input boxes
+                    editFirstNameField.setEnabled(true);
+                    editLastNameField.setEnabled(true);
+                    editEmailField.setEnabled(true);
+                    editPasswordField.setEnabled(true);
+                    editConfirmBtn.setEnabled(true);
+                }
+                else {
+                    JOptionPane.showMessageDialog(this, "Tester ID not found");
+                }
+            }
+            catch (Exception Ex) {
+                JOptionPane.showMessageDialog(this, "Database error: " + Ex.getMessage());
+            }
+            
+        }
+
     }//GEN-LAST:event_editEnterBtnActionPerformed
 
     private void addLastNameFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addLastNameFieldActionPerformed

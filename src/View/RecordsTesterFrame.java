@@ -793,27 +793,7 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
     private void deleteTesterBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteTesterBtnActionPerformed
         // TODO add your handling code here:
         // loop through the array of a specific user input, then delete
-        String testerID = deleteUserIDField.getText();
         
-        if (testerID.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Enter a tester ID to delete");
-        }
-        else {
-            try {
-                // Need to code Tester Model Class to complete
-                boolean success = Tester.deleteTester(testerID);
-                
-                if (success) {
-                    JOptionPane.showMessageDialog(this, "Tester Deleted");
-                }
-                else {
-                    JOptionPane.showMessageDialog(this, "Tester not found.");
-                }
-            }
-            catch (Exception Ex) {
-                System.out.println("Error: " + Ex.getMessage());
-            }
-        }
 
     }//GEN-LAST:event_deleteTesterBtnActionPerformed
 
@@ -827,7 +807,7 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
 
     private void editEnterBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editEnterBtnActionPerformed
         // TODO add your handling code here:
-         String testerID = editTesterIDField.getText();
+        String testerID = editTesterIDField.getText();
         
         if (testerID.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Enter tester ID");

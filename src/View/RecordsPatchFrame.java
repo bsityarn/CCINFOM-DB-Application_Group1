@@ -75,7 +75,9 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
         editTechnicianIDField = new javax.swing.JTextField();
         jLabel18 = new javax.swing.JLabel();
         editDescriptionField = new javax.swing.JTextField();
-        editPatchTypeComboBox = new javax.swing.JComboBox<>();
+        patchStatusField = new javax.swing.JComboBox<>();
+        jLabel19 = new javax.swing.JLabel();
+        editPatchTypeComboBox1 = new javax.swing.JComboBox<>();
         jLabel5 = new javax.swing.JLabel();
 
         plainPanel.setBackground(new java.awt.Color(40, 48, 143));
@@ -307,33 +309,39 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
         mainPanel.add(deletePanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 380, 830, -1));
 
         editPanel.setBackground(new java.awt.Color(40, 48, 143));
+        editPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel8.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
         jLabel8.setForeground(new java.awt.Color(255, 255, 255));
         jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel8.setText("Patch Name:");
+        editPanel.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(29, 40, -1, 28));
 
         jLabel9.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
         jLabel9.setForeground(new java.awt.Color(255, 255, 255));
         jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel9.setText("SoftwareID:");
+        jLabel9.setText("Status:");
+        editPanel.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 140, -1, 28));
 
         jLabel10.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
         jLabel10.setForeground(new java.awt.Color(255, 255, 255));
         jLabel10.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel10.setText("Type:");
+        editPanel.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(45, 81, 72, 28));
 
         editPatchNameField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 editPatchNameFieldActionPerformed(evt);
             }
         });
+        editPanel.add(editPatchNameField, new org.netbeans.lib.awtextra.AbsoluteConstraints(123, 43, 171, -1));
 
         editSoftwareIDField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 editSoftwareIDFieldActionPerformed(evt);
             }
         });
+        editPanel.add(editSoftwareIDField, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 110, 171, -1));
 
         editConfirmBtn.setFont(new java.awt.Font("Krungthep", 0, 18)); // NOI18N
         editConfirmBtn.setText("Confirm edits");
@@ -344,28 +352,33 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
                 editConfirmBtnActionPerformed(evt);
             }
         });
+        editPanel.add(editConfirmBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(629, 6, -1, 158));
 
         jLabel15.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
         jLabel15.setForeground(new java.awt.Color(255, 255, 255));
         jLabel15.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel15.setText("MachineID:");
+        editPanel.add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(312, 40, 113, 28));
 
         editMachineIDField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 editMachineIDFieldActionPerformed(evt);
             }
         });
+        editPanel.add(editMachineIDField, new org.netbeans.lib.awtextra.AbsoluteConstraints(431, 43, 171, -1));
 
         jLabel16.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
         jLabel16.setForeground(new java.awt.Color(255, 255, 255));
         jLabel16.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel16.setText("PatchID");
+        editPanel.add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(61, 6, -1, 28));
 
         editPatchIDField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 editPatchIDFieldActionPerformed(evt);
             }
         });
+        editPanel.add(editPatchIDField, new org.netbeans.lib.awtextra.AbsoluteConstraints(123, 9, 171, -1));
 
         editEnterBtn.setFont(new java.awt.Font("Krungthep", 0, 12)); // NOI18N
         editEnterBtn.setText("enter");
@@ -376,117 +389,55 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
                 editEnterBtnActionPerformed(evt);
             }
         });
+        editPanel.add(editEnterBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(306, 9, -1, -1));
 
         jLabel17.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
         jLabel17.setForeground(new java.awt.Color(255, 255, 255));
         jLabel17.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel17.setText("TechnicianID:");
+        editPanel.add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(312, 74, 113, 28));
 
         editTechnicianIDField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 editTechnicianIDFieldActionPerformed(evt);
             }
         });
+        editPanel.add(editTechnicianIDField, new org.netbeans.lib.awtextra.AbsoluteConstraints(431, 77, 171, -1));
 
         jLabel18.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
         jLabel18.setForeground(new java.awt.Color(255, 255, 255));
         jLabel18.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel18.setText("Description:");
+        editPanel.add(jLabel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(312, 108, 113, 28));
 
         editDescriptionField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 editDescriptionFieldActionPerformed(evt);
             }
         });
+        editPanel.add(editDescriptionField, new org.netbeans.lib.awtextra.AbsoluteConstraints(431, 111, 171, -1));
 
-        editPatchTypeComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Application", "System", "Programming", "Network", "Server" }));
-        editPatchTypeComboBox.addActionListener(new java.awt.event.ActionListener() {
+        patchStatusField.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Working", "Not Working" }));
+        patchStatusField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                editPatchTypeComboBoxActionPerformed(evt);
+                patchStatusFieldActionPerformed(evt);
             }
         });
+        editPanel.add(patchStatusField, new org.netbeans.lib.awtextra.AbsoluteConstraints(123, 144, 171, -1));
 
-        javax.swing.GroupLayout editPanelLayout = new javax.swing.GroupLayout(editPanel);
-        editPanel.setLayout(editPanelLayout);
-        editPanelLayout.setHorizontalGroup(
-            editPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(editPanelLayout.createSequentialGroup()
-                .addGap(29, 29, 29)
-                .addGroup(editPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel16)
-                    .addComponent(jLabel8)
-                    .addComponent(jLabel9)
-                    .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(editPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(editPanelLayout.createSequentialGroup()
-                        .addGroup(editPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(editSoftwareIDField, javax.swing.GroupLayout.DEFAULT_SIZE, 171, Short.MAX_VALUE)
-                            .addComponent(editPatchNameField, javax.swing.GroupLayout.DEFAULT_SIZE, 171, Short.MAX_VALUE)
-                            .addComponent(editPatchTypeComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(18, 18, 18)
-                        .addGroup(editPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(editPanelLayout.createSequentialGroup()
-                                .addComponent(jLabel15, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(editMachineIDField, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(editPanelLayout.createSequentialGroup()
-                                .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(editTechnicianIDField, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(editPanelLayout.createSequentialGroup()
-                                .addComponent(jLabel18, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(editDescriptionField, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(27, 27, 27)
-                        .addComponent(editConfirmBtn)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(editPanelLayout.createSequentialGroup()
-                        .addComponent(editPatchIDField, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(editEnterBtn)
-                        .addContainerGap(452, Short.MAX_VALUE))))
-        );
-        editPanelLayout.setVerticalGroup(
-            editPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, editPanelLayout.createSequentialGroup()
-                .addContainerGap(34, Short.MAX_VALUE)
-                .addGroup(editPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(editPatchIDField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(editEnterBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(editPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(editPanelLayout.createSequentialGroup()
-                        .addGroup(editPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(editPatchNameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel15, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(editMachineIDField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGroup(editPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(editPanelLayout.createSequentialGroup()
-                                .addGap(13, 13, 13)
-                                .addGroup(editPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(editPatchTypeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(editPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(editSoftwareIDField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addGroup(editPanelLayout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(editPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(editTechnicianIDField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(editPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabel18, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(editDescriptionField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addGap(18, 18, 18))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, editPanelLayout.createSequentialGroup()
-                        .addComponent(editConfirmBtn, javax.swing.GroupLayout.DEFAULT_SIZE, 96, Short.MAX_VALUE)
-                        .addGap(26, 26, 26))))
-        );
+        jLabel19.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
+        jLabel19.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel19.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel19.setText("SoftwareID:");
+        editPanel.add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 110, -1, 28));
+
+        editPatchTypeComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Application", "System", "Programming", "Network", "Server" }));
+        editPatchTypeComboBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editPatchTypeComboBox1ActionPerformed(evt);
+            }
+        });
+        editPanel.add(editPatchTypeComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 80, 171, -1));
 
         mainPanel.add(editPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 380, 830, -1));
 
@@ -597,9 +548,13 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_editDescriptionFieldActionPerformed
 
-    private void editPatchTypeComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editPatchTypeComboBoxActionPerformed
+    private void patchStatusFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_patchStatusFieldActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_editPatchTypeComboBoxActionPerformed
+    }//GEN-LAST:event_patchStatusFieldActionPerformed
+
+    private void editPatchTypeComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editPatchTypeComboBox1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_editPatchTypeComboBox1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -644,7 +599,7 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
     private javax.swing.JPanel editPanel;
     private javax.swing.JTextField editPatchIDField;
     private javax.swing.JTextField editPatchNameField;
-    private javax.swing.JComboBox<String> editPatchTypeComboBox;
+    private javax.swing.JComboBox<String> editPatchTypeComboBox1;
     private javax.swing.JTextField editSoftwareIDField;
     private javax.swing.JTextField editTechnicianIDField;
     private javax.swing.JLabel jLabel1;
@@ -657,6 +612,7 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel18;
+    private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -667,6 +623,7 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTable jTable1;
     private javax.swing.JPanel mainPanel;
+    private javax.swing.JComboBox<String> patchStatusField;
     private javax.swing.JPanel plainPanel;
     private javax.swing.JLabel resultsLbl;
     private javax.swing.JTextField searchIDField;

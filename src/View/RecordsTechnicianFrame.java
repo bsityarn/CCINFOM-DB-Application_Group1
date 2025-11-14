@@ -5,6 +5,9 @@
 package View;
 
 import javax.swing.JLayeredPane;
+import Controller.*;
+import Model.Technician;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -574,6 +577,8 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
 
     private void SearchBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SearchBtnActionPerformed
         // TODO add your handling code here:
+        String technicianID = searchIDField.getText();
+
     }//GEN-LAST:event_SearchBtnActionPerformed
 
     private void actionComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionComboBoxActionPerformed
@@ -604,6 +609,18 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
 
     private void deleteTechnicianBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteTechnicianBtnActionPerformed
         // TODO add your handling code here:
+        String technicianID = deleteTechnicianIDField.getText();
+
+        if (Technician.delete(technicianID) == "Valid") {
+            deleteTechnicianIDField.setText("");
+            JOptionPane.showMessageDialog(this, "Technician deleted successfully!", "Deleted Technician", JOptionPane.INFORMATION_MESSAGE);
+        } else if (Technician.delete(technicianID) == "Empty") {
+            JOptionPane.showMessageDialog(this, "Please fill in the information", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (Technician.delete(technicianID) == "Missing") {
+            JOptionPane.showMessageDialog(this, "Technician does not exist", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (Technician.delete(technicianID) == "Invalid") {
+            JOptionPane.showMessageDialog(this, "Invalid information", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_deleteTechnicianBtnActionPerformed
 
     private void addFirstNameFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addFirstNameFieldActionPerformed
@@ -620,6 +637,29 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
 
     private void addTechnicianBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addTechnicianBtnActionPerformed
         // TODO add your handling code here:
+        String firstName = addFirstNameField.getText();
+        String lastName = addLastNameField.getText();
+        String email = addEmailField.getText();
+        String position = (String) addTechnicianPositionComboBox.getSelectedItem();
+        String password = addPasswordField.getText();
+
+        if (Technician.add(firstName, lastName, email, position, password) == "Valid") {
+            //Makes the textfields blank again
+            addFirstNameField.setText("");
+            addLastNameField.setText("");
+            addEmailField.setText("");
+            addTechnicianPositionComboBox.setSelectedItem(1);
+            addPasswordField.setText("");
+
+            JOptionPane.showMessageDialog(this, "Technician added successfully!", "Added Technician", JOptionPane.INFORMATION_MESSAGE);
+            System.out.println("ADD: Technician " + firstName + " " + lastName + "added");
+        } else if (Technician.add(firstName, lastName, email, position, password) == "Empty") {
+            //This is an error when the User leaves a certain field blank
+            JOptionPane.showMessageDialog(this, "Please fill in the information", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (Technician.add(firstName, lastName, email, position, password) == "Duplicate Email") {
+            //This is an error when the User inputs a duplicate email
+            JOptionPane.showMessageDialog(this, "Duplicate email found, please change", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_addTechnicianBtnActionPerformed
 
     private void addPasswordFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addPasswordFieldActionPerformed
@@ -644,6 +684,37 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
 
     private void editConfirmBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editConfirmBtnActionPerformed
         // TODO add your handling code here:
+        String technicianID = editTechnicianIDField.getText();
+        String firstName = editFirstNameField.getText();
+        String lastName = editLastNameField.getText();
+        String email = editEmailField.getText();
+        String position = (String) editTechnicianPositionComboBox.getSelectedItem();
+        String currentPassword = oldPasswordField.getText();
+        String newPassword = editPasswordField.getText();
+
+        if (Technician.edit(technicianID, firstName, lastName, email, position, currentPassword, newPassword) == "Valid") {
+            //Makes the textfields blank again
+            editTechnicianIDField.setText("");
+            editFirstNameField.setText("");
+            editLastNameField.setText("");
+            editEmailField.setText("");
+            editTechnicianPositionComboBox.setSelectedItem(1);
+            oldPasswordField.setText("");
+            editPasswordField.setText("");
+            
+            JOptionPane.showMessageDialog(this, "Technician edited successfully!", "Edited Technician", JOptionPane.INFORMATION_MESSAGE);
+            System.out.println("EDIT: Technician " + firstName + " " + lastName + "edited");
+        } else if (Technician.edit(technicianID, firstName, lastName, email, position, currentPassword, newPassword) == "Empty") {
+            //This is an error when the User leaves a certain field blank
+            JOptionPane.showMessageDialog(this, "Please fill in the information", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (Technician.edit(technicianID, firstName, lastName, email, position, currentPassword, newPassword) == "Duplicate Email") {
+            //This is an error when the User inputs a duplicate email
+            JOptionPane.showMessageDialog(this, "Duplicate email found, please change", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (Technician.edit(technicianID, firstName, lastName, email, position, currentPassword, newPassword) == "Wrong password") {
+            //This is an error when the User wanted to change the password, but inputted the wrong old password
+            oldPasswordField.setText("");
+            JOptionPane.showMessageDialog(this, "Wrong password", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_editConfirmBtnActionPerformed
 
     private void oldPasswordFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_oldPasswordFieldActionPerformed
@@ -664,6 +735,25 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
 
     private void editEnterBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editEnterBtnActionPerformed
         // TODO add your handling code here:
+        // This function will fill up the text fields with the current Info depending on the technician ID inputted
+        String technicianID = editTechnicianIDField.getText();
+        Technician technician = new Technician();
+        technician = Technician.getInfo(technicianID);
+
+        if (technician.getTechnicianID() != null) {
+            Technician currentInfo = new Technician(); //Initialize a currentInfo Technician variable
+            currentInfo = Technician.getInfo(technicianID); //Gets the information from the getInfo function
+            editFirstNameField.setText(currentInfo.getFirstName());
+            editLastNameField.setText(currentInfo.getLastName());
+            editEmailField.setText(currentInfo.getEmail());
+            editTechnicianPositionComboBox.setSelectedItem(currentInfo.getPosition());
+            System.out.println("EDIT: Technician ID " + currentInfo.getTechnicianID() + " current info retrieved");
+        } else {
+            JOptionPane.showMessageDialog(this, "Technician ID not found", "Error", JOptionPane.ERROR_MESSAGE);
+            System.out.println("EDIT: Technician ID " + technicianID + " does not exist");
+
+        }
+
     }//GEN-LAST:event_editEnterBtnActionPerformed
 
     /**

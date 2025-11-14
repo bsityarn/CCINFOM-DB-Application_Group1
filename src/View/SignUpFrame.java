@@ -195,7 +195,6 @@ public class SignUpFrame extends javax.swing.JFrame {
             LoginFrame loginFrame = new LoginFrame();
             loginFrame.setVisible(true);
             this.dispose();
-
         }
 
     }//GEN-LAST:event_backBtnActionPerformed

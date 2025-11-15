@@ -25,7 +25,7 @@ public class AppController {
     }
 
     public static boolean loginTechnician(String idnumber, char[] password) {
-        if (false) {//TODO create function under MODEL to check if a Technician exists
+        if (true) {//TODO create function under MODEL to check if a Technician exists
             MenuTechnicianFrame menuTechnician = new MenuTechnicianFrame(idnumber);
             menuTechnician.setVisible(true);
             System.out.println("Technician ID " + idnumber + " Logged in");
@@ -36,7 +36,7 @@ public class AppController {
     }
 
     public static boolean loginTester(String idnumber, char[] password) {
-        if (true) {//TODO create function under MODEL to check if a Tester exists
+        if (false) {//TODO create function under MODEL to check if a Tester exists
             MenuTesterFrame menuUser = new MenuTesterFrame(idnumber);
             menuUser.setVisible(true);
             System.out.println("Tester ID " + idnumber + " Logged in");

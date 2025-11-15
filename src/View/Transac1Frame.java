@@ -4,6 +4,7 @@
  */
 package View;
 
+import javax.swing.JOptionPane;
 /**
  *
  * @author marcquizon
@@ -96,6 +97,12 @@ public class Transac1Frame extends javax.swing.JFrame {
         jLabel7.setForeground(new java.awt.Color(255, 255, 255));
         jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel7.setText("Patch Name:");
+
+        patchNameField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                patchNameFieldActionPerformed(evt);
+            }
+        });
 
         softwareIDField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -269,11 +276,66 @@ public class Transac1Frame extends javax.swing.JFrame {
 
     private void releaseBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_releaseBtnActionPerformed
         // TODO add your handling code here:
+        String patchName = patchNameField.getText();
+        String patchType = (String) patchTypeComboBox.getSelectedItem();
+        String softwareID = softwareIDField.getText();
+        String machineID = machineIDField.getText();
+        String technicianID = technicianIDField.getText();
+        String description = descriptionField.getText();
+        
+        // if there's no testerID inputted, it just prompts again
+        if (patchName.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "missing patch Name; input one first");
+        }
+        else if (patchType.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "unfilled patch Type; input one first");
+        }
+        else if (softwareID.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "missing software ID; input one first");
+        }
+        else if (machineID.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "missing machine ID; input one first");
+        }
+        else if (technicianID.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "missing technician ID; input one first");
+        }
+        else if (description.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "missing description; input one first");
+        }
+        else {
+            // a failsafe action just in case
+            try {
+                
+               boolean success = Tester.releasePatch(patchName, patchType, softwareID, machineID, technicianID, description);
+               
+               if (success) {
+                   JOptionPane.showMessageDialog(this, "Patch has been released successfully!");
+                   
+                   // clears the fields again
+                   patchNameField.setText("");
+                   patchTypeComboBox.setSelectedIndex(0);
+                   softwareIDField.setText("");
+                   machineIDField.setText("");
+                   technicianIDField.setText("");
+                   descriptionField.setText("");
+               }
+               else {
+                   JOptionPane.showMessageDialog(this, "Failed to release patch.");
+               }
+            }
+            catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
+            }
+        }
     }//GEN-LAST:event_releaseBtnActionPerformed
 
     private void patchTypeComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_patchTypeComboBoxActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_patchTypeComboBoxActionPerformed
+
+    private void patchNameFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_patchNameFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_patchNameFieldActionPerformed
 
     /**
      * @param args the command line arguments

@@ -5,7 +5,8 @@
 package View;
 
 import java.awt.CardLayout;
-
+import java.util.ArrayList;
+import javax.swing.JOptionPane;
 /**
  *
  * @author marcquizon
@@ -472,6 +473,26 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
 
     private void SearchBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SearchBtnActionPerformed
         // TODO add your handling code here:
+        String patchID = searchIDField.getText();
+        
+        // if there's no testerID inputted, it just prompts again
+        if (patchID.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Enter a tester ID to search");
+        }
+        
+        else {
+            // a failsafe action just in case
+            try {
+                
+                // placeholder since need to declare a method in Model for searching database
+                ArrayList<String> matches = Tester.searchTester(patchID);
+               
+                System.out.println("Found " + matches.size() + " matches.");
+            }
+            catch (Exception ex) {
+                System.out.println("Error during search: " + ex.getMessage());
+            }
+        }
     }//GEN-LAST:event_SearchBtnActionPerformed
 
     private void actionComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionComboBoxActionPerformed
@@ -502,6 +523,31 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
 
     private void editConfirmBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editConfirmBtnActionPerformed
         // TODO add your handling code here:
+        String patchID = editPatchIDField.getText();
+        String technicianID = editTechnicianIDField.getText();
+        String machineID = editMachineIDField.getText();
+        String description = editDescriptionField.getText();
+        String patchName = editPatchNameField.getText();
+        String patchStatus = (String) patchStatusField.getSelectedItem();
+        String patchType = (String) editPatchTypeComboBox1.getSelectedItem();
+        
+        Tester tester = new Tester();
+        
+        int result = tester.updatePatch(patchID, technicianID, machineID, description, patchName, patchStatus, patchType);
+        
+        if (result == 0) {
+            JOptionPane.showMessageDialog(this, "patch info updated successfully!");
+        }
+        else if (result == 1) {
+            JOptionPane.showMessageDialog(this, "Update failed: Duplicate patch name for the same machine.");
+        }
+        else if (result == 2) {
+            JOptionPane.showMessageDialog(this, "Update failed: missing info, fill in all the necessary data.");
+        }
+        else {
+            JOptionPane.showMessageDialog(this, "Failed to update patch info");
+        }
+
     }//GEN-LAST:event_editConfirmBtnActionPerformed
 
     private void addUsernameField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addUsernameField1ActionPerformed
@@ -526,6 +572,27 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
 
     private void deletePatchBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deletePatchBtnActionPerformed
         // TODO add your handling code here:
+        String patchID = deletePatchIDField.getText();
+        
+        if (patchID.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Enter a tester ID to delete");
+        }
+        else {
+            try {
+                // Need to code Tester Model Class to complete
+                boolean success = Tester.deletePatch(patchID);
+                
+                if (success) {
+                    JOptionPane.showMessageDialog(this, "Tester Deleted");
+                }
+                else {
+                    JOptionPane.showMessageDialog(this, "Tester not found.");
+                }
+            }
+            catch (Exception Ex) {
+                System.out.println("Error: " + Ex.getMessage());
+            }
+        }
     }//GEN-LAST:event_deletePatchBtnActionPerformed
 
     private void editMachineIDFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editMachineIDFieldActionPerformed
@@ -538,6 +605,47 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
 
     private void editEnterBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editEnterBtnActionPerformed
         // TODO add your handling code here:
+        String patchID = editPatchIDField.getText();
+        
+        if (patchID.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Enter Patch ID");
+            
+        }
+        else {
+            try {
+                Tester tester = Tester.getPatchByID(patchID);
+                
+                if (tester != null) {
+                    // populates the input boxes of the default info
+                    editTechnicianIDField.setText(tester.getTechnicianID());
+                    editDescriptionField.setText(tester.getDescription());
+                    editMachineIDField.setText(tester.getMachineID());
+                    editPatchNameField.setText(tester.getPatchName());
+                    editSoftwareIDField.setText(tester.getSoftwareID());
+                    
+                    patchStatusField.setSelectedItem(tester.getStatus()); 
+                    editPatchTypeComboBox1.setSelectedItem(tester.getType());
+                    
+
+                    // lets the user edit the provided input boxes
+                    editTechnicianIDField.setEnabled(true);
+                    editDescriptionField.setEnabled(true);
+                    editMachineIDField.setEnabled(true);
+                    editPatchNameField.setEnabled(true);
+                    editSoftwareIDField.setEnabled(true);
+                    patchStatusField.setEnabled(true);
+                    editPatchTypeComboBox1.setEnabled(true);
+                    editConfirmBtn.setEnabled(true);
+                }
+                else {
+                    JOptionPane.showMessageDialog(this, "Patch ID not found");
+                }
+            }
+            catch (Exception Ex) {
+                JOptionPane.showMessageDialog(this, "Database error: " + Ex.getMessage());
+            }
+            
+        }
     }//GEN-LAST:event_editEnterBtnActionPerformed
 
     private void editTechnicianIDFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editTechnicianIDFieldActionPerformed

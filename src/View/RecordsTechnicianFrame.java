@@ -656,7 +656,7 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
         String firstName = addFirstNameField.getText();
         String lastName = addLastNameField.getText();
-        String email = addEmailField.getText();
+        String email = addEmailField.getText() + emailSuffixLabel.getText();
         String position = (String) addTechnicianPositionComboBox.getSelectedItem();
         String password = addPasswordField.getText();
 
@@ -704,7 +704,7 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
         String technicianID = editTechnicianIDField.getText();
         String firstName = editFirstNameField.getText();
         String lastName = editLastNameField.getText();
-        String email = editEmailField.getText();
+        String email = editEmailField.getText() + emailSuffixLabel.getText();
         String position = (String) editTechnicianPositionComboBox.getSelectedItem();
         String currentPassword = oldPasswordField.getText();
         String newPassword = editPasswordField.getText();

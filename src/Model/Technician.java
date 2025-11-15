@@ -93,8 +93,8 @@ public class Technician {
 
     public static String add(String firstName, String lastName, String email, String position, String password) {
         StringBuilder query = new StringBuilder();
-        query.append(" INSERT INTO technician (firstName, lastName, position, email, password) ");
-        query.append(" VALUES (?, ?, ?, ?, ?)");
+        query.append(" INSERT INTO technician (technicianID, firstName, lastName, position, email, password) ");
+        query.append(" VALUES (?, ?, ?, ?, ?, ?)");
 
         //TODO - Check for email duplicates
         if (firstName.isBlank() || lastName.isBlank() || email.isBlank() || password.isBlank()) {//Checker for when the User leaves a Field blank
@@ -109,11 +109,13 @@ public class Technician {
                 // Prepare SQL statement to be executed
                 PreparedStatement statement = conn.prepareStatement(query.toString());
 
-                statement.setString(1, firstName);
-                statement.setString(2, lastName);
-                statement.setString(3, position);
-                statement.setString(4, email);
-                statement.setString(5, password);
+                String incrementedID = HelperFunctions.incrementID("technicians");
+                statement.setString(1, incrementedID);
+                statement.setString(2, firstName);
+                statement.setString(3, lastName);
+                statement.setString(4, position);
+                statement.setString(5, email);
+                statement.setString(6, password);
 
                 statement.executeUpdate();
 
@@ -133,11 +135,11 @@ public class Technician {
         query1.append("UPDATE technicians");
         query1.append("SET firstName = ?, lastName = ?, position = ?, email = ?");
         query1.append("WHERE technicianID = ?");
-        
+
         StringBuilder query2 = new StringBuilder();//This command is used when the user want to change their password
         query2.append("UPDATE technicians");
         query2.append("SET firstName = ?, lastName = ?, position = ?, email = ?, password = ?");
-        query2.append("WHERE technicianID = ?"); 
+        query2.append("WHERE technicianID = ?");
 
         //Checker for when the User leaves a Field blank
         //We allow the currentPassword and newPassword field to BOTH be blank, but we do not allow ONLY 1 of them to be blank
@@ -159,7 +161,6 @@ public class Technician {
                 statement1.setString(3, position);
                 statement1.setString(4, email);
                 statement1.setString(5, technicianID);
-                
 
                 statement1.executeUpdate();
 
@@ -184,7 +185,6 @@ public class Technician {
                 statement2.setString(5, newPassword);
                 statement2.setString(6, technicianID);
 
-
                 statement2.executeUpdate();
 
                 statement2.close();
@@ -194,7 +194,7 @@ public class Technician {
                 System.out.println(ex.getMessage());
                 return "Invalid";
             }
-        } else if (checkMatchCurrentPassword(technicianID, currentPassword) == false){
+        } else if (checkMatchCurrentPassword(technicianID, currentPassword) == false) {
             return "Wrong password";
         }
         return "Valid";
@@ -204,9 +204,10 @@ public class Technician {
         StringBuilder query = new StringBuilder();
         query.append(" DELETE FROM technicians               ");
         query.append(" WHERE   technicianID = ? ");
+        String result = "Invalid";
 
         if (technicianID.isBlank()) {
-            return "Empty";
+            result = "Empty";
         } else {
             try {
                 // Establish connection to DB
@@ -217,17 +218,23 @@ public class Technician {
 
                 statement.setString(1, technicianID);
 
-                statement.executeUpdate();
-//TODO add code logic for checking if a technician exists
+                ResultSet rs = statement.executeQuery();
+
+                if (rs.next() == false) {
+                    result = "Missing";
+                } else if (rs.next() == true) {
+                    result = "Valid";
+                }
+                rs.close();
                 statement.close();
                 conn.close();
 
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
-                return "Invalid";
+                result = "Invalid";
             }
         }
-        return "Valid";
+        return result;
     }
 
     public static Technician getInfo(String technicianID) {
@@ -254,7 +261,7 @@ public class Technician {
                 resultTechnician.setLastName(rs.getString("lastName"));
                 resultTechnician.setEmail(rs.getString("email"));
                 resultTechnician.setPosition(rs.getString("position"));
-            } 
+            }
 
             //Closing the connections to avoid DB app slow down in performance
             rs.close();
@@ -265,8 +272,6 @@ public class Technician {
             System.out.println(ex.getMessage());
         }
 
-        //TODO: Code logic for retrieving a record
-        //TODO: Code setting of attributes for technician to be returned
         return resultTechnician;
     }
 

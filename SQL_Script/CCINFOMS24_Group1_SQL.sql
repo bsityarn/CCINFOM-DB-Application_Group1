@@ -6,7 +6,7 @@
  * Author:  marcquizon
  * Created: Nov 15, 2025
  */
-CREATE DATABASE IF NOT EXISTS CCINFOMS24_GROUP1_DB;
+-- CREATE DATABASE IF NOT EXISTS CCINFOMS24_GROUP1_DB;
 DROP TABLE IF EXISTS technicians;
 DROP TABLE IF EXISTS machines;
 DROP TABLE IF EXISTS software;
@@ -75,7 +75,7 @@ CREATE TABLE patch (
     machineID VARCHAR(6) NOT NULL,
     technicianID VARCHAR(6) NOT NULL,
 
-    FOREIGN KEY (machineID) REFERENCES machine(machineID),
+    FOREIGN KEY (machineID) REFERENCES machines(machineID),
     FOREIGN KEY (softwareID) REFERENCES software(softwareID),
     FOREIGN KEY (technicianID) REFERENCES technicians(technicianID)
 );
@@ -98,9 +98,9 @@ CREATE TABLE maintenance(
     
 
 CREATE TABLE feedback (
-    feedbackID INT PRIMARY KEY AUTO_INCREMENT,
+    feedbackID VARCHAR(6) NOT NULL UNIQUE PRIMARY KEY,
     testerID VARCHAR(6) NOT NULL,
-    patchID INT NOT NULL,
+    patchID VARCHAR(6) NOT NULL,
     description VARCHAR(255) NOT NULL,
     rating int NOT NULL,
 

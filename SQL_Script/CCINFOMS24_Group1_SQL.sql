@@ -25,6 +25,20 @@ CREATE TABLE technicians(
     password VARCHAR(50) NOT NULL,
     status ENUM('Available', 'Unavailable') DEFAULT 'Available' NOT NULL
     );
+
+INSERT INTO technicians (technicianID, firstName, lastName, email, position, password, status)
+VALUES
+('TH1000', 'James', 'Santos', 'jsantos@ptrackerdb', 'Desktop Support', 'pass123', 'Available'),
+('TH1001', 'Maria', 'Reyes', 'mreyes@ptrackerdb', 'System Admin', 'pass123', 'Available'),
+('TH1002', 'John', 'Cruz', 'jcruz@ptrackerdb', 'Network Admin', 'pass123', 'Available'),
+('TH1003', 'Angela', 'DelaCruz', 'adelacruz@ptrackerdb', 'Desktop Support', 'pass123', 'Available'),
+('TH1004', 'Robert', 'Garcia', 'rgarcia@ptrackerdb', 'System Admin', 'pass123', 'Available'),
+('TH1005', 'Carla', 'Mendoza', 'cmendoza@ptrackerdb', 'Network Admin', 'pass123', 'Available'),
+('TH1006', 'Joseph', 'Villanueva', 'jvillanueva@ptrackerdb', 'Desktop Support', 'pass123', 'Available'),
+('TH1007', 'Patricia', 'Torres', 'ptorres@ptrackerdb', 'System Admin', 'pass123', 'Available'),
+('TH1008', 'Daniel', 'Lopez', 'dlopez@ptrackerdb', 'Network Admin', 'pass123', 'Available'),
+('TH1009', 'Sophia', 'Bautista', 'sbautista@ptrackerdb', 'Desktop Support', 'pass123', 'Available');
+
     
 CREATE TABLE machines (
     machineID VARCHAR(6) NOT NULL UNIQUE PRIMARY KEY,

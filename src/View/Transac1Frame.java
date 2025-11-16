@@ -5,6 +5,7 @@
 package View;
 
 import javax.swing.JOptionPane;
+import Model.Patch;
 /**
  *
  * @author marcquizon

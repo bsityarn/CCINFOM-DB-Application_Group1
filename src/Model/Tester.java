@@ -184,8 +184,8 @@ public class Tester {
 
                 statement.setString(1, firstName);
                 statement.setString(2, lastName);
-                statement.setString(4, email);
-                statement.setString(5, password);
+                statement.setString(3, email);
+                statement.setString(4, password);
 
                 statement.executeUpdate();
 

@@ -12,7 +12,7 @@ import Controller.*;
  * @author marcquizon
  */
 public class LoginFrame extends javax.swing.JFrame {
-
+//CHECK LNG IF WORKING
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(LoginFrame.class.getName());
 
     /**

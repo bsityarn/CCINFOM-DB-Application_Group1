@@ -91,9 +91,46 @@ public class Technician {
         return matchResult;
     }
 
+    public static boolean login(String technicianID, char[] password) {
+        StringBuilder query = new StringBuilder();
+        query.append(" SELECT  *               ");
+        query.append(" FROM    technicians ");
+        query.append(" WHERE   technicianID = ? ");
+        Boolean result = false;
+
+        try {
+            // Establish connection to DB
+            Connection conn = MySQLConnector.connectDB();
+
+            // Prepare SQL statement to be executed
+            PreparedStatement statement = conn.prepareStatement(query.toString());
+
+            statement.setString(1, technicianID);
+            // 1. Use executeQuery() and get the ResultSet
+            ResultSet rs = statement.executeQuery();
+
+            if (rs.next()) {//"if (rs.next)" will return true when AT LEAST 1 record is found. Hence, the technician is found
+                if(rs.getString("password").equals(password)){//Checks if the right password was inputted
+                    result = true;
+                }else{
+                    result = false;
+                }
+            }
+            
+            rs.close();
+            statement.close();
+            conn.close();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+            result = false;
+        }
+        return result;
+    }
+
     public static String add(String firstName, String lastName, String email, String position, String password) {
         StringBuilder query = new StringBuilder();
-        query.append(" INSERT INTO technician (technicianID, firstName, lastName, position, email, password) ");
+        query.append(" INSERT INTO technicians (technicianID, firstName, lastName, position, email, password) ");
         query.append(" VALUES (?, ?, ?, ?, ?, ?)");
 
         //TODO - Check for email duplicates
@@ -132,13 +169,13 @@ public class Technician {
 
     public static String edit(String technicianID, String firstName, String lastName, String email, String position, String currentPassword, String newPassword) {
         StringBuilder query1 = new StringBuilder();//This command is used when the user wants to keep the password the same
-        query1.append("UPDATE technicians");
-        query1.append("SET firstName = ?, lastName = ?, position = ?, email = ?");
+        query1.append("UPDATE technicians ");
+        query1.append("SET firstName = ?, lastName = ?, position = ?, email = ? ");
         query1.append("WHERE technicianID = ?");
 
         StringBuilder query2 = new StringBuilder();//This command is used when the user want to change their password
-        query2.append("UPDATE technicians");
-        query2.append("SET firstName = ?, lastName = ?, position = ?, email = ?, password = ?");
+        query2.append("UPDATE technicians ");
+        query2.append("SET firstName = ?, lastName = ?, position = ?, email = ?, password = ? ");
         query2.append("WHERE technicianID = ?");
 
         //Checker for when the User leaves a Field blank
@@ -217,15 +254,14 @@ public class Technician {
                 PreparedStatement statement = conn.prepareStatement(query.toString());
 
                 statement.setString(1, technicianID);
+                int rowAffected = statement.executeUpdate();
+                System.out.println(rowAffected);
 
-                ResultSet rs = statement.executeQuery();
-
-                if (rs.next() == false) {
+                if (rowAffected == 0) {
                     result = "Missing";
-                } else if (rs.next() == true) {
+                } else if (rowAffected > 0) {
                     result = "Valid";
                 }
-                rs.close();
                 statement.close();
                 conn.close();
 
@@ -238,6 +274,8 @@ public class Technician {
     }
 
     public static Technician getInfo(String technicianID) {
+        //TODO edit email part to get the first part and remove @ptrackerdb.com
+
         StringBuilder query = new StringBuilder();
         query.append(" SELECT  *               ");
         query.append(" FROM    technicians ");

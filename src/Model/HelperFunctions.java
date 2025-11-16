@@ -63,8 +63,9 @@ public class HelperFunctions {
             ResultSet rs = statement.executeQuery();
 
             if (rs.next()) {//This command will return true when AT LEAST 1 record is found.
-                int lastID = rs.getInt("lastID") + 1;
+                String lastID = rs.getString("lastID");//Issue here, check what lastID returns
                 incrementedID = IDPrefix + String.format("%04d", lastID);
+                System.out.println(lastID);
             }
 
             //Closing the connections to avoid DB app slow down in performance

@@ -306,7 +306,7 @@ public class Transac1Frame extends javax.swing.JFrame {
             // a failsafe action just in case
             try {
                 
-               boolean success = Tester.releasePatch(patchName, patchType, softwareID, machineID, technicianID, description);
+               boolean success = Patch.releasePatch(patchName, patchType, softwareID, machineID, technicianID, description);
                
                if (success) {
                    JOptionPane.showMessageDialog(this, "Patch has been released successfully!");

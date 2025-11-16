@@ -4,6 +4,8 @@
  */
 package View;
 
+
+import Model.Tester;
 import java.awt.CardLayout;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
@@ -643,7 +645,7 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
             try {
                 
                 // placeholder since need to declare a method in Model for searching database
-                ArrayList<String> matches = Tester.searchTester(testerID);
+                ArrayList<String[]> matches = Tester.searchTester(testerID);
                
                 System.out.println("Found " + matches.size() + " matches.");
             }
@@ -698,42 +700,27 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
         String email = addEmailField.getText();
         String password = addPasswordField.getText();
         
-        // if there's no testerID inputted, it just prompts again
-        if (firstName.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "missing first Name; input one first");
-        }
-        else if (lastName.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "missing last Name; input one first");
-        }
-        else if (email.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "missing email; input one first");
-        }
-        else if (password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "missing password; input one first");
+        String result = Tester.addTester(firstName, lastName, email, password);
+        
+        if ("Valid".equals(result)) {
+            //Makes the textfields blank again
+            addFirstNameField.setText("");
+            addLastNameField.setText("");
+            addEmailField.setText("");
+            addPasswordField.setText("");
+
+            JOptionPane.showMessageDialog(this, "Tester added successfully!", "Added Tester", JOptionPane.INFORMATION_MESSAGE);
+            System.out.println("ADD: Tester " + firstName + " " + lastName + "added");
+        } else if ("Empty".equals(result)) {
+            //This is an error when the User leaves a certain field blank
+            JOptionPane.showMessageDialog(this, "Please fill in the information", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if ("Duplicate Email".equals(result)) {
+            //This is an error when the User inputs a duplicate email
+            JOptionPane.showMessageDialog(this, "Duplicate email found, please change", "Error", JOptionPane.ERROR_MESSAGE);
         }
         else {
-            // a failsafe action just in case
-            try {
-                
-               boolean success = Tester.addTester(firstName, lastName, email, password);
-               
-               if (success) {
-                   JOptionPane.showMessageDialog(this, "Tester added successfully!");
-                   
-                   // clears the fields again
-                   addFirstNameField.setText("");
-                   addLastNameField.setText("");
-                   addEmailField.setText("");
-                   addPasswordField.setText("");
-               }
-               else {
-                   JOptionPane.showMessageDialog(this, "Failed to add tester.");
-               }
+            JOptionPane.showMessageDialog(this, "Failed to add tester.");
             }
-            catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
-            }
-        }
 
     }//GEN-LAST:event_addtesterBtnActionPerformed
 
@@ -755,19 +742,34 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
         String firstName = editFirstNameField.getText();
         String lastName = editLastNameField.getText();
         String email = editEmailField.getText();
-        String password = editPasswordField.getText();
+        String currentPassword = oldPasswordField.getText();
+        String newPassword = editPasswordField.getText();
         
-        Tester tester = new Tester();
+        String result = Tester.editTester(testerID, lastName, firstName, email, currentPassword, newPassword);
         
-        boolean success = tester.updateTester(testerID, firstName, lastName, email, password);
-        
-        if (success) {
-            JOptionPane.showMessageDialog(this, "Tester updated successfully!");
+        if ("Valid".equals(result)) {
+            //Makes the textfields blank again
+            editTesterIDField.setText("");
+            editFirstNameField.setText("");
+            editLastNameField.setText("");
+            editEmailField.setText("");
+            oldPasswordField.setText("");
+            editPasswordField.setText("");
+            
+            JOptionPane.showMessageDialog(this, "Tester edited successfully!", "Edited Tester", JOptionPane.INFORMATION_MESSAGE);
+            System.out.println("EDIT: Technician " + firstName + " " + lastName + "edited");
+        } else if ("Empty".equals(result)) {
+            //This is an error when the User leaves a certain field blank
+            JOptionPane.showMessageDialog(this, "Please fill in the information", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if ("Duplicate Email".equals(result)) {
+            //This is an error when the User inputs a duplicate email
+            JOptionPane.showMessageDialog(this, "Duplicate email found, please change", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if ("Wrong password".equals(result)) {
+            //This is an error when the User wanted to change the password, but inputted the wrong old password
+            oldPasswordField.setText("");
+            JOptionPane.showMessageDialog(this, "Wrong password", "Error", JOptionPane.ERROR_MESSAGE);
         }
-        else {
-            JOptionPane.showMessageDialog(this, "Failed to update Tester info");
-        }
-
+        
     }//GEN-LAST:event_editConfirmBtnActionPerformed
 
     private void addUsernameField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addUsernameField1ActionPerformed
@@ -793,8 +795,21 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
     private void deleteTesterBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteTesterBtnActionPerformed
         // TODO add your handling code here:
         // loop through the array of a specific user input, then delete
+        String testerID = deleteUserIDField.getText();
         
-
+        String result = Tester.deleteTester(testerID);
+        
+        if ("Valid".equals(result)) {
+            deleteUserIDField.setText("");
+            JOptionPane.showMessageDialog(this, "Tester deleted successfully!", "Deleted Technician", JOptionPane.INFORMATION_MESSAGE);
+        } else if ("Empty".equals(result)) {
+            JOptionPane.showMessageDialog(this, "Please fill in the information", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if ("not Found".equals(result)) {
+            JOptionPane.showMessageDialog(this, "Tester does not exist", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if ("Invalid".equals(result)) {
+            JOptionPane.showMessageDialog(this, "Invalid information", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        
     }//GEN-LAST:event_deleteTesterBtnActionPerformed
 
     private void editPasswordFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editPasswordFieldActionPerformed

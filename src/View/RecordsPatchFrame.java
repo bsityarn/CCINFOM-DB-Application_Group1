@@ -7,6 +7,7 @@ package View;
 import java.awt.CardLayout;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
+import Model.Patch;
 /**
  *
  * @author marcquizon
@@ -477,7 +478,7 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
         
         // if there's no testerID inputted, it just prompts again
         if (patchID.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Enter a tester ID to search");
+            JOptionPane.showMessageDialog(this, "Enter a patch ID to search");
         }
         
         else {
@@ -485,7 +486,7 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
             try {
                 
                 // placeholder since need to declare a method in Model for searching database
-                ArrayList<String> matches = Tester.searchTester(patchID);
+                ArrayList<String[]> matches = Patch.searchPatch(patchID);
                
                 System.out.println("Found " + matches.size() + " matches.");
             }
@@ -531,22 +532,35 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
         String patchStatus = (String) patchStatusField.getSelectedItem();
         String patchType = (String) editPatchTypeComboBox1.getSelectedItem();
         
-        Tester tester = new Tester();
+        Patch patch = new Patch();
         
-        int result = tester.updatePatch(patchID, technicianID, machineID, description, patchName, patchStatus, patchType);
+        String result = patch.editPatch(patchID, technicianID, machineID, description, patchName, patchStatus, patchType);
         
-        if (result == 0) {
-            JOptionPane.showMessageDialog(this, "patch info updated successfully!");
-        }
-        else if (result == 1) {
-            JOptionPane.showMessageDialog(this, "Update failed: Duplicate patch name for the same machine.");
-        }
-        else if (result == 2) {
+        switch (result) {
+        case "Valid":
+            JOptionPane.showMessageDialog(this, "Patch info updated successfully!");
+            break;
+        case "Empty":
             JOptionPane.showMessageDialog(this, "Update failed: missing info, fill in all the necessary data.");
-        }
-        else {
-            JOptionPane.showMessageDialog(this, "Failed to update patch info");
-        }
+            break;
+        case "Invalid":
+            JOptionPane.showMessageDialog(this, "Failed to update patch info due to database error.");
+            break;
+        case "not Found":
+            JOptionPane.showMessageDialog(this, "Update failed: patch ID not found.");
+            break;
+        case "Invalid Type":
+            JOptionPane.showMessageDialog(this, "Update failed: invalid patch type selected.");
+            break;
+        case "Invalid Status":
+            JOptionPane.showMessageDialog(this, "Update failed: invalid patch status selected.");
+            break;
+        case "Update Failed":
+            JOptionPane.showMessageDialog(this, "Update failed: database update did not affect any row.");
+            break;
+        default:
+            JOptionPane.showMessageDialog(this, "Unknown error.");
+    }
 
     }//GEN-LAST:event_editConfirmBtnActionPerformed
 
@@ -580,9 +594,9 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
         else {
             try {
                 // Need to code Tester Model Class to complete
-                boolean success = Tester.deletePatch(patchID);
+                String success = Patch.deletePatch(patchID);
                 
-                if (success) {
+                if (success.equals("Valid")) {
                     JOptionPane.showMessageDialog(this, "Tester Deleted");
                 }
                 else {
@@ -613,18 +627,18 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
         }
         else {
             try {
-                Tester tester = Tester.getPatchByID(patchID);
+                Patch patch = Patch.getPatchByID(patchID);
                 
-                if (tester != null) {
+                if (patch != null) {
                     // populates the input boxes of the default info
-                    editTechnicianIDField.setText(tester.getTechnicianID());
-                    editDescriptionField.setText(tester.getDescription());
-                    editMachineIDField.setText(tester.getMachineID());
-                    editPatchNameField.setText(tester.getPatchName());
-                    editSoftwareIDField.setText(tester.getSoftwareID());
+                    editTechnicianIDField.setText(patch.getTechnicianID());
+                    editDescriptionField.setText(patch.getDescription());
+                    editMachineIDField.setText(patch.getMachineID());
+                    editPatchNameField.setText(patch.getPatchName());
+                    editSoftwareIDField.setText(patch.getSoftwareID());
                     
-                    patchStatusField.setSelectedItem(tester.getStatus()); 
-                    editPatchTypeComboBox1.setSelectedItem(tester.getType());
+                    patchStatusField.setSelectedItem(patch.getStatus()); 
+                    editPatchTypeComboBox1.setSelectedItem(patch.getType());
                     
 
                     // lets the user edit the provided input boxes

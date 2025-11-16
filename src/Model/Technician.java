@@ -93,7 +93,7 @@ public class Technician {
 
     public static String add(String firstName, String lastName, String email, String position, String password) {
         StringBuilder query = new StringBuilder();
-        query.append(" INSERT INTO technician (technicianID, firstName, lastName, position, email, password) ");
+        query.append(" INSERT INTO technicians (technicianID, firstName, lastName, position, email, password) ");
         query.append(" VALUES (?, ?, ?, ?, ?, ?)");
 
         //TODO - Check for email duplicates

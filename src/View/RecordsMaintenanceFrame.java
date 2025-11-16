@@ -4,7 +4,9 @@
  */
 package View;
 
+import Model.Maintenance;
 import java.awt.CardLayout;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -340,6 +342,18 @@ public class RecordsMaintenanceFrame extends javax.swing.JFrame {
 
     private void deleteMaintenanceBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteMaintenanceBtnActionPerformed
         // TODO add your handling code here:
+        String maintenanceID = deleteMaintenanceIDField.getText();
+
+        if (Maintenance.delete(maintenanceID) == "Valid") {
+            deleteMaintenanceIDField.setText("");
+            JOptionPane.showMessageDialog(this, "Maintenance deleted successfully!", "Deleted Maintenance record", JOptionPane.INFORMATION_MESSAGE);
+        } else if (Maintenance.delete(maintenanceID) == "Empty") {
+            JOptionPane.showMessageDialog(this, "Please fill in the information", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (Maintenance.delete(maintenanceID) == "Missing/Wrong Status") {
+            JOptionPane.showMessageDialog(this, "Unsuccessful Deletion. Record is still in progress or does not exist", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (Maintenance.delete(maintenanceID) == "Invalid") {
+            JOptionPane.showMessageDialog(this, "Invalid information", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_deleteMaintenanceBtnActionPerformed
 
     /**

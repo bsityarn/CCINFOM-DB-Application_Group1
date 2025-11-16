@@ -132,13 +132,13 @@ public class Technician {
 
     public static String edit(String technicianID, String firstName, String lastName, String email, String position, String currentPassword, String newPassword) {
         StringBuilder query1 = new StringBuilder();//This command is used when the user wants to keep the password the same
-        query1.append("UPDATE technicians");
-        query1.append("SET firstName = ?, lastName = ?, position = ?, email = ?");
+        query1.append("UPDATE technicians ");
+        query1.append("SET firstName = ?, lastName = ?, position = ?, email = ? ");
         query1.append("WHERE technicianID = ?");
 
         StringBuilder query2 = new StringBuilder();//This command is used when the user want to change their password
-        query2.append("UPDATE technicians");
-        query2.append("SET firstName = ?, lastName = ?, position = ?, email = ?, password = ?");
+        query2.append("UPDATE technicians ");
+        query2.append("SET firstName = ?, lastName = ?, position = ?, email = ?, password = ? ");
         query2.append("WHERE technicianID = ?");
 
         //Checker for when the User leaves a Field blank
@@ -217,15 +217,14 @@ public class Technician {
                 PreparedStatement statement = conn.prepareStatement(query.toString());
 
                 statement.setString(1, technicianID);
+                int rowAffected = statement.executeUpdate();
+                System.out.println(rowAffected);
 
-                ResultSet rs = statement.executeQuery();
-
-                if (rs.next() == false) {
+                if (rowAffected == 0) {
                     result = "Missing";
-                } else if (rs.next() == true) {
+                } else if (rowAffected > 0) {
                     result = "Valid";
                 }
-                rs.close();
                 statement.close();
                 conn.close();
 
@@ -238,6 +237,8 @@ public class Technician {
     }
 
     public static Technician getInfo(String technicianID) {
+        //TODO edit email part to get the first part and remove @ptrackerdb.com
+
         StringBuilder query = new StringBuilder();
         query.append(" SELECT  *               ");
         query.append(" FROM    technicians ");

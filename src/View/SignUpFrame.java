@@ -4,6 +4,9 @@
  */
 package View;
 
+import Model.Technician;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author marcquizon
@@ -50,6 +53,7 @@ public class SignUpFrame extends javax.swing.JFrame {
         firstNameField = new javax.swing.JTextField();
         lastNameLabel = new javax.swing.JLabel();
         lastNameField = new javax.swing.JTextField();
+        emailSuffixLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -125,7 +129,7 @@ public class SignUpFrame extends javax.swing.JFrame {
             }
         });
         mainPanel.add(signUpBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 260, 331, 87));
-        mainPanel.add(emailField, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 270, 256, -1));
+        mainPanel.add(emailField, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 270, 120, -1));
 
         roleComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Tester", "Technician" }));
         roleComboBox.addActionListener(new java.awt.event.ActionListener() {
@@ -175,6 +179,12 @@ public class SignUpFrame extends javax.swing.JFrame {
         });
         mainPanel.add(lastNameField, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 240, 256, -1));
 
+        emailSuffixLabel.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
+        emailSuffixLabel.setForeground(new java.awt.Color(255, 255, 255));
+        emailSuffixLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        emailSuffixLabel.setText("@ptrackerdb.com");
+        mainPanel.add(emailSuffixLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 270, -1, -1));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -205,6 +215,35 @@ public class SignUpFrame extends javax.swing.JFrame {
 
     private void signUpBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_signUpBtnActionPerformed
         // TODO add your handling code here:
+        String firstName = firstNameField.getText();
+        String lastName = lastNameField.getText();
+        String email = emailField.getText() + emailSuffixLabel.getText();
+        String password = passwordField.getText();
+
+        if (roleComboBox.getSelectedItem().equals("Technician")) {
+            String position = (String) technicianPositionComboBox.getSelectedItem();
+            if (Technician.add(firstName, lastName, email, position, password) == "Valid") {
+                //Makes the textfields blank again
+                firstNameField.setText("");
+                lastNameField.setText("");
+                emailField.setText("");
+                technicianPositionComboBox.setSelectedItem(1);
+                passwordField.setText("");
+
+                JOptionPane.showMessageDialog(this, "Sign up successfull!", "Added Technician", JOptionPane.INFORMATION_MESSAGE);
+                System.out.println("ADD: Technician " + firstName + " " + lastName + "added");
+            } else if (Technician.add(firstName, lastName, email, position, password) == "Empty") {
+                //This is an error when the User leaves a certain field blank
+                JOptionPane.showMessageDialog(this, "Please fill in the information", "Error", JOptionPane.ERROR_MESSAGE);
+            } else if (Technician.add(firstName, lastName, email, position, password) == "Duplicate Email") {
+                //This is an error when the User inputs a duplicate email
+                JOptionPane.showMessageDialog(this, "Duplicate email found, please change", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } else if(roleComboBox.getSelectedItem().equals("Tester")){
+            //TODO Anton can add his add function for tester here
+        }
+
+
     }//GEN-LAST:event_signUpBtnActionPerformed
 
     private void roleComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_roleComboBoxActionPerformed
@@ -266,6 +305,7 @@ public class SignUpFrame extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton backBtn;
     private javax.swing.JTextField emailField;
+    private javax.swing.JLabel emailSuffixLabel;
     private javax.swing.JTextField firstNameField;
     private javax.swing.JLabel firstNameLabel;
     private javax.swing.JLabel jLabel1;

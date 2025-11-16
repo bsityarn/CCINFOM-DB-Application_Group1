@@ -91,6 +91,43 @@ public class Technician {
         return matchResult;
     }
 
+    public static boolean login(String technicianID, char[] password) {
+        StringBuilder query = new StringBuilder();
+        query.append(" SELECT  *               ");
+        query.append(" FROM    technicians ");
+        query.append(" WHERE   technicianID = ? ");
+        Boolean result = false;
+
+        try {
+            // Establish connection to DB
+            Connection conn = MySQLConnector.connectDB();
+
+            // Prepare SQL statement to be executed
+            PreparedStatement statement = conn.prepareStatement(query.toString());
+
+            statement.setString(1, technicianID);
+            // 1. Use executeQuery() and get the ResultSet
+            ResultSet rs = statement.executeQuery();
+
+            if (rs.next()) {//"if (rs.next)" will return true when AT LEAST 1 record is found. Hence, the technician is found
+                if(rs.getString("password").equals(password)){//Checks if the right password was inputted
+                    result = true;
+                }else{
+                    result = false;
+                }
+            }
+            
+            rs.close();
+            statement.close();
+            conn.close();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+            result = false;
+        }
+        return result;
+    }
+
     public static String add(String firstName, String lastName, String email, String position, String password) {
         StringBuilder query = new StringBuilder();
         query.append(" INSERT INTO technicians (technicianID, firstName, lastName, position, email, password) ");

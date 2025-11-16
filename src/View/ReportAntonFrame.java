@@ -8,14 +8,14 @@ package View;
  *
  * @author marcquizon
  */
-public class ReportsFrame extends javax.swing.JFrame {
+public class ReportAntonFrame extends javax.swing.JFrame {
     
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ReportsFrame.class.getName());
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ReportAntonFrame.class.getName());
 
     /**
      * Creates new form AdminMenuFrame
      */
-    public ReportsFrame() {
+    public ReportAntonFrame() {
         initComponents();
         this.setResizable(false);
     }
@@ -35,10 +35,7 @@ public class ReportsFrame extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         backBtn = new javax.swing.JButton();
         jSeparator1 = new javax.swing.JSeparator();
-        marcReportBtn = new javax.swing.JButton();
-        bernardReportBtn = new javax.swing.JButton();
-        antonReportBtn = new javax.swing.JButton();
-        albertoReportBtn = new javax.swing.JButton();
+        generateBtn = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -50,10 +47,10 @@ public class ReportsFrame extends javax.swing.JFrame {
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/View/SmallLogo.png"))); // NOI18N
 
-        jLabel2.setFont(new java.awt.Font("Andale Mono", 0, 36)); // NOI18N
+        jLabel2.setFont(new java.awt.Font("Andale Mono", 0, 14)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel2.setText("REPORTS");
+        jLabel2.setText("(add Report name here)");
 
         jLabel3.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(255, 255, 255));
@@ -73,43 +70,13 @@ public class ReportsFrame extends javax.swing.JFrame {
 
         jSeparator1.setBackground(new java.awt.Color(255, 255, 255));
 
-        marcReportBtn.setFont(new java.awt.Font("Krungthep", 0, 24)); // NOI18N
-        marcReportBtn.setText("Technician Performance");
-        marcReportBtn.setBorderPainted(false);
-        marcReportBtn.setOpaque(true);
-        marcReportBtn.addActionListener(new java.awt.event.ActionListener() {
+        generateBtn.setFont(new java.awt.Font("Krungthep", 0, 24)); // NOI18N
+        generateBtn.setText("Generate report");
+        generateBtn.setBorderPainted(false);
+        generateBtn.setOpaque(true);
+        generateBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                marcReportBtnActionPerformed(evt);
-            }
-        });
-
-        bernardReportBtn.setFont(new java.awt.Font("Krungthep", 0, 24)); // NOI18N
-        bernardReportBtn.setText("Patch Feedback");
-        bernardReportBtn.setBorderPainted(false);
-        bernardReportBtn.setOpaque(true);
-        bernardReportBtn.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bernardReportBtnActionPerformed(evt);
-            }
-        });
-
-        antonReportBtn.setFont(new java.awt.Font("Krungthep", 0, 24)); // NOI18N
-        antonReportBtn.setText("Patch Success/Failure");
-        antonReportBtn.setBorderPainted(false);
-        antonReportBtn.setOpaque(true);
-        antonReportBtn.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                antonReportBtnActionPerformed(evt);
-            }
-        });
-
-        albertoReportBtn.setFont(new java.awt.Font("Krungthep", 0, 18)); // NOI18N
-        albertoReportBtn.setText("Deployment & Patch Inventory");
-        albertoReportBtn.setBorderPainted(false);
-        albertoReportBtn.setOpaque(true);
-        albertoReportBtn.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                albertoReportBtnActionPerformed(evt);
+                generateBtnActionPerformed(evt);
             }
         });
 
@@ -122,8 +89,8 @@ public class ReportsFrame extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 493, Short.MAX_VALUE)
-                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 246, Short.MAX_VALUE)
+                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 446, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(backBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -131,17 +98,11 @@ public class ReportsFrame extends javax.swing.JFrame {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jSeparator1))
-                        .addGap(6, 6, 6))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(albertoReportBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 357, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(antonReportBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 357, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(58, 58, 58)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(bernardReportBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 357, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(marcReportBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 357, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(59, 59, 59))))
+                        .addGap(6, 6, 6))))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(generateBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 274, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -153,17 +114,9 @@ public class ReportsFrame extends javax.swing.JFrame {
                 .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(29, 29, 29)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(marcReportBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(38, 38, 38)
-                        .addComponent(bernardReportBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(antonReportBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(38, 38, 38)
-                        .addComponent(albertoReportBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 211, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(generateBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 552, Short.MAX_VALUE)
                 .addComponent(backBtn)
                 .addGap(16, 16, 16))
         );
@@ -186,38 +139,14 @@ public class ReportsFrame extends javax.swing.JFrame {
 
     private void backBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backBtnActionPerformed
         // TODO add your handling code here:
-        MenuTechnicianFrame menuTechnician = new MenuTechnicianFrame();
-        menuTechnician.setVisible(true);
+        ReportsFrame reportframe = new ReportsFrame();
+        reportframe.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_backBtnActionPerformed
 
-    private void marcReportBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_marcReportBtnActionPerformed
+    private void generateBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generateBtnActionPerformed
         // TODO add your handling code here:
-        ReportMarcFrame reportmarcframe = new ReportMarcFrame();
-        reportmarcframe.setVisible(true);
-        this.dispose();
-    }//GEN-LAST:event_marcReportBtnActionPerformed
-
-    private void bernardReportBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bernardReportBtnActionPerformed
-        // TODO add your handling code here:
-        ReportBernardFrame reportbernardframe = new ReportBernardFrame();
-        reportbernardframe.setVisible(true);
-        this.dispose();
-    }//GEN-LAST:event_bernardReportBtnActionPerformed
-
-    private void antonReportBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_antonReportBtnActionPerformed
-        // TODO add your handling code here:
-        ReportAntonFrame reportantonframe = new ReportAntonFrame();
-        reportantonframe.setVisible(true);
-        this.dispose();
-    }//GEN-LAST:event_antonReportBtnActionPerformed
-
-    private void albertoReportBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_albertoReportBtnActionPerformed
-        // TODO add your handling code here:
-        ReportAlbertoFrame reportalbertoframe = new ReportAlbertoFrame();
-        reportalbertoframe.setVisible(true);
-        this.dispose();
-    }//GEN-LAST:event_albertoReportBtnActionPerformed
+    }//GEN-LAST:event_generateBtnActionPerformed
 
     /**
      * @param args the command line arguments
@@ -241,19 +170,16 @@ public class ReportsFrame extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new ReportsFrame().setVisible(true));
+        java.awt.EventQueue.invokeLater(() -> new ReportAntonFrame().setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton albertoReportBtn;
-    private javax.swing.JButton antonReportBtn;
     private javax.swing.JButton backBtn;
-    private javax.swing.JButton bernardReportBtn;
+    private javax.swing.JButton generateBtn;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JButton marcReportBtn;
     // End of variables declaration//GEN-END:variables
 }

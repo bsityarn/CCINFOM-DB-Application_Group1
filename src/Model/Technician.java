@@ -19,8 +19,44 @@ public class Technician {
     private String position;
     private String currentPassword;
     private String newPassword;
+    private String status;
 
-    public static boolean checkEmailDuplicates(String email) {
+    public static boolean checkEmailDuplicates(String email, String technicianID) {//used when editing a technician
+        StringBuilder query = new StringBuilder();
+        query.append(" SELECT  *               ");
+        query.append(" FROM    technicians ");
+        query.append(" WHERE   email = ? AND technicianID != ?");//Exempts the record of the technician we are editing
+        Boolean duplicateResult = false;
+
+        try {
+            // Establish connection to DB
+            Connection conn = MySQLConnector.connectDB();
+
+            PreparedStatement statement = conn.prepareStatement(query.toString());
+
+            statement.setString(1, email);
+            statement.setString(2, technicianID);
+
+            // 1. Use executeQuery() and get the ResultSet
+            ResultSet rs = statement.executeQuery();
+
+            if (rs.next()) {//This command will return true when AT LEAST 1 record is found. Hence, duplicate is true
+                duplicateResult = true;
+            }
+
+            //Closing the connections to avoid DB app slow down in performance
+            rs.close();
+            statement.close();
+            conn.close();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+
+        return duplicateResult;
+    }
+
+    public static boolean checkEmailDuplicates(String email) {//used when adding a new technician, no ID yet
         StringBuilder query = new StringBuilder();
         query.append(" SELECT  *               ");
         query.append(" FROM    technicians ");
@@ -110,13 +146,13 @@ public class Technician {
             ResultSet rs = statement.executeQuery();
 
             if (rs.next()) {//"if (rs.next)" will return true when AT LEAST 1 record is found. Hence, the technician is found
-                if(rs.getString("password").equals(password)){//Checks if the right password was inputted
+                if (rs.getString("password").equals(password)) {//Checks if the right password was inputted
                     result = true;
-                }else{
+                } else {
                     result = false;
                 }
             }
-            
+
             rs.close();
             statement.close();
             conn.close();
@@ -183,7 +219,7 @@ public class Technician {
         if (firstName.isBlank() || lastName.isBlank() || email.isBlank()
                 || (currentPassword.isBlank() && !newPassword.isBlank()) || (!currentPassword.isBlank() && newPassword.isBlank())) {
             return "Empty";
-        } else if (checkEmailDuplicates(email) == true) {//Checker for email duplicates
+        } else if (checkEmailDuplicates(email, technicianID) == true) {//Checker for email duplicates
             return "Duplicate Email";
         } else if (currentPassword.isBlank() && newPassword.isBlank()) {
             try {
@@ -239,8 +275,48 @@ public class Technician {
 
     public static String delete(String technicianID) {
         StringBuilder query = new StringBuilder();
-        query.append(" DELETE FROM technicians               ");
+        query.append(" UPDATE technicians               ");
+        query.append(" SET   status = 'Inactive' ");
         query.append(" WHERE   technicianID = ? ");
+
+        String result = "Invalid";
+
+        if (technicianID.isBlank()) {
+            result = "Empty";
+        } else {
+            try {
+                // Establish connection to DB
+                Connection conn = MySQLConnector.connectDB();
+
+                // Prepare SQL statement to be executed
+                PreparedStatement statement = conn.prepareStatement(query.toString());
+
+                statement.setString(1, technicianID);
+                int rowAffected = statement.executeUpdate();
+                System.out.println(rowAffected);
+
+                if (rowAffected == 0) {
+                    result = "Missing";
+                } else if (rowAffected > 0) {
+                    result = "Valid";
+                }
+                statement.close();
+                conn.close();
+
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+                result = "Invalid";
+            }
+        }
+        return result;
+    }
+
+    public static String activate(String technicianID) {
+        StringBuilder query = new StringBuilder();
+        query.append(" UPDATE technicians               ");
+        query.append(" SET   status = 'Available' ");
+        query.append(" WHERE   technicianID = ? ");
+
         String result = "Invalid";
 
         if (technicianID.isBlank()) {
@@ -299,6 +375,7 @@ public class Technician {
                 resultTechnician.setLastName(rs.getString("lastName"));
                 resultTechnician.setEmail(rs.getString("email"));
                 resultTechnician.setPosition(rs.getString("position"));
+                resultTechnician.setStatus(rs.getString("status"));
             }
 
             //Closing the connections to avoid DB app slow down in performance
@@ -342,6 +419,10 @@ public class Technician {
         return newPassword;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
     // --- Setters ---
     public void setID(String technicianID) {
         this.technicianID = technicianID;
@@ -369,6 +450,10 @@ public class Technician {
 
     public void setNewPassword(String newPassword) {
         this.newPassword = newPassword;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
 }

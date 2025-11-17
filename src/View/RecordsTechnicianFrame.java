@@ -26,6 +26,7 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
         addPanel.setVisible(false);
         editPanel.setVisible(false);
         deletePanel.setVisible(false);
+        activateTechnicianBtn.setVisible(false);
     }
 
     /**
@@ -40,7 +41,7 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
         mainPanel = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
+        inactiveTechnicianLabel = new javax.swing.JLabel();
         backBtn = new javax.swing.JButton();
         jSeparator1 = new javax.swing.JSeparator();
         resultsLbl = new javax.swing.JLabel();
@@ -87,6 +88,8 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
         jLabel21 = new javax.swing.JLabel();
         emailSuffixLabel1 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        activateTechnicianBtn = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -106,11 +109,10 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
         jLabel2.setText("TECHNICIAN RECORDS");
         mainPanel.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1304, 0, 199, 85));
 
-        jLabel3.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jLabel3.setText("Select Action");
-        mainPanel.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 340, 118, 28));
+        inactiveTechnicianLabel.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
+        inactiveTechnicianLabel.setForeground(new java.awt.Color(255, 255, 255));
+        inactiveTechnicianLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        mainPanel.add(inactiveTechnicianLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 340, 410, 28));
 
         backBtn.setBackground(new java.awt.Color(255, 255, 204));
         backBtn.setFont(new java.awt.Font("Krungthep", 0, 18)); // NOI18N
@@ -569,6 +571,23 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
         jLabel8.setText("Technician Records");
         mainPanel.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(651, 0, 199, 85));
 
+        jLabel6.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jLabel6.setText("Select Action");
+        mainPanel.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 340, 118, 28));
+
+        activateTechnicianBtn.setFont(new java.awt.Font("Krungthep", 0, 12)); // NOI18N
+        activateTechnicianBtn.setText("Activate");
+        activateTechnicianBtn.setBorderPainted(false);
+        activateTechnicianBtn.setOpaque(true);
+        activateTechnicianBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                activateTechnicianBtnActionPerformed(evt);
+            }
+        });
+        mainPanel.add(activateTechnicianBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(700, 340, -1, -1));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -720,7 +739,7 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
             editPasswordField.setText("");
 
             JOptionPane.showMessageDialog(this, "Technician edited successfully!", "Edited Technician", JOptionPane.INFORMATION_MESSAGE);
-            System.out.println("EDIT: Technician " + firstName + " " + lastName + "edited");
+            System.out.println("EDIT: Technician " + firstName + " " + lastName + " edited");
         } else if (Technician.edit(technicianID, firstName, lastName, email, position, currentPassword, newPassword) == "Empty") {
             //This is an error when the User leaves a certain field blank
             JOptionPane.showMessageDialog(this, "Please fill in the information", "Error", JOptionPane.ERROR_MESSAGE);
@@ -762,8 +781,17 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
             Technician currentInfo = new Technician(); //Initialize a currentInfo Technician variable
             currentInfo = Technician.getInfo(technicianID); //Gets the information from the getInfo function
             String email = currentInfo.getEmail();//gets the full email
+            
             if (email.endsWith(suffix)) {//removes the suffix
                 email = email.substring(0, email.length() - suffix.length());
+            }
+            
+            if(currentInfo.getStatus().equals("Inactive")){//Shows the option to activate the techncian
+                inactiveTechnicianLabel.setText("This technician is inactive, click the button to");
+                activateTechnicianBtn.setVisible(true);
+            }else{
+                inactiveTechnicianLabel.setText("");
+                activateTechnicianBtn.setVisible(false);
             }
 
             editFirstNameField.setText(currentInfo.getFirstName());
@@ -778,6 +806,21 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
         }
 
     }//GEN-LAST:event_editEnterBtnActionPerformed
+
+    private void activateTechnicianBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_activateTechnicianBtnActionPerformed
+        // TODO add your handling code here:
+        String technicianID = editTechnicianIDField.getText();
+
+        if (Technician.activate(technicianID) == "Valid") {
+            JOptionPane.showMessageDialog(this, "Technician activated successfully!", "Activated Technician", JOptionPane.INFORMATION_MESSAGE);
+        } else if (Technician.delete(technicianID) == "Empty") {
+            JOptionPane.showMessageDialog(this, "Please fill in the information", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (Technician.delete(technicianID) == "Missing") {
+            JOptionPane.showMessageDialog(this, "Technician does not exist", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (Technician.delete(technicianID) == "Invalid") {
+            JOptionPane.showMessageDialog(this, "Invalid information", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_activateTechnicianBtnActionPerformed
 
     /**
      * @param args the command line arguments
@@ -807,6 +850,7 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton SearchBtn;
     private javax.swing.JComboBox<String> actionComboBox;
+    private javax.swing.JButton activateTechnicianBtn;
     private javax.swing.JTextField addEmailField;
     private javax.swing.JTextField addFirstNameField;
     private javax.swing.JTextField addLastNameField;
@@ -829,6 +873,7 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> editTechnicianPositionComboBox;
     private javax.swing.JLabel emailSuffixLabel;
     private javax.swing.JLabel emailSuffixLabel1;
+    private javax.swing.JLabel inactiveTechnicianLabel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
@@ -842,9 +887,9 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;

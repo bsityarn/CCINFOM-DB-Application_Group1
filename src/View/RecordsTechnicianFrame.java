@@ -718,7 +718,7 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
             editTechnicianPositionComboBox.setSelectedItem(1);
             oldPasswordField.setText("");
             editPasswordField.setText("");
-            
+
             JOptionPane.showMessageDialog(this, "Technician edited successfully!", "Edited Technician", JOptionPane.INFORMATION_MESSAGE);
             System.out.println("EDIT: Technician " + firstName + " " + lastName + "edited");
         } else if (Technician.edit(technicianID, firstName, lastName, email, position, currentPassword, newPassword) == "Empty") {
@@ -756,13 +756,19 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
         String technicianID = editTechnicianIDField.getText();
         Technician technician = new Technician();
         technician = Technician.getInfo(technicianID);
+        String suffix = "@ptrackerdb.com";
 
         if (technician.getTechnicianID() != null) {
             Technician currentInfo = new Technician(); //Initialize a currentInfo Technician variable
             currentInfo = Technician.getInfo(technicianID); //Gets the information from the getInfo function
+            String email = currentInfo.getEmail();//gets the full email
+            if (email.endsWith(suffix)) {//removes the suffix
+                email = email.substring(0, email.length() - suffix.length());
+            }
+
             editFirstNameField.setText(currentInfo.getFirstName());
             editLastNameField.setText(currentInfo.getLastName());
-            editEmailField.setText(currentInfo.getEmail());
+            editEmailField.setText(email);//We add the email without the suffix as the GUI shows the suffix already
             editTechnicianPositionComboBox.setSelectedItem(currentInfo.getPosition());
             System.out.println("EDIT: Technician ID " + currentInfo.getTechnicianID() + " current info retrieved");
         } else {

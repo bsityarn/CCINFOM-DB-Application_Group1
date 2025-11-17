@@ -28,16 +28,16 @@ CREATE TABLE technicians(
 
 INSERT INTO technicians (technicianID, firstName, lastName, email, position, password, status)
 VALUES
-('TH1000', 'James', 'Santos', 'jsantos@ptrackerdb', 'Desktop Support', 'pass123', 'Available'),
-('TH1001', 'Maria', 'Reyes', 'mreyes@ptrackerdb', 'System Admin', 'pass123', 'Available'),
-('TH1002', 'John', 'Cruz', 'jcruz@ptrackerdb', 'Network Admin', 'pass123', 'Available'),
-('TH1003', 'Angela', 'DelaCruz', 'adelacruz@ptrackerdb', 'Desktop Support', 'pass123', 'Available'),
-('TH1004', 'Robert', 'Garcia', 'rgarcia@ptrackerdb', 'System Admin', 'pass123', 'Available'),
-('TH1005', 'Carla', 'Mendoza', 'cmendoza@ptrackerdb', 'Network Admin', 'pass123', 'Available'),
-('TH1006', 'Joseph', 'Villanueva', 'jvillanueva@ptrackerdb', 'Desktop Support', 'pass123', 'Available'),
-('TH1007', 'Patricia', 'Torres', 'ptorres@ptrackerdb', 'System Admin', 'pass123', 'Available'),
-('TH1008', 'Daniel', 'Lopez', 'dlopez@ptrackerdb', 'Network Admin', 'pass123', 'Available'),
-('TH1009', 'Sophia', 'Bautista', 'sbautista@ptrackerdb', 'Desktop Support', 'pass123', 'Available');
+('TH0001', 'James', 'Santos', 'jsantos@ptrackerdb.com', 'Desktop Support', 'pass123', 'Available'),
+('TH0002', 'Maria', 'Reyes', 'mreyes@ptrackerdb.com', 'System Admin', 'pass123', 'Available'),
+('TH0003', 'John', 'Cruz', 'jcruz@ptrackerdb.com', 'Network Admin', 'pass123', 'Available'),
+('TH0004', 'Angela', 'DelaCruz', 'adelacruz@ptrackerdb.com', 'Desktop Support', 'pass123', 'Available'),
+('TH0005', 'Robert', 'Garcia', 'rgarcia@ptrackerdb.com', 'System Admin', 'pass123', 'Available'),
+('TH0006', 'Carla', 'Mendoza', 'cmendoza@ptrackerdb.com', 'Network Admin', 'pass123', 'Available'),
+('TH0007', 'Joseph', 'Villanueva', 'jvillanueva@ptrackerdb.com', 'Desktop Support', 'pass123', 'Available'),
+('TH0008', 'Patricia', 'Torres', 'ptorres@ptrackerdb.com', 'System Admin', 'pass123', 'Available'),
+('TH0009', 'Daniel', 'Lopez', 'dlopez@ptrackerdb.com', 'Network Admin', 'pass123', 'Available'),
+('TH0010', 'Sophia', 'Bautista', 'sbautista@ptrackerdb.com', 'Desktop Support', 'pass123', 'Available');
 
     
 CREATE TABLE machines (

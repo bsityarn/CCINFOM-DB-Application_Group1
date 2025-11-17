@@ -40,33 +40,28 @@ public class HelperFunctions {
             IDFieldName = "feedbackID";
             IDPrefix = "FB";
         } else {
-            System.out.println("⚠️ Unknown table name: " + tableName);
+            System.out.println("Unknown table name: " + tableName);
             return "Invalid";
         }
-        
+
         String incrementedID = "";
-        StringBuilder query = new StringBuilder();
-        query.append("SELECT MAX(CAST(SUBSTRING(?, 3) AS UNSIGNED)) AS lastID");
-        query.append("FROM ?");
-        
+        String query = "SELECT MAX(CAST(SUBSTRING(" + IDFieldName + ", 3) AS UNSIGNED)) AS lastID FROM " + tableName;
+
         try {
             // Establish connection to DB
             Connection conn = MySQLConnector.connectDB();
 
             PreparedStatement statement = conn.prepareStatement(query.toString());
 
-            statement.setString(1, IDFieldName);
-            statement.setString(2, tableName);
-
-
             // 1. Use executeQuery() and get the ResultSet
             ResultSet rs = statement.executeQuery();
-
-            if (rs.next()) {//This command will return true when AT LEAST 1 record is found.
-                String lastID = rs.getString("lastID");//Issue here, check what lastID returns
-                incrementedID = IDPrefix + String.format("%04d", lastID);
-                System.out.println(lastID);
+            
+            int lastID = 0;//Constant value for when the table is empty
+            if (rs.next()) {//Will run if the machine has records. If empty, it will not run
+                lastID = rs.getInt("lastID");//will get the last max ID from the records
             }
+            //The increment part of the ID
+            incrementedID = IDPrefix.concat(String.format("%04d", lastID + 1));
 
             //Closing the connections to avoid DB app slow down in performance
             rs.close();
@@ -76,7 +71,7 @@ public class HelperFunctions {
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
         }
-        
+
         return incrementedID;
     }
 

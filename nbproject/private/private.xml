@@ -6,14 +6,21 @@
             <file>file:/Users/marcquizon/NetBeansProjects/CCINFOM_DBapplication_GROUP1/src/Model/Tester.java</file>
             <file>file:/Users/marcquizon/NetBeansProjects/CCINFOM_DBapplication_GROUP1/src/View/RecordsFeedbackFrame.java</file>
             <file>file:/Users/marcquizon/NetBeansProjects/CCINFOM_DBapplication_GROUP1/src/View/RecordsPatchFrame.java</file>
+            <file>file:/Users/marcquizon/NetBeansProjects/CCINFOM_DBapplication_GROUP1/src/Model/MySQLConnector.java</file>
             <file>file:/Users/marcquizon/NetBeansProjects/CCINFOM_DBapplication_GROUP1/src/View/SignUpFrame.java</file>
-            <file>file:/Users/marcquizon/NetBeansProjects/CCINFOM_DBapplication_GROUP1/src/View/Transac1Frame.java</file>
-            <file>file:/Users/marcquizon/NetBeansProjects/CCINFOM_DBapplication_GROUP1/src/View/RecordsMachineFrame.java</file>
-            <file>file:/Users/marcquizon/NetBeansProjects/CCINFOM_DBapplication_GROUP1/src/Model/HelperFunctions.java</file>
-            <file>file:/Users/marcquizon/NetBeansProjects/CCINFOM_DBapplication_GROUP1/build/built-jar.properties</file>
-            <file>file:/Users/marcquizon/NetBeansProjects/CCINFOM_DBapplication_GROUP1/src/View/Transac4Frame.java</file>
-            <file>file:/Users/marcquizon/NetBeansProjects/CCINFOM_DBapplication_GROUP1/src/View/Transac3Frame.java</file>
             <file>file:/Users/marcquizon/NetBeansProjects/CCINFOM_DBapplication_GROUP1/src/View/LoginFrame.java</file>
+            <file>file:/Users/marcquizon/NetBeansProjects/CCINFOM_DBapplication_GROUP1/src/Model/Technician.java</file>
+            <file>file:/Users/marcquizon/NetBeansProjects/CCINFOM_DBapplication_GROUP1/src/Controller/AppController.java</file>
+            <file>file:/Users/marcquizon/NetBeansProjects/CCINFOM_DBapplication_GROUP1/src/View/RecordsSoftwareFrame.java</file>
+            <file>file:/Users/marcquizon/NetBeansProjects/CCINFOM_DBapplication_GROUP1/src/View/RecordsTechnicianFrame.java</file>
+            <file>file:/Users/marcquizon/NetBeansProjects/CCINFOM_DBapplication_GROUP1/src/Main_app/CCINFOM_DBapplication_GROUP11.java</file>
+            <file>file:/Users/marcquizon/NetBeansProjects/CCINFOM_DBapplication_GROUP1/src/View/Transac3Frame.java</file>
+            <file>file:/Users/marcquizon/NetBeansProjects/CCINFOM_DBapplication_GROUP1/src/View/Transac4Frame.java</file>
+            <file>file:/Users/marcquizon/NetBeansProjects/CCINFOM_DBapplication_GROUP1/src/View/ReportsFrame.java</file>
+            <file>file:/Users/marcquizon/NetBeansProjects/CCINFOM_DBapplication_GROUP1/src/View/ReportAlbertoFrame.java</file>
+            <file>file:/Users/marcquizon/NetBeansProjects/CCINFOM_DBapplication_GROUP1/src/View/RecordsMachineFrame.java</file>
+            <file>file:/Users/marcquizon/NetBeansProjects/CCINFOM_DBapplication_GROUP1/src/Model/Patch.java</file>
+            <file>file:/Users/marcquizon/NetBeansProjects/CCINFOM_DBapplication_GROUP1/SQL_Script/CCINFOMS24_Group1_SQL.sql</file>
         </group>
     </open-files>
 </project-private>

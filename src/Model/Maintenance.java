@@ -20,6 +20,48 @@ public class Maintenance {
     private String dateFinished;
     private String status;
     private String description;
+    
+    public static String transac3(String workType, String patchID, String technicianIDassigned, 
+                                  String targetDeadline, String description){
+        StringBuilder query = new StringBuilder();
+        query.append(" INSERT INTO maintenance               ");
+        query.append(" (maintenanceID, workType, patchID, technicianIDassigned, targetDeadline, description)");
+        query.append(" VALUES (?, ?, ?, ?, ?, ?)");
+        String incrementedID = "";
+
+        if (workType.isBlank() || patchID.isBlank() || technicianIDassigned.isBlank() || targetDeadline.isBlank() || description.isBlank()) {//Checker for when the User leaves a Field blank
+            return "Empty";
+        } else if (false) {//Checker for email duplicates
+            return "Duplicate Email";
+        } else {
+            try {
+                // Establish connection to DB
+                Connection conn = MySQLConnector.connectDB();
+
+                // Prepare SQL statement to be executed
+                PreparedStatement statement = conn.prepareStatement(query.toString());
+
+                incrementedID = HelperFunctions.incrementID("maintenance");
+                statement.setString(1, incrementedID);
+                statement.setString(2, workType);
+                statement.setString(3, patchID);
+                statement.setString(4, technicianIDassigned);
+                statement.setString(5, targetDeadline);
+                statement.setString(6, description);
+
+                statement.executeUpdate();
+
+                statement.close();
+                conn.close();
+
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+                return "Invalid";
+            }
+        }
+        
+        return incrementedID;
+    }
 
     public static String delete(String maintenanceID) {
         StringBuilder query1 = new StringBuilder();

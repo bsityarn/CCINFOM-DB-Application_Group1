@@ -86,7 +86,7 @@ CREATE TABLE maintenance(
     workType ENUM('Deploy', 'Rollback'),
     patchID VARCHAR(6) NOT NULL,
     technicianIDassigned VARCHAR(6) NOT NULL,
-    dateAssigned DATE NOT NULL,
+    dateAssigned DATE NOT NULL DEFAULT NOW(),
     targetDeadline DATE NOT NULL,
     dateFinished DATE,
     status ENUM('Not Started', 'In progress', 'Done') DEFAULT 'Not Started',

@@ -171,7 +171,6 @@ public class Technician {
         query.append(" INSERT INTO technicians (technicianID, firstName, lastName, position, email, password) ");
         query.append(" VALUES (?, ?, ?, ?, ?, ?)");
 
-        //TODO - Check for email duplicates
         if (firstName.isBlank() || lastName.isBlank() || email.isBlank() || password.isBlank()) {//Checker for when the User leaves a Field blank
             return "Empty";
         } else if (checkEmailDuplicates(email) == true) {//Checker for email duplicates

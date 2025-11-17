@@ -3,6 +3,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package View;
+import Model.Maintenance;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -90,7 +94,7 @@ public class Transac3Frame extends javax.swing.JFrame {
         jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel7.setText("Technician ID:");
 
-        workTypeComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Deployment", "Rollback" }));
+        workTypeComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Deploy", "Rollback" }));
         workTypeComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 workTypeComboBoxActionPerformed(evt);
@@ -239,6 +243,33 @@ public class Transac3Frame extends javax.swing.JFrame {
 
     private void scheduleBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_scheduleBtnActionPerformed
         // TODO add your handling code here:
+        String technicianID = technicianIDField.getText();
+        String patchID = patchIDField.getText();
+        String workType = (String) workTypeComboBox.getSelectedItem();
+        String description = descriptionField.getText();
+        java.util.Date selectedDate = jDateChooser1.getDate();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String targetDeadline = sdf.format(selectedDate);
+        
+        System.out.println("targetDeadline: " + targetDeadline);
+        if (Maintenance.transac3(workType, patchID, technicianID, targetDeadline, description).startsWith("MT")) {
+            //Makes the textfields blank again
+            technicianIDField.setText("");
+            patchIDField.setText("");
+            workTypeComboBox.setSelectedItem(1);
+            descriptionField.setText("");
+            jDateChooser1.setDate(null);
+
+
+            JOptionPane.showMessageDialog(this, "Patch work assigned successfully!", "Added Maintenance", JOptionPane.INFORMATION_MESSAGE);
+            System.out.println("ADD: Maintenance, PatchID and TechnicianID " + patchID + " " + technicianID + " added");
+        } else if (Maintenance.transac3(workType, patchID, technicianID, targetDeadline, description) == "Empty") {
+            //This is an error when the User leaves a certain field blank
+            JOptionPane.showMessageDialog(this, "Please fill in the information", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (Maintenance.transac3(workType, patchID, technicianID, targetDeadline, description) == "Duplicate Email") {
+            //This is an error when the User inputs a duplicate email
+            JOptionPane.showMessageDialog(this, "Duplicate email found, please change", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_scheduleBtnActionPerformed
 
     private void workTypeComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_workTypeComboBoxActionPerformed

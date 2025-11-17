@@ -239,7 +239,8 @@ public class Patch {
             PreparedStatement softwareStmt = conn.prepareStatement(softwareQuery);
             softwareStmt.setString(1, softwareID);
             ResultSet rsSoftware = softwareStmt.executeQuery();
-
+            
+            // 
             if (!rsSoftware.next()) {
                 rsSoftware.close();
                 softwareStmt.close();
@@ -248,9 +249,18 @@ public class Patch {
             }
 
             String softwareType = rsSoftware.getString("type");
+            String softwareStatus = rsSoftware.getString("status");
+       
+            if (!softwareStatus.equals("Active")) {
+                rsSoftware.close();
+                softwareStmt.close();
+                conn.close();
+                return false; // Software not active
+            }
+    
             rsSoftware.close();
             softwareStmt.close();
-
+            
             // 4. Verify the machine exists, its type, and status
             String machineQuery = "SELECT type, status FROM machine WHERE machineID = ?";
             PreparedStatement machineStmt = conn.prepareStatement(machineQuery);
@@ -266,16 +276,61 @@ public class Patch {
 
             String machineType = rsMachine.getString("type");
             String machineStatus = rsMachine.getString("status");
-            rsMachine.close();
-            machineStmt.close();
+            
+            if (!machineStatus.equals("Vulnerable")) {
+                rsMachine.close();
+                machineStmt.close();
+                conn.close();
+                return false; // Machine not ready for patch
+            }
+            
+            rsSoftware.close();
+            softwareStmt.close();
+            
+            // 5. Verify the technician exists, role matches machine, and availability
+            String techQuery = "SELECT position, status FROM technicians WHERE technicianID = ?";
+            PreparedStatement techStmt = conn.prepareStatement(techQuery);
+            techStmt.setString(1, technicianID);
+            ResultSet rsTech = techStmt.executeQuery();
 
-            // 5. Check that patch type matches software type
+            if (!rsTech.next()) {
+                rsTech.close();
+                techStmt.close();
+                conn.close();
+                return false; // Technician does not exist
+            }
+
+            String techPosition = rsTech.getString("position");
+            String techStatus = rsTech.getString("status");
+            
+            // Check role compatibility
+            if ((techPosition.equals("Desktop Support") && !machineType.equals("PC")) ||
+                (techPosition.equals("Network Admin") && !(machineType.equals("Switch") || machineType.equals("Router"))) ||
+                (techPosition.equals("System Admin") && !machineType.equals("Server"))) {
+                rsTech.close();
+                techStmt.close();
+                conn.close();
+                return false; // Technician role mismatch
+            }
+            
+             // Check availability (assuming Available means less than 3 assigned patch works)
+            if (!techStatus.equals("Available")) {
+                rsTech.close();
+                techStmt.close();
+                conn.close();
+                return false; // Technician not available
+            }
+
+            rsTech.close();
+            techStmt.close();
+            
+            // 6. Check that patch type matches software type
             if (!patchType.equals(softwareType)) {
                 conn.close();
                 return false; // Patch type must match software type
             }
 
-            // 6. Check software type compatibility with machine type
+            // 7. Check software type compatibility with machine type
             if (softwareType.equals("Application") || softwareType.equals("System") || softwareType.equals("Programming")) {
                 if (!machineType.equals("PC")) {
                     conn.close();
@@ -293,18 +348,15 @@ public class Patch {
                 }
             }
 
-            // 7. Machine must be 'Vulnerable'
-            if (!machineStatus.equals("Vulnerable")) {
-                conn.close();
-                return false; // Machine not ready for patch
-            }
-
             // 8. Generate next patchID
             String nextPatchID = generateNextPatchID();
-
-            // 9. Insert the patch record with default status "New"
-            String insertQuery = "INSERT INTO patch (patchID, patchName, type, softwareID, machineID, technicianID, description, status) " +
-                                 "VALUES (?, ?, ?, ?, ?, ?, ?, 'New')";
+            
+            // 9. Get current date for releaseDate
+            java.sql.Date releaseDate = new java.sql.Date(System.currentTimeMillis());
+            
+            // 10. Insert the patch record with default status "New"
+            String insertQuery = "INSERT INTO patch (patchID, patchName, type, softwareID, machineID, technicianID, description, status, releaseDate) " +
+                                 "VALUES (?, ?, ?, ?, ?, ?, ?, 'New', ?)";
             PreparedStatement insertStmt = conn.prepareStatement(insertQuery);
             insertStmt.setString(1, nextPatchID);
             insertStmt.setString(2, patchName);
@@ -313,12 +365,13 @@ public class Patch {
             insertStmt.setString(5, machineID);
             insertStmt.setString(6, technicianID);
             insertStmt.setString(7, description);
-
+            insertStmt.setDate(8, releaseDate);
+             
             int rows = insertStmt.executeUpdate();
-
             insertStmt.close();
+            
+            
             conn.close();
-
             return rows > 0; // true if insert succeeded
 
         } catch (SQLException ex) {

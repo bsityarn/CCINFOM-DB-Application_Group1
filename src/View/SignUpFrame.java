@@ -5,6 +5,7 @@
 package View;
 
 import Model.Technician;
+import Model.Tester;
 import javax.swing.JOptionPane;
 
 /**
@@ -241,6 +242,24 @@ public class SignUpFrame extends javax.swing.JFrame {
             }
         } else if(roleComboBox.getSelectedItem().equals("Tester")){
             //TODO Anton can add his add function for tester here
+         
+            String newTesterID = Tester.addTester(firstName, lastName, email, password);
+            if (!newTesterID.equals("Empty") && !newTesterID.equals("Duplicate Email") && !newTesterID.equals("Invalid")) {
+                // Clear the fields
+                firstNameField.setText("");
+                lastNameField.setText("");
+                emailField.setText("");
+                passwordField.setText("");
+
+                JOptionPane.showMessageDialog(this, "Your ID is " + newTesterID, "Successful sign up", JOptionPane.INFORMATION_MESSAGE);
+                System.out.println("ADD: Tester " + firstName + " " + lastName + " added");
+            } else if ("Empty".equals(newTesterID)) {
+                JOptionPane.showMessageDialog(this, "Please fill in the information", "Error", JOptionPane.ERROR_MESSAGE);
+            } else if ("Duplicate Email".equals(newTesterID)) {
+                JOptionPane.showMessageDialog(this, "Duplicate email found, please change", "Error", JOptionPane.ERROR_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "Failed to add tester.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
 
 

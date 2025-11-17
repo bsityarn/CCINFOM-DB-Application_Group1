@@ -121,7 +121,7 @@
               <Color blue="ff" green="ff" red="ff" type="rgb"/>
             </Property>
             <Property name="horizontalAlignment" type="int" value="4"/>
-            <Property name="text" type="java.lang.String" value="(add Report name here)"/>
+            <Property name="text" type="java.lang.String" value="Tester Reports"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel3">

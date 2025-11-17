@@ -757,7 +757,7 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
             editPasswordField.setText("");
             
             JOptionPane.showMessageDialog(this, "Tester edited successfully!", "Edited Tester", JOptionPane.INFORMATION_MESSAGE);
-            System.out.println("EDIT: Technician " + firstName + " " + lastName + "edited");
+            System.out.println("EDIT: Tester " + firstName + " " + lastName + "edited");
         } else if ("Empty".equals(result)) {
             //This is an error when the User leaves a certain field blank
             JOptionPane.showMessageDialog(this, "Please fill in the information", "Error", JOptionPane.ERROR_MESSAGE);

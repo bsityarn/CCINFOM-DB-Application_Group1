@@ -50,7 +50,7 @@ public class ReportAntonFrame extends javax.swing.JFrame {
         jLabel2.setFont(new java.awt.Font("Andale Mono", 0, 14)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel2.setText("(add Report name here)");
+        jLabel2.setText("Tester Reports");
 
         jLabel3.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(255, 255, 255));
@@ -146,6 +146,7 @@ public class ReportAntonFrame extends javax.swing.JFrame {
 
     private void generateBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generateBtnActionPerformed
         // TODO add your handling code here:
+        
     }//GEN-LAST:event_generateBtnActionPerformed
 
     /**

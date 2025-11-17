@@ -165,9 +165,9 @@ public class Tester {
     }
     
     public static String addTester(String firstName, String lastName, String email, String password) {
-         StringBuilder query = new StringBuilder();
-        query.append(" INSERT INTO tester (firstName, lastName, email, password) ");
-        query.append(" VALUES (?, ?, ?, ?)");
+        StringBuilder query = new StringBuilder();
+        query.append(" INSERT INTO tester (testerID, firstName, lastName, email, password) ");
+        query.append(" VALUES (?, ?, ?, ?, ?)");
 
         //TODO - Check for email duplicates
         if (firstName.isBlank() || lastName.isBlank() || email.isBlank() || password.isBlank()) {//Checker for when the User leaves a Field blank
@@ -175,29 +175,32 @@ public class Tester {
         } else if (checkEmailDuplicates(email) == true) {
             return "Duplicate Email";
         } else {
+            String testerID = generateNextTesterID();
             try {
                 // Establish connection to DB
                 Connection conn = MySQLConnector.connectDB();
 
                 // Prepare SQL statement to be executed
                 PreparedStatement statement = conn.prepareStatement(query.toString());
-
-                statement.setString(1, firstName);
-                statement.setString(2, lastName);
-                statement.setString(3, email);
-                statement.setString(4, password);
+                
+                statement.setString(1, testerID);
+                statement.setString(2, firstName);
+                statement.setString(3, lastName);
+                statement.setString(4, email);
+                statement.setString(5, password);
 
                 statement.executeUpdate();
-
+                
+                
                 statement.close();
                 conn.close();
-
+                return testerID;
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
                 return "Invalid";
             }
         }
-        return "Valid";
+        
     }
     
     public static String deleteTester(String testerID) {

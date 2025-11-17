@@ -222,7 +222,8 @@ public class SignUpFrame extends javax.swing.JFrame {
 
         if (roleComboBox.getSelectedItem().equals("Technician")) {
             String position = (String) technicianPositionComboBox.getSelectedItem();
-            if (Technician.add(firstName, lastName, email, position, password) == "Valid") {
+            String newTechnicianID = Technician.add(firstName, lastName, email, position, password);
+            if (newTechnicianID.startsWith("TH")) {
                 //Makes the textfields blank again
                 firstNameField.setText("");
                 lastNameField.setText("");
@@ -230,12 +231,14 @@ public class SignUpFrame extends javax.swing.JFrame {
                 technicianPositionComboBox.setSelectedItem(1);
                 passwordField.setText("");
 
-                JOptionPane.showMessageDialog(this, "Sign up successfull!", "Added Technician", JOptionPane.INFORMATION_MESSAGE);
-                System.out.println("ADD: Technician " + firstName + " " + lastName + "added");
-            } else if (Technician.add(firstName, lastName, email, position, password) == "Empty") {
+                JOptionPane.showMessageDialog(this, "Your ID is " + newTechnicianID, "Successful sign up", JOptionPane.INFORMATION_MESSAGE);
+                System.out.println("ADD: Technician " + firstName + " " + lastName + " added");
+                
+                
+            } else if (newTechnicianID == "Empty") {
                 //This is an error when the User leaves a certain field blank
                 JOptionPane.showMessageDialog(this, "Please fill in the information", "Error", JOptionPane.ERROR_MESSAGE);
-            } else if (Technician.add(firstName, lastName, email, position, password) == "Duplicate Email") {
+            } else if (newTechnicianID == "Duplicate Email") {
                 //This is an error when the User inputs a duplicate email
                 JOptionPane.showMessageDialog(this, "Duplicate email found, please change", "Error", JOptionPane.ERROR_MESSAGE);
             }

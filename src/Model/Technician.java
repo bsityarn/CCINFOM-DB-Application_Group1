@@ -133,7 +133,7 @@ public class Technician {
         query.append(" FROM    technicians ");
         query.append(" WHERE   technicianID = ? ");
         Boolean result = false;
-
+        String typedPassword = new String(password);
         try {
             // Establish connection to DB
             Connection conn = MySQLConnector.connectDB();
@@ -146,7 +146,8 @@ public class Technician {
             ResultSet rs = statement.executeQuery();
 
             if (rs.next()) {//"if (rs.next)" will return true when AT LEAST 1 record is found. Hence, the technician is found
-                if (rs.getString("password").equals(password)) {//Checks if the right password was inputted
+                String passwordFromDB = rs.getString("password");
+                if (passwordFromDB.equals(typedPassword)) {//Checks if the right password was inputted
                     result = true;
                 } else {
                     result = false;
@@ -165,6 +166,7 @@ public class Technician {
     }
 
     public static String add(String firstName, String lastName, String email, String position, String password) {
+        String incrementedID = "";
         StringBuilder query = new StringBuilder();
         query.append(" INSERT INTO technicians (technicianID, firstName, lastName, position, email, password) ");
         query.append(" VALUES (?, ?, ?, ?, ?, ?)");
@@ -182,7 +184,7 @@ public class Technician {
                 // Prepare SQL statement to be executed
                 PreparedStatement statement = conn.prepareStatement(query.toString());
 
-                String incrementedID = HelperFunctions.incrementID("technicians");
+                incrementedID = HelperFunctions.incrementID("technicians");
                 statement.setString(1, incrementedID);
                 statement.setString(2, firstName);
                 statement.setString(3, lastName);
@@ -200,7 +202,7 @@ public class Technician {
                 return "Invalid";
             }
         }
-        return "Valid";
+        return incrementedID;//We return the incrementedID, so the sign up frame can show the user their ID credential
     }
 
     public static String edit(String technicianID, String firstName, String lastName, String email, String position, String currentPassword, String newPassword) {

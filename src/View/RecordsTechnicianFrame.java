@@ -679,7 +679,7 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
         String position = (String) addTechnicianPositionComboBox.getSelectedItem();
         String password = addPasswordField.getText();
 
-        if (Technician.add(firstName, lastName, email, position, password) == "Valid") {
+        if (Technician.add(firstName, lastName, email, position, password).startsWith("TH")) {
             //Makes the textfields blank again
             addFirstNameField.setText("");
             addLastNameField.setText("");
@@ -688,7 +688,7 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
             addPasswordField.setText("");
 
             JOptionPane.showMessageDialog(this, "Technician added successfully!", "Added Technician", JOptionPane.INFORMATION_MESSAGE);
-            System.out.println("ADD: Technician " + firstName + " " + lastName + "added");
+            System.out.println("ADD: Technician " + firstName + " " + lastName + " added");
         } else if (Technician.add(firstName, lastName, email, position, password) == "Empty") {
             //This is an error when the User leaves a certain field blank
             JOptionPane.showMessageDialog(this, "Please fill in the information", "Error", JOptionPane.ERROR_MESSAGE);

@@ -23,7 +23,7 @@ CREATE TABLE technicians(
     email VARCHAR(50) NOT NULL,
     position ENUM('Desktop Support', 'System Admin', 'Network Admin') NOT NULL,
     password VARCHAR(50) NOT NULL,
-    status ENUM('Available', 'Unavailable') DEFAULT 'Available' NOT NULL
+    status ENUM('Available', 'Unavailable', 'Inactive') DEFAULT 'Available' NOT NULL
     );
 
 INSERT INTO technicians (technicianID, firstName, lastName, email, position, password, status)

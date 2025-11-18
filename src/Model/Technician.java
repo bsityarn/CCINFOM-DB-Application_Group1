@@ -22,16 +22,50 @@ public class Technician {
     private String currentPassword;
     private String newPassword;
     private String status;
-    
+
     public static DefaultTableModel displayReport() {
         DefaultTableModel model = new DefaultTableModel();
         StringBuilder query = new StringBuilder();
-        query.append(" SELECT * FROM technicians ");
-        query.append(" WHERE technicianID = ? ");
+        query.append(" SELECT\n"
+                + "	t.technicianID,\n"
+                + "    CONCAT(t.firstName, ' ', t.lastName) AS Name,\n"
+                + "    COALESCE(p.Total_Patches, 0) AS Total_Patches_Released,\n"
+                + "    ROUND(IFNULL(p.Working_Patches / p.Total_Patches *100, 0), 2) AS '%WorkingPatches',\n"
+                + "	ROUND(IFNULL(p.NotWorking_Patches / p.Total_Patches *100, 0), 2) AS '%NotWorkingPatches',\n"
+                + "    \n"
+                + "    COALESCE(m.Total_Maintenance, 0) AS Total_MaintenanceAssigned,\n"
+                + "	COALESCE(m.Pending_Maintenance, 0) AS Total_Pending,\n"
+                + "	COALESCE(m.Completed_Maintenance, 0) AS Total_Completed,\n"
+                + "    ROUND(IFNULL(m.Late_Maintenance / m.Completed_Maintenance * 100, 0), 2) AS '%Late_completed',\n"
+                + "    ROUND(IFNULL(m.Punctual_Maintenance / m.Completed_Maintenance *100, 0), 2) AS '%Punctual_completed'\n"
+                + "\n"
+                + "FROM technicians t\n"
+                + "\n"
+                + "LEFT JOIN (\n"
+                + "	SELECT\n"
+                + "    technicianID,\n"
+                + "    COUNT(*) AS Total_Patches,\n"
+                + "    SUM(CASE WHEN status = 'Working' THEN 1 ELSE 0 END) AS Working_Patches,\n"
+                + "    SUM(CASE WHEN status = 'Not Working' THEN 1 ELSE 0 END) AS NotWorking_Patches\n"
+                + "    FROM patch\n"
+                + "    GROUP BY technicianID\n"
+                + ") p ON p.technicianID = t.technicianID\n"
+                + "\n"
+                + "LEFT JOIN(\n"
+                + "	SELECT\n"
+                + "    technicianIDassigned,\n"
+                + "    COUNT(*) AS Total_Maintenance,\n"
+                + "    SUM(CASE WHEN status IN ('In progress', 'Not Started') THEN 1 ELSE 0 END) AS Pending_Maintenance,\n"
+                + "    SUM(CASE WHEN status = 'Done' THEN 1 ELSE 0 END) AS Completed_Maintenance,\n"
+                + "    SUM(CASE WHEN status = 'Done' AND dateFinished > targetDeadline THEN 1 ELSE 0 END) AS Late_Maintenance,\n"
+                + "    SUM(CASE WHEN status = 'Done' AND dateFinished < targetDeadline THEN 1 ELSE 0 END) AS Punctual_Maintenance\n"
+                + "    \n"
+                + "    FROM maintenance\n"
+                + "    GROUP BY technicianIDassigned\n"
+                + ") m ON m.technicianIDassigned = t.technicianID;\n"
+                + "");
 
-        try (Connection conn = MySQLConnector.connectDB();
-             PreparedStatement statement = conn.prepareStatement(query.toString())) {
-
+        try (Connection conn = MySQLConnector.connectDB(); PreparedStatement statement = conn.prepareStatement(query.toString())) {
 
             // Execute query inside the try block
             try (ResultSet rs = statement.executeQuery()) {
@@ -44,8 +78,7 @@ public class Technician {
                     columnNames.add(metaData.getColumnName(i));
                 }
 
-
-                model.setColumnIdentifiers(columnNames); 
+                model.setColumnIdentifiers(columnNames);
 
                 int rowCount = 0;
                 while (rs.next()) {
@@ -57,7 +90,7 @@ public class Technician {
                     model.addRow(rowData);
                 }
 
-                System.out.println("Technician Rows found: " + rowCount);
+                System.out.println("Technician Performance Report Rows found: " + rowCount);
             }
 
         } catch (SQLException ex) {
@@ -74,8 +107,7 @@ public class Technician {
         query.append(" SELECT * FROM technicians ");
         query.append(" WHERE technicianID = ? ");
 
-        try (Connection conn = MySQLConnector.connectDB();
-             PreparedStatement statement = conn.prepareStatement(query.toString())) {
+        try (Connection conn = MySQLConnector.connectDB(); PreparedStatement statement = conn.prepareStatement(query.toString())) {
 
             statement.setString(1, technicianID);
 
@@ -90,8 +122,7 @@ public class Technician {
                     columnNames.add(metaData.getColumnName(i));
                 }
 
-
-                model.setColumnIdentifiers(columnNames); 
+                model.setColumnIdentifiers(columnNames);
 
                 int rowCount = 0;
                 while (rs.next()) {
@@ -119,9 +150,7 @@ public class Technician {
         StringBuilder query = new StringBuilder();
         query.append(" SELECT * FROM technicians ");
 
-        try (Connection conn = MySQLConnector.connectDB();
-             PreparedStatement statement = conn.prepareStatement(query.toString())) {
-
+        try (Connection conn = MySQLConnector.connectDB(); PreparedStatement statement = conn.prepareStatement(query.toString())) {
 
             // Execute query inside the try block
             try (ResultSet rs = statement.executeQuery()) {
@@ -134,8 +163,7 @@ public class Technician {
                     columnNames.add(metaData.getColumnName(i));
                 }
 
-
-                model.setColumnIdentifiers(columnNames); 
+                model.setColumnIdentifiers(columnNames);
 
                 int rowCount = 0;
                 while (rs.next()) {

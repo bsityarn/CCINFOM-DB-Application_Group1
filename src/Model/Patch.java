@@ -397,18 +397,18 @@ public class Patch {
 
             // If a row exists, rs.next() will be true and we can read the last patchID
             if (rs.next()) {
-                String lastID = rs.getString("patchID"); // e.g., "PT1005"
+                String lastID = rs.getString("patchID"); // e.g., "PT0005"
 
                 try {
                     // Remove the "PT" prefix and parse the remaining numeric part
-                    String numericPart = lastID.substring(2); // e.g., "1005"
+                    String numericPart = lastID.substring(2); // e.g., "0005"
                     int num = Integer.parseInt(numericPart);  // parse to int
                     int nextNum = num + 1;                    // increment
-                    nextID = "PT" + nextNum;                  // build new ID, e.g., "PT1006"
+                    nextID = String.format("PT%04d", nextNum);                  // build new ID, e.g., "PT0006"
                 } catch (Exception parseEx) {
                     // If parsing fails for any reason (unexpected format), fall back to default nextID
                     System.out.println("ID parse error: " + parseEx.getMessage());
-                    nextID = "PT1001";
+                    nextID = "PT0001";
                 }
             }
 
@@ -420,7 +420,7 @@ public class Patch {
         } catch (SQLException e) {
             // On DB error, print the message and fall back to default nextID
             System.out.println(e.getMessage());
-            nextID = "PT1001";
+            nextID = "PT0001";
         }
 
         // Return the computed or fallback patchID

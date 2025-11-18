@@ -329,6 +329,45 @@ public class Tester {
         return "Valid";
     }
     
+    public static boolean login(String testerID, char[] password) {
+        StringBuilder query = new StringBuilder();
+        query.append(" SELECT password ");
+        query.append(" FROM tester ");
+        query.append(" WHERE testerID = ? AND status = 'Active' ");
+
+        boolean result = false;
+
+        try {
+            Connection conn = MySQLConnector.connectDB();
+            PreparedStatement statement = conn.prepareStatement(query.toString());
+
+            statement.setString(1, testerID);
+
+            ResultSet rs = statement.executeQuery();
+
+            if (rs.next()) {
+                String passwordFromDB = rs.getString("password");
+
+                // convert char[] to String for comparison
+                String passwordInput = new String(password);
+
+                if (passwordFromDB.equals(passwordInput)) {
+                    result = true;
+                }
+            }
+
+            rs.close();
+            statement.close();
+            conn.close();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+            result = false;
+        }
+
+        return result;
+    }
+
     public static String activate(String testerID) {
         StringBuilder query = new StringBuilder();
         query.append(" UPDATE tester               ");
@@ -390,11 +429,11 @@ public class Tester {
                     String numericPart = lastID.substring(2); 
                     int num = Integer.parseInt(numericPart);  
                     int nextNum = num + 1;                    
-                    nextID = "TS" + nextNum;                  
+                    nextID = String.format("TS%04d", nextNum);                 
                 } catch (Exception parseEx) {
                     // If format is weird or corrupted, default to TS1001
                     System.out.println("ID parse error: " + parseEx.getMessage());
-                    nextID = "TS1001";
+                    nextID = "TS0001";
                 }
             }
 
@@ -404,7 +443,7 @@ public class Tester {
             conn.close();
 
         } catch (SQLException e) {
-            // On SQL error, fallback to TS1001
+            // On SQL error, fallback to TS0001
             System.out.println(e.getMessage());
             nextID = "TS0001";
         }

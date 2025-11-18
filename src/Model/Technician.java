@@ -22,6 +22,51 @@ public class Technician {
     private String currentPassword;
     private String newPassword;
     private String status;
+    
+    public static DefaultTableModel displayReport() {
+        DefaultTableModel model = new DefaultTableModel();
+        StringBuilder query = new StringBuilder();
+        query.append(" SELECT * FROM technicians ");
+        query.append(" WHERE technicianID = ? ");
+
+        try (Connection conn = MySQLConnector.connectDB();
+             PreparedStatement statement = conn.prepareStatement(query.toString())) {
+
+
+            // Execute query inside the try block
+            try (ResultSet rs = statement.executeQuery()) {
+
+                ResultSetMetaData metaData = rs.getMetaData();
+                int columnCount = metaData.getColumnCount();
+                Vector<String> columnNames = new Vector<>();
+
+                for (int i = 1; i <= columnCount; i++) {
+                    columnNames.add(metaData.getColumnName(i));
+                }
+
+
+                model.setColumnIdentifiers(columnNames); 
+
+                int rowCount = 0;
+                while (rs.next()) {
+                    rowCount++;
+                    Vector<Object> rowData = new Vector<>();
+                    for (int i = 1; i <= columnCount; i++) {
+                        rowData.add(rs.getObject(i));
+                    }
+                    model.addRow(rowData);
+                }
+
+                System.out.println("Technician Rows found: " + rowCount);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+            ex.printStackTrace();
+        }
+
+        return model;
+    }
 
     public static DefaultTableModel displayRecord(String technicianID) {
         DefaultTableModel model = new DefaultTableModel();

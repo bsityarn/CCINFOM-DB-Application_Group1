@@ -26,6 +26,7 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
         addPanel.setVisible(false);
         editPanel.setVisible(false);
         deletePanel.setVisible(false);
+        ActivateTesterBtn.setVisible(false);
 
     }
 
@@ -91,7 +92,7 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
         jLabel19 = new javax.swing.JLabel();
         editLastNameField = new javax.swing.JTextField();
         jLabel21 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        ActivateTesterBtn = new javax.swing.JButton();
         jLabel22 = new javax.swing.JLabel();
 
         plainPanel.setBackground(new java.awt.Color(40, 48, 143));
@@ -619,8 +620,8 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
 
         mainPanel.add(editPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 380, 830, -1));
 
-        jButton1.setText("Activate");
-        mainPanel.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 340, -1, -1));
+        ActivateTesterBtn.setText("Activate");
+        mainPanel.add(ActivateTesterBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 340, -1, -1));
 
         jLabel22.setText("jLabel22");
         mainPanel.add(jLabel22, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 340, 330, -1));
@@ -910,6 +911,7 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton ActivateTesterBtn;
     private javax.swing.JButton SearchBtn;
     private javax.swing.JComboBox<String> actionComboBox;
     private javax.swing.JTextField addEmailField;
@@ -934,7 +936,6 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
     private javax.swing.JPanel editPanel;
     private javax.swing.JTextField editPasswordField;
     private javax.swing.JTextField editTesterIDField;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;

@@ -288,6 +288,12 @@ public class Transac3Frame extends javax.swing.JFrame {
         } else if (transac3Result.contains("cannot work with")) {
             //This is an error when the User inputs incompatible technician and patchtype
             JOptionPane.showMessageDialog(this, transac3Result, "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (transac3Result == "Duplicate found") {
+            //This is an error when the User inputs incompatible technician and patchtype
+            JOptionPane.showMessageDialog(this, "Duplicate Maintenance Work found!", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (transac3Result == "Invalid") {
+            //This is an error when the User inputs incompatible technician and patchtype
+            JOptionPane.showMessageDialog(this, "Technician or Patch ID is invalid!", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_scheduleBtnActionPerformed
 

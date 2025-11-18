@@ -4,6 +4,14 @@
  */
 package View;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author marcquizon
@@ -36,6 +44,8 @@ public class ReportBernardFrame extends javax.swing.JFrame {
         backBtn = new javax.swing.JButton();
         jSeparator1 = new javax.swing.JSeparator();
         generateBtn = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -50,7 +60,7 @@ public class ReportBernardFrame extends javax.swing.JFrame {
         jLabel2.setFont(new java.awt.Font("Andale Mono", 0, 14)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel2.setText("(add Report name here)");
+        jLabel2.setText("Patch Feedback Record  ");
 
         jLabel3.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(255, 255, 255));
@@ -80,6 +90,16 @@ public class ReportBernardFrame extends javax.swing.JFrame {
             }
         });
 
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
+            }
+        ));
+        jScrollPane1.setViewportView(jTable1);
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -88,9 +108,13 @@ public class ReportBernardFrame extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jScrollPane1)
+                        .addContainerGap())
+                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 246, Short.MAX_VALUE)
-                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 446, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 240, Short.MAX_VALUE)
+                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 446, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap())
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(backBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -102,7 +126,7 @@ public class ReportBernardFrame extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(generateBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 274, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addGap(312, 312, 312))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -116,7 +140,9 @@ public class ReportBernardFrame extends javax.swing.JFrame {
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(generateBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 552, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 19, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 505, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(27, 27, 27)
                 .addComponent(backBtn)
                 .addGap(16, 16, 16))
         );
@@ -146,6 +172,58 @@ public class ReportBernardFrame extends javax.swing.JFrame {
 
     private void generateBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generateBtnActionPerformed
         // TODO add your handling code here:
+        String url = "jdbc:mysql://localhost:3306/CCINFOMS24_GROUP1_DB";
+        String user = "root";
+        String password = ""; // change if needed
+
+        String query = """
+        SELECT 
+            p.patchID,
+            p.name AS patchName,
+            CONCAT(t.firstName, ' ', t.lastName) AS testerName,
+            f.description AS feedbackDescription,
+            f.rating,
+            (SELECT AVG(f2.rating) FROM feedback f2 WHERE f2.patchID = p.patchID) AS avgRating,
+            (SELECT COUNT(*) FROM feedback f3 WHERE f3.patchID = p.patchID) AS feedbackCount
+        FROM feedback f
+        JOIN patch p ON f.patchID = p.patchID
+        JOIN tester t ON f.testerID = t.testerID
+        ORDER BY p.patchID, testerName;
+        """;
+
+        try (Connection conn = DriverManager.getConnection(url, user, password); PreparedStatement stmt = conn.prepareStatement(query); ResultSet rs = stmt.executeQuery()) {
+
+            // Build table model
+            DefaultTableModel model = new DefaultTableModel();
+            model.addColumn("Patch ID");
+            model.addColumn("Patch Name");
+            model.addColumn("Tester Name");
+            model.addColumn("Feedback Description");
+            model.addColumn("Rating");
+            model.addColumn("Average Rating");
+            model.addColumn("Feedback Count");
+
+            while (rs.next()) {
+                model.addRow(new Object[]{
+                    rs.getString("patchID"),
+                    rs.getString("patchName"),
+                    rs.getString("testerName"),
+                    rs.getString("feedbackDescription"),
+                    rs.getInt("rating"),
+                    rs.getDouble("avgRating"),
+                    rs.getInt("feedbackCount")
+                });
+            }
+
+            jTable1.setModel(model);
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this,
+                    "Error loading report: " + e.getMessage(),
+                    "Database Error",
+                    JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
     }//GEN-LAST:event_generateBtnActionPerformed
 
     /**
@@ -180,6 +258,8 @@ public class ReportBernardFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables
 }

@@ -53,7 +53,13 @@ VALUES
 ('MC0002', 'Database Node 1', 'Server', 'Healthy'),
 ('MC0003', 'API Server 2', 'Server', 'Scheduled for patch'),
 ('MC0004', 'Core Switch A', 'Switch', 'Vulnerable'),
-('MC0005', 'Network Router X', 'Router', 'Scheduled for patch');
+('MC0005', 'Network Router X', 'Router', 'Scheduled for patch'),
+('MC0006', 'Development PC Bravo', 'PC', 'Healthy'),
+('MC0007', 'Backup Server Delta', 'Server', 'Healthy'),
+('MC0008', 'Core Switch B', 'Switch', 'Healthy'),
+('MC0009', 'Router Zeta', 'Router', 'Vulnerable'),
+('MC0010', 'File Server Omega', 'Server', 'Scheduled for patch');
+
 
 CREATE TABLE software (
     softwareID VARCHAR(6) NOT NULL UNIQUE PRIMARY KEY,
@@ -70,7 +76,13 @@ VALUES
 ('SF0002', 'DataLink DB Engine', 'Programming', 'v3.5.0', '2025-09-30'),
 ('SF0003', 'UIFlow Framework', 'Application', 'v2.0.0', '2025-10-05'),
 ('SF0004', 'SysBoost Core', 'System', 'v1.2.0', '2025-10-10'),
-('SF0005', 'NetConnect Suite', 'Network', 'v4.2.0', '2025-10-15');
+('SF0005', 'NetConnect Suite', 'Network', 'v4.2.0', '2025-10-15'),
+('SF0006', 'ServerMon Dashboard', 'Server', 'v2.1.0', '2025-10-20'),
+('SF0007', 'PacketTrace Utility', 'Network', 'v1.5.0', '2025-10-22'),
+('SF0008', 'AutoDeploy Manager', 'System', 'v3.0.1', '2025-10-25'),
+('SF0009', 'CodeBridge IDE', 'Programming', 'v5.4.2', '2025-10-28'),
+('SF0010', 'UserFlow Portal', 'Application', 'v1.3.5', '2025-11-01');
+
 
 CREATE TABLE tester (
     testerID VARCHAR(6) NOT NULL UNIQUE PRIMARY KEY,
@@ -87,7 +99,13 @@ VALUES
 ('TS0002', 'Ryan', 'Lim', 'ryan@ptrackerdb.com', 'pass123', 'Active'),
 ('TS0003', 'Sofia', 'Cruz', 'sofia@ptrackerdb.com', 'pass123', 'Active'),
 ('TS0004', 'Daniel', 'Tan', 'daniel@ptrackerdb.com', 'pass123', 'Inactive'),
-('TS0005', 'Lea', 'Reyes', 'lea@ptrackerdb.com', 'pass123', 'Active');
+('TS0005', 'Lea', 'Reyes', 'lea@ptrackerdb.com', 'pass123', 'Active'),
+('TS0006', 'Kevin', 'Ocampo', 'kevin@ptrackerdb.com', 'pass123', 'Active'),
+('TS0007', 'Marianne', 'Lopez', 'marianne@ptrackerdb.com', 'pass123', 'Active'),
+('TS0008', 'Patrick', 'Dizon', 'patrick@ptrackerdb.com', 'pass123', 'Inactive'),
+('TS0009', 'Faith', 'Garcia', 'faith@ptrackerdb.com', 'pass123', 'Active'),
+('TS0010', 'Oliver', 'Chua', 'oliver@ptrackerdb.com', 'pass123', 'Active');
+
 
     
 -- Creating the transactional records

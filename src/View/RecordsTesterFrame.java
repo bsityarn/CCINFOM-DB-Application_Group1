@@ -93,7 +93,7 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
         editLastNameField = new javax.swing.JTextField();
         jLabel21 = new javax.swing.JLabel();
         ActivateTesterBtn = new javax.swing.JButton();
-        jLabel22 = new javax.swing.JLabel();
+        inactiveTesterLabel = new javax.swing.JLabel();
 
         plainPanel.setBackground(new java.awt.Color(40, 48, 143));
 
@@ -621,10 +621,16 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
         mainPanel.add(editPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 380, 830, -1));
 
         ActivateTesterBtn.setText("Activate");
+        ActivateTesterBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ActivateTesterBtnActionPerformed(evt);
+            }
+        });
         mainPanel.add(ActivateTesterBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 340, -1, -1));
 
-        jLabel22.setText("jLabel22");
-        mainPanel.add(jLabel22, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 340, 330, -1));
+        inactiveTesterLabel.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
+        inactiveTesterLabel.setForeground(new java.awt.Color(255, 255, 255));
+        mainPanel.add(inactiveTesterLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 340, 330, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -863,7 +869,16 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
                     editEmailField.setEnabled(true);
                     editPasswordField.setEnabled(true);
                     editConfirmBtn.setEnabled(true);
-                }
+                    
+                    // Show activation option if tester is inactive
+                    if (tester.getStatus().equals("Inactive")) {
+                        inactiveTesterLabel.setText("This tester is inactive, click the button to activate");
+                        ActivateTesterBtn.setVisible(true);
+                    } else {
+                        inactiveTesterLabel.setText("");
+                        ActivateTesterBtn.setVisible(false);
+                    }
+                } 
                 else {
                     JOptionPane.showMessageDialog(this, "Tester ID not found");
                 }
@@ -884,6 +899,22 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
         //Here is the new function to add your code in
     }//GEN-LAST:event_editLastNameFieldActionPerformed
+
+    private void ActivateTesterBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ActivateTesterBtnActionPerformed
+        // TODO add your handling code here:
+        String testerID = editTesterIDField.getText();
+        String result = Tester.activate(testerID);
+
+        if (result.equals("Valid")) {
+            JOptionPane.showMessageDialog(this, "Tester activated successfully!", "Activated Tester", JOptionPane.INFORMATION_MESSAGE);
+        } else if (result.equals("Empty")) {
+            JOptionPane.showMessageDialog(this, "Please fill in the information", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (result.equals("Missing")) {
+            JOptionPane.showMessageDialog(this, "Tester does not exist", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (result.equals("Invalid")) {
+            JOptionPane.showMessageDialog(this, "Invalid information", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_ActivateTesterBtnActionPerformed
 
     /**
      * @param args the command line arguments
@@ -936,6 +967,7 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
     private javax.swing.JPanel editPanel;
     private javax.swing.JTextField editPasswordField;
     private javax.swing.JTextField editTesterIDField;
+    private javax.swing.JLabel inactiveTesterLabel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -950,7 +982,6 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
-    private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;

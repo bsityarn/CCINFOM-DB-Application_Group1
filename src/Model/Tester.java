@@ -17,6 +17,7 @@ public class Tester {
     private String lastName;
     private String email;
     private String password;
+    private String status;
     
     public static boolean checkEmailDuplicates(String email) {
         StringBuilder query = new StringBuilder();
@@ -431,6 +432,9 @@ public class Tester {
         return password;
     }
     
+    public String getStatus() {
+        return status;
+    }
     public void setID(String testerID) {
         this.testerID = testerID;
     }

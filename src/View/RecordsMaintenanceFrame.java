@@ -7,6 +7,7 @@ package View;
 import Model.Maintenance;
 import java.awt.CardLayout;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -49,7 +50,7 @@ public class RecordsMaintenanceFrame extends javax.swing.JFrame {
         backBtn = new javax.swing.JButton();
         resultsLbl = new javax.swing.JLabel();
         searchIDField = new javax.swing.JTextField();
-        SearchBtn = new javax.swing.JButton();
+        viewAllBtn = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         jLabel4 = new javax.swing.JLabel();
@@ -60,6 +61,7 @@ public class RecordsMaintenanceFrame extends javax.swing.JFrame {
         jSeparator1 = new javax.swing.JSeparator();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
+        SearchBtn = new javax.swing.JButton();
 
         plainPanel.setBackground(new java.awt.Color(40, 48, 143));
 
@@ -192,30 +194,39 @@ public class RecordsMaintenanceFrame extends javax.swing.JFrame {
         resultsLbl.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         resultsLbl.setText("Results found");
         mainPanel.add(resultsLbl, new org.netbeans.lib.awtextra.AbsoluteConstraints(334, 62, 178, 28));
-        mainPanel.add(searchIDField, new org.netbeans.lib.awtextra.AbsoluteConstraints(334, 31, 178, -1));
+        mainPanel.add(searchIDField, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 30, 100, -1));
 
-        SearchBtn.setFont(new java.awt.Font("Krungthep", 0, 14)); // NOI18N
-        SearchBtn.setText("Search");
-        SearchBtn.setBorderPainted(false);
-        SearchBtn.setOpaque(true);
-        SearchBtn.addActionListener(new java.awt.event.ActionListener() {
+        viewAllBtn.setFont(new java.awt.Font("Krungthep", 0, 14)); // NOI18N
+        viewAllBtn.setText("View All");
+        viewAllBtn.setBorderPainted(false);
+        viewAllBtn.setOpaque(true);
+        viewAllBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                SearchBtnActionPerformed(evt);
+                viewAllBtnActionPerformed(evt);
             }
         });
-        mainPanel.add(SearchBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(524, 31, -1, -1));
+        mainPanel.add(viewAllBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 30, -1, -1));
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "maintenanceID", "workType", "patchID", "technicianIDAssigned", "dateAssigned", "targetDeadline", "dateFinished", "status", "description"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         jScrollPane1.setViewportView(jTable1);
 
         mainPanel.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 96, 838, 236));
@@ -224,7 +235,7 @@ public class RecordsMaintenanceFrame extends javax.swing.JFrame {
         jLabel4.setForeground(new java.awt.Color(255, 255, 255));
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jLabel4.setText("Search ID:");
-        mainPanel.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 28, 88, 28));
+        mainPanel.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 30, 88, 28));
 
         deletePanel.setBackground(new java.awt.Color(40, 48, 143));
 
@@ -293,6 +304,17 @@ public class RecordsMaintenanceFrame extends javax.swing.JFrame {
         jLabel6.setText("Click \"Schedule patch work to Technician\" on Menu to add a Maintnenance Record");
         mainPanel.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 340, 570, 28));
 
+        SearchBtn.setFont(new java.awt.Font("Krungthep", 0, 14)); // NOI18N
+        SearchBtn.setText("Search");
+        SearchBtn.setBorderPainted(false);
+        SearchBtn.setOpaque(true);
+        SearchBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SearchBtnActionPerformed(evt);
+            }
+        });
+        mainPanel.add(SearchBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 30, -1, -1));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -316,9 +338,12 @@ public class RecordsMaintenanceFrame extends javax.swing.JFrame {
         this.dispose();
     }//GEN-LAST:event_backBtnActionPerformed
 
-    private void SearchBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SearchBtnActionPerformed
+    private void viewAllBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewAllBtnActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_SearchBtnActionPerformed
+        
+        DefaultTableModel model = Maintenance.displayTable();
+        jTable1.setModel(model);
+    }//GEN-LAST:event_viewAllBtnActionPerformed
 
     private void addUsernameField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addUsernameField1ActionPerformed
         // TODO add your handling code here:
@@ -355,6 +380,18 @@ public class RecordsMaintenanceFrame extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Invalid information", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_deleteMaintenanceBtnActionPerformed
+
+    private void SearchBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SearchBtnActionPerformed
+        // TODO add your handling code here:
+        String maintenanceID = searchIDField.getText();
+
+        if (maintenanceID.isBlank()) {
+            JOptionPane.showMessageDialog(this, "Please fill in the information", "Error", JOptionPane.ERROR_MESSAGE);
+        } else {
+            DefaultTableModel model = Maintenance.displayRecord(maintenanceID);
+            jTable1.setModel(model);
+        }
+    }//GEN-LAST:event_SearchBtnActionPerformed
 
     /**
      * @param args the command line arguments
@@ -408,5 +445,6 @@ public class RecordsMaintenanceFrame extends javax.swing.JFrame {
     private javax.swing.JPanel plainPanel;
     private javax.swing.JLabel resultsLbl;
     private javax.swing.JTextField searchIDField;
+    private javax.swing.JButton viewAllBtn;
     // End of variables declaration//GEN-END:variables
 }

@@ -26,48 +26,44 @@ public class Technician {
     public static DefaultTableModel displayRecord(String technicianID) {
         DefaultTableModel model = new DefaultTableModel();
         StringBuilder query = new StringBuilder();
-        query.append(" SELECT  *               ");
-        query.append(" FROM    technicians ");
-        query.append(" WHERE   technicianID = ? ");
+        query.append(" SELECT * FROM technicians ");
+        query.append(" WHERE technicianID = ? ");
 
-        try {
-            // Establish connection to DB
-            Connection conn = MySQLConnector.connectDB();
-
-            PreparedStatement statement = conn.prepareStatement(query.toString());
+        try (Connection conn = MySQLConnector.connectDB();
+             PreparedStatement statement = conn.prepareStatement(query.toString())) {
 
             statement.setString(1, technicianID);
-            ResultSet rs = statement.executeQuery();
 
-            // 1. Use executeQuery() and get the ResultSet
-            ResultSetMetaData metaData = rs.getMetaData();
-            int columnCount = metaData.getColumnCount();
-            Vector<String> columnNames = new Vector<>();
+            // Execute query inside the try block
+            try (ResultSet rs = statement.executeQuery()) {
 
-            for (int i = 1; i <= columnCount; i++) {
-                columnNames.add(metaData.getColumnName(i));
-            }
+                ResultSetMetaData metaData = rs.getMetaData();
+                int columnCount = metaData.getColumnCount();
+                Vector<String> columnNames = new Vector<>();
 
-            int rowCount = 0;
-            model.setColumnIdentifiers(columnNames);
-
-            while (rs.next()) {
-                rowCount++;
-                Vector<Object> rowData = new Vector<>();
                 for (int i = 1; i <= columnCount; i++) {
-                    rowData.add(rs.getObject(i));
+                    columnNames.add(metaData.getColumnName(i));
                 }
-                model.addRow(rowData);
+
+
+                model.setColumnIdentifiers(columnNames); 
+
+                int rowCount = 0;
+                while (rs.next()) {
+                    rowCount++;
+                    Vector<Object> rowData = new Vector<>();
+                    for (int i = 1; i <= columnCount; i++) {
+                        rowData.add(rs.getObject(i));
+                    }
+                    model.addRow(rowData);
+                }
+
+                System.out.println("Technician Rows found: " + rowCount);
             }
 
-            System.out.println("Rows found: " + rowCount); // DEBUG CHECK 3
-
-            //Closing the connections to avoid DB app slow down in performance
-//            rs.close();
-//            statement.close();
-//            conn.close();
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
+            ex.printStackTrace();
         }
 
         return model;
@@ -76,42 +72,42 @@ public class Technician {
     public static DefaultTableModel displayTable() {
         DefaultTableModel model = new DefaultTableModel();
         StringBuilder query = new StringBuilder();
-        query.append(" SELECT  *               ");
-        query.append(" FROM    technicians ");
+        query.append(" SELECT * FROM technicians ");
 
-        try {
-            // Establish connection to DB
-            Connection conn = MySQLConnector.connectDB();
+        try (Connection conn = MySQLConnector.connectDB();
+             PreparedStatement statement = conn.prepareStatement(query.toString())) {
 
-            PreparedStatement statement = conn.prepareStatement(query.toString());
 
-            ResultSet rs = statement.executeQuery();
+            // Execute query inside the try block
+            try (ResultSet rs = statement.executeQuery()) {
 
-            // 1. Use executeQuery() and get the ResultSet
-            ResultSetMetaData metaData = rs.getMetaData();
-            int columnCount = metaData.getColumnCount();
-            Vector<String> columnNames = new Vector<>();
+                ResultSetMetaData metaData = rs.getMetaData();
+                int columnCount = metaData.getColumnCount();
+                Vector<String> columnNames = new Vector<>();
 
-            for (int i = 1; i <= columnCount; i++) {
-                columnNames.add(metaData.getColumnName(i));
-            }
-            model.setColumnIdentifiers(columnNames);
-
-            while (rs.next()) {
-                Vector<Object> rowData = new Vector<>();
                 for (int i = 1; i <= columnCount; i++) {
-                    rowData.add(rs.getObject(i));
+                    columnNames.add(metaData.getColumnName(i));
                 }
-                model.addRow(rowData);
+
+
+                model.setColumnIdentifiers(columnNames); 
+
+                int rowCount = 0;
+                while (rs.next()) {
+                    rowCount++;
+                    Vector<Object> rowData = new Vector<>();
+                    for (int i = 1; i <= columnCount; i++) {
+                        rowData.add(rs.getObject(i));
+                    }
+                    model.addRow(rowData);
+                }
+
+                System.out.println("Technician Rows found: " + rowCount);
             }
 
-
-            //Closing the connections to avoid DB app slow down in performance
-//            rs.close();
-//            statement.close();
-//            conn.close();
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
+            ex.printStackTrace();
         }
 
         return model;

@@ -5,6 +5,8 @@
 package Model;
 
 import java.sql.*;
+import java.util.Vector;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -21,6 +23,95 @@ public class Maintenance {
     private String dateFinished;
     private String status;
     private String description;
+    public static DefaultTableModel displayRecord(String maintenanceID) {
+        DefaultTableModel model = new DefaultTableModel();
+        StringBuilder query = new StringBuilder();
+        query.append(" SELECT * FROM maintenance ");
+        query.append(" WHERE maintenanceID = ? ");
+
+        try (Connection conn = MySQLConnector.connectDB();
+             PreparedStatement statement = conn.prepareStatement(query.toString())) {
+
+            statement.setString(1, maintenanceID);
+
+            // Execute query inside the try block
+            try (ResultSet rs = statement.executeQuery()) {
+
+                ResultSetMetaData metaData = rs.getMetaData();
+                int columnCount = metaData.getColumnCount();
+                Vector<String> columnNames = new Vector<>();
+
+                for (int i = 1; i <= columnCount; i++) {
+                    columnNames.add(metaData.getColumnName(i));
+                }
+
+
+                model.setColumnIdentifiers(columnNames); 
+
+                int rowCount = 0;
+                while (rs.next()) {
+                    rowCount++;
+                    Vector<Object> rowData = new Vector<>();
+                    for (int i = 1; i <= columnCount; i++) {
+                        rowData.add(rs.getObject(i));
+                    }
+                    model.addRow(rowData);
+                }
+
+                System.out.println("Maintenance Rows found: " + rowCount);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+            ex.printStackTrace();
+        }
+
+        return model;
+    }
+
+    public static DefaultTableModel displayTable() {
+        DefaultTableModel model = new DefaultTableModel();
+        StringBuilder query = new StringBuilder();
+        query.append(" SELECT * FROM maintenance ");
+
+        try (Connection conn = MySQLConnector.connectDB();
+             PreparedStatement statement = conn.prepareStatement(query.toString())) {
+
+
+            // Execute query inside the try block
+            try (ResultSet rs = statement.executeQuery()) {
+
+                ResultSetMetaData metaData = rs.getMetaData();
+                int columnCount = metaData.getColumnCount();
+                Vector<String> columnNames = new Vector<>();
+
+                for (int i = 1; i <= columnCount; i++) {
+                    columnNames.add(metaData.getColumnName(i));
+                }
+
+
+                model.setColumnIdentifiers(columnNames); 
+
+                int rowCount = 0;
+                while (rs.next()) {
+                    rowCount++;
+                    Vector<Object> rowData = new Vector<>();
+                    for (int i = 1; i <= columnCount; i++) {
+                        rowData.add(rs.getObject(i));
+                    }
+                    model.addRow(rowData);
+                }
+
+                System.out.println("Maintenance Rows found: " + rowCount);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+            ex.printStackTrace();
+        }
+
+        return model;
+    }
 
     //CHECKER for Technician's availability
     public static int checkTechAvailability(String technicianIDassigned) {

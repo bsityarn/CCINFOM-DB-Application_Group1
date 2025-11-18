@@ -9,6 +9,8 @@ import java.sql.*;
 import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Vector;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -25,6 +27,60 @@ public class Patch {
     private String status;
     private String type;
     
+    public static DefaultTableModel displayPatchReport(int year, int month) {
+         DefaultTableModel model = new DefaultTableModel();
+
+        // SQL query for patch success/failure stats
+        String query = """
+        SELECT name AS patchName,
+               type AS patchType,
+               COUNT(CASE WHEN status='Working' THEN 1 END) AS successCount,
+               COUNT(CASE WHEN status<>'Working' THEN 1 END) AS failureCount,
+               ROUND(COUNT(CASE WHEN status='Working' THEN 1 END)/COUNT(*)*100, 2) AS successRate,
+               ROUND(COUNT(CASE WHEN status<>'Working' THEN 1 END)/COUNT(*)*100, 2) AS failureRate
+        FROM patch
+        WHERE YEAR(releaseDate) = ? AND MONTH(releaseDate) = ?
+        GROUP BY name, type
+        """;
+
+
+        try (Connection conn = MySQLConnector.connectDB();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            // Bind parameters for year and month
+            stmt.setInt(1, year);
+            stmt.setInt(2, month);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                // Build column headers dynamically
+                ResultSetMetaData metaData = rs.getMetaData();
+                int columnCount = metaData.getColumnCount();
+                Vector<String> columnNames = new Vector<>();
+                for (int i = 1; i <= columnCount; i++) {
+                    columnNames.add(metaData.getColumnLabel(i));
+                }
+                model.setColumnIdentifiers(columnNames);
+
+                // Fill rows
+                int rowCount = 0;
+                while (rs.next()) {
+                    rowCount++;
+                    Vector<Object> rowData = new Vector<>();
+                    for (int i = 1; i <= columnCount; i++) {
+                        rowData.add(rs.getObject(i));
+                    }
+                    model.addRow(rowData);
+                }
+
+                System.out.println("Patch Rows found: " + rowCount);
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return model;
+    }
     public static String deletePatch(String patchID) {
 
         if (patchID.isBlank()) {

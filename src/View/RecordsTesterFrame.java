@@ -96,6 +96,7 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
         jLabel21 = new javax.swing.JLabel();
         ActivateTesterBtn = new javax.swing.JButton();
         inactiveTesterLabel = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
 
         plainPanel.setBackground(new java.awt.Color(40, 48, 143));
 
@@ -203,7 +204,7 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel2.setText("Tester Records");
-        mainPanel.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(651, 0, 199, 85));
+        mainPanel.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 0, 199, 85));
 
         jLabel3.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(255, 255, 255));
@@ -634,6 +635,14 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
         inactiveTesterLabel.setForeground(new java.awt.Color(255, 255, 255));
         mainPanel.add(inactiveTesterLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 340, 330, -1));
 
+        jButton1.setText("View All");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        mainPanel.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 70, -1, -1));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -657,26 +666,6 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
         this.dispose();
     }//GEN-LAST:event_backBtnActionPerformed
     
-//    public void populateTable() {
-//        String[] columnNames = {"Tester ID", "First Name", "Last Name", "Email"};
-//        DefaultTableModel model = new DefaultTableModel(columnNames, 0) {
-//            @Override
-//            public boolean isCellEditable(int row, int column) {
-//                return false;
-//            }
-//        };
-//
-//        try {
-//            ArrayList<Tester> testers = Tester.getAllTesters(); // Model handles DB
-//            for (Tester t : testers) {
-//                model.addRow(new Object[]{t.getTesterID(), t.getFirstName(), t.getLastName(), t.getEmail()});
-//            }
-//        } catch (Exception e) {
-//            JOptionPane.showMessageDialog(this, "Error fetching data: " + e.getMessage());
-//        }
-//
-//        jTable1.setModel(model);
-//    }
 
     private void SearchBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SearchBtnActionPerformed
         // TODO add your handling code here:
@@ -689,19 +678,12 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
         
         else {
             // a failsafe action just in case
-            try {
-                
-                // placeholder since need to declare a method in Model for searching database
-                ArrayList<String[]> matches = Tester.searchTester(testerID);
-               
-                System.out.println("Found " + matches.size() + " matches.");
-            }
-            catch (Exception ex) {
-                System.out.println("Error during search: " + ex.getMessage());
-            }
+            DefaultTableModel model = Tester.displayRecord(testerID);
+            jTable1.setModel(model);
         }
 
     }//GEN-LAST:event_SearchBtnActionPerformed
+     
 
     private void actionComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionComboBoxActionPerformed
         // TODO add your handling code here:
@@ -939,6 +921,14 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_ActivateTesterBtnActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        String testerID = searchIDField.getText();
+
+        DefaultTableModel model = Tester.displayTable();
+        jTable1.setModel(model);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -991,6 +981,7 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
     private javax.swing.JTextField editPasswordField;
     private javax.swing.JTextField editTesterIDField;
     private javax.swing.JLabel inactiveTesterLabel;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;

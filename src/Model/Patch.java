@@ -30,70 +30,53 @@ public class Patch {
     public static DefaultTableModel displayPatchReport(int year, int month) {
         DefaultTableModel model = new DefaultTableModel();
 
-        // Step 1: Get all patches for the given year and month (using releaseDate)
-        String patchQuery = "SELECT patchID, name AS patchName, type AS patchType FROM patch " +
-                            "WHERE YEAR(releaseDate) = ? AND MONTH(releaseDate) = ?";
+        // Set table headers
+        Vector<String> columnNames = new Vector<>();
+        columnNames.add("Patch Name");
+        columnNames.add("Patch Type");
+        columnNames.add("Success Deployments");
+        columnNames.add("Failed Deployments");
+        columnNames.add("Success Rate");
+        columnNames.add("Fail Rate");
+        model.setColumnIdentifiers(columnNames);
+
+        // SQL query: join patch -> machine -> maintenance
+        String query = "SELECT p.patchID, p.name AS patchName, p.type AS patchType, " +
+               "COALESCE(SUM(CASE WHEN m.status = 'Done' THEN 1 ELSE 0 END), 0) AS successCount, " +
+               "COALESCE(SUM(CASE WHEN m.status IN ('Not Started', 'In progress') THEN 1 ELSE 0 END), 0) AS failureCount " +
+               "FROM patch p " +
+               "LEFT JOIN maintenance m ON p.patchID = m.patchID " +
+               "WHERE YEAR(p.releaseDate) = ? AND MONTH(p.releaseDate) = ? " +
+               "GROUP BY p.patchID, p.name, p.type " +
+               "ORDER BY p.name";
 
         try (Connection conn = MySQLConnector.connectDB();
-             PreparedStatement patchStmt = conn.prepareStatement(patchQuery)) {
+             PreparedStatement stmt = conn.prepareStatement(query)) {
 
-            patchStmt.setInt(1, year);
-            patchStmt.setInt(2, month);
+            stmt.setInt(1, year);
+            stmt.setInt(2, month);
 
-            try (ResultSet patchRs = patchStmt.executeQuery()) {
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    String patchName = rs.getString("patchName");
+                    String patchType = rs.getString("patchType");
+                    int successCount = rs.getInt("successCount");
+                    int failureCount = rs.getInt("failureCount");
 
-                // Step 2: Set table headers manually
-                Vector<String> columnNames = new Vector<>();
-                columnNames.add("patchName");
-                columnNames.add("patchType");
-                columnNames.add("successCount");
-                columnNames.add("failureCount");
-                columnNames.add("successRate");
-                columnNames.add("failureRate");
-                model.setColumnIdentifiers(columnNames);
+                    int total = successCount + failureCount;
+                    double successRate = total > 0 ? ((double) successCount / total) * 100 : 0;
+                    double failureRate = total > 0 ? ((double) failureCount / total) * 100 : 0;
 
-                // Step 3: Loop through each patch
-                while (patchRs.next()) {
-                    String patchID = patchRs.getString("patchID");
-                    String patchName = patchRs.getString("patchName");
-                    String patchType = patchRs.getString("patchType");
+                    Vector<Object> rowData = new Vector<>();
+                    rowData.add(patchName);
+                    rowData.add(patchType);
+                    rowData.add(successCount);
+                    rowData.add(failureCount);
+                    rowData.add(String.format("%.2f", successRate));
+                    rowData.add(String.format("%.2f", failureRate));
 
-                    // Step 4: Count successes and failures from maintenance table
-                    String maintQuery = "SELECT status FROM maintenance WHERE patchID = ?";
-                    try (PreparedStatement maintStmt = conn.prepareStatement(maintQuery)) {
-                        maintStmt.setString(1, patchID);
-                        try (ResultSet maintRs = maintStmt.executeQuery()) {
-
-                            int successCount = 0;
-                            int failureCount = 0;
-
-                            // Step 5: Loop through maintenance records to determine success/failure
-                            while (maintRs.next()) {
-                                String status = maintRs.getString("status");
-                                if ("Done".equals(status)) { // Done = success
-                                    successCount++;
-                                } else { // Not Started or In progress = failure
-                                    failureCount++;
-                                }
-                            }
-
-                            int total = successCount + failureCount;
-                            double successRate = total > 0 ? ((double) successCount / total) * 100 : 0;
-                            double failureRate = total > 0 ? ((double) failureCount / total) * 100 : 0;
-
-                            // Step 6: Add row to table model
-                            Vector<Object> rowData = new Vector<>();
-                            rowData.add(patchName);
-                            rowData.add(patchType);
-                            rowData.add(successCount);
-                            rowData.add(failureCount);
-                            rowData.add(successRate);  // store as Double
-                            rowData.add(failureRate);  // store as Double
-                            model.addRow(rowData);
-                        }
-                    }
+                    model.addRow(rowData);
                 }
-
             }
 
         } catch (SQLException ex) {
@@ -102,6 +85,8 @@ public class Patch {
 
         return model;
     }
+
+
     
     public static String deletePatch(String patchID) {
 

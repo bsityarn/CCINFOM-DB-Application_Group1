@@ -3,10 +3,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package View;
+
 import Model.Maintenance;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.JOptionPane;
+import java.util.Calendar;
 
 /**
  *
@@ -14,6 +16,7 @@ import javax.swing.JOptionPane;
  */
 public class Transac3Frame extends javax.swing.JFrame {
     
+
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Transac3Frame.class.getName());
 
     /**
@@ -22,6 +25,14 @@ public class Transac3Frame extends javax.swing.JFrame {
     public Transac3Frame() {
         initComponents();
         this.setResizable(false);
+        Calendar calendar = Calendar.getInstance();//Gets current date
+        calendar.add(Calendar.DAY_OF_MONTH, 1);//Adds 1 day
+        Date dayTomorrow = calendar.getTime();// turns into a Date variable
+
+        //Only allows user to choose tomorrow and onwards as a Deadline
+        jDateChooser1.setMinSelectableDate(dayTomorrow);
+        //Automatically choose tomorrow as the selected date to avoid null date
+        jDateChooser1.setDate(dayTomorrow);
     }
 
     /**
@@ -247,28 +258,36 @@ public class Transac3Frame extends javax.swing.JFrame {
         String patchID = patchIDField.getText();
         String workType = (String) workTypeComboBox.getSelectedItem();
         String description = descriptionField.getText();
+        String targetDeadline = "";
         java.util.Date selectedDate = jDateChooser1.getDate();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String targetDeadline = sdf.format(selectedDate);
         
-        System.out.println("targetDeadline: " + targetDeadline);
-        if (Maintenance.transac3(workType, patchID, technicianID, targetDeadline, description).startsWith("MT")) {
+        Calendar calendar = Calendar.getInstance();//Gets current date
+        calendar.add(Calendar.DAY_OF_MONTH, 1);//Adds 1 day
+        Date dayTomorrow = calendar.getTime();// turns into a Date variable
+        
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        targetDeadline = sdf.format(selectedDate);
+        String transac3Result = Maintenance.transac3(workType, patchID, technicianID, targetDeadline, description);
+
+        if (transac3Result.startsWith("MT")) {
             //Makes the textfields blank again
             technicianIDField.setText("");
             patchIDField.setText("");
             workTypeComboBox.setSelectedItem(1);
             descriptionField.setText("");
-            jDateChooser1.setDate(null);
-
-
-            JOptionPane.showMessageDialog(this, "Patch work assigned successfully!", "Added Maintenance", JOptionPane.INFORMATION_MESSAGE);
+            jDateChooser1.setDate(dayTomorrow);
+            
             System.out.println("ADD: Maintenance, PatchID and TechnicianID " + patchID + " " + technicianID + " added");
-        } else if (Maintenance.transac3(workType, patchID, technicianID, targetDeadline, description) == "Empty") {
+            JOptionPane.showMessageDialog(this, "Patch work assigned successfully!", "Added Maintenance", JOptionPane.INFORMATION_MESSAGE);
+        } else if (transac3Result == "Empty") {
             //This is an error when the User leaves a certain field blank
             JOptionPane.showMessageDialog(this, "Please fill in the information", "Error", JOptionPane.ERROR_MESSAGE);
-        } else if (Maintenance.transac3(workType, patchID, technicianID, targetDeadline, description) == "Duplicate Email") {
-            //This is an error when the User inputs a duplicate email
-            JOptionPane.showMessageDialog(this, "Duplicate email found, please change", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (transac3Result == "Unavailable Technician") {
+            //This is an error when the User inputs an unavailable technician
+            JOptionPane.showMessageDialog(this, "Technician is Unavailable", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (transac3Result.contains("cannot work with")) {
+            //This is an error when the User inputs incompatible technician and patchtype
+            JOptionPane.showMessageDialog(this, transac3Result, "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_scheduleBtnActionPerformed
 

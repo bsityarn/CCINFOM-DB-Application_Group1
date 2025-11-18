@@ -21,6 +21,112 @@ public class Maintenance {
     private String status;
     private String description;
     
+    //CHECKER for Technician's availability
+    public static int checkTechAvailability(String technicianIDassigned){
+        StringBuilder query = new StringBuilder();
+        query.append(" SELECT COUNT(technicianIDassigned) AS noOfTasks  ");
+        query.append(" FROM maintenance ");
+        query.append(" WHERE technicianIDassigned = ? AND status != 'Done'");
+        int noOfTasks = -1;
+        try {
+                // Establish connection to DB
+                Connection conn = MySQLConnector.connectDB();
+
+                // Prepare SQL statement to be executed
+                PreparedStatement statement = conn.prepareStatement(query.toString());
+
+                
+                statement.setString(1, technicianIDassigned);
+
+                ResultSet rs = statement.executeQuery();
+                if(rs.next()){
+                    noOfTasks = rs.getInt("noOfTasks");
+                }
+                System.out.println("NoOfTasks for Technician " + technicianIDassigned + ":" + " " + noOfTasks);
+
+                rs.close();
+                statement.close();
+                conn.close();
+
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+                return -1;
+            }
+        
+        
+        
+        return noOfTasks;
+    }
+    
+    public static String checkTechCompatibility(String technicianIDassigned, String patchID){
+        StringBuilder query1 = new StringBuilder();
+        query1.append(" SELECT position FROM technicians              ");
+        query1.append(" WHERE technicianID = ?");
+        //Get the position of the Technician assigned
+        
+        StringBuilder query2 = new StringBuilder();
+        query2.append(" SELECT type FROM patch              ");
+        query2.append(" WHERE patchID = ?");
+        //Get the type of the Patch Assigned
+        
+        String techPosition = "";
+        String patchType = "";
+        String result = "Invalid";
+        
+        try {
+                // Establish connection to DB
+                Connection conn = MySQLConnector.connectDB();
+
+                // Prepare SQL statement to be executed
+                PreparedStatement statement1 = conn.prepareStatement(query1.toString());
+                statement1.setString(1, technicianIDassigned);
+                
+                PreparedStatement statement2 = conn.prepareStatement(query2.toString());
+                statement2.setString(1, patchID);
+
+                ResultSet rsTechnician = statement1.executeQuery();
+                ResultSet rsPatch = statement2.executeQuery();
+
+                if(rsTechnician.next()){
+                    techPosition = rsTechnician.getString("position");//Retrieve and store technician's postion
+                }
+                if(rsPatch.next()){
+                    patchType = rsPatch.getString("type");//Retrieve and store patch's type
+                }
+                
+                rsTechnician.close();
+                rsPatch.close();
+                statement1.close();
+                statement2.close();
+                conn.close();
+
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+                return "Invalid";
+            }
+        
+        if(techPosition.equals("Desktop Support")){
+            if(patchType.equals("Application") || patchType.equals("System") || patchType.equals("Programming")){
+                result = "Valid";
+            }else{
+                result = techPosition + " cannot work with " + patchType + " patch type";
+            }
+        } else if(techPosition.equals("Network Admin")){
+            if(patchType.equals("Network")){
+                result = "Valid";
+            }else{
+                result = techPosition + " cannot work with " + patchType  + " patch type";
+            }
+        } else if(techPosition.equals("System Admin")){
+            if(patchType.equals("Server")){
+                result = "Valid";
+            }else{
+                result = techPosition + " cannot work with " + patchType  + " patch type";
+            }
+        }  
+        return result;
+    }
+    
     public static String transac3(String workType, String patchID, String technicianIDassigned, 
                                   String targetDeadline, String description){
         StringBuilder query = new StringBuilder();
@@ -28,12 +134,15 @@ public class Maintenance {
         query.append(" (maintenanceID, workType, patchID, technicianIDassigned, targetDeadline, description)");
         query.append(" VALUES (?, ?, ?, ?, ?, ?)");
         String incrementedID = "";
+        String compatibilityResult = checkTechCompatibility(technicianIDassigned, patchID);
 
-        if (workType.isBlank() || patchID.isBlank() || technicianIDassigned.isBlank() || targetDeadline.isBlank() || description.isBlank()) {//Checker for when the User leaves a Field blank
+        if (workType.isBlank() || patchID.isBlank() || technicianIDassigned.isBlank() || targetDeadline.isBlank() || description.isBlank() || targetDeadline.isBlank()) {//Checker for when the User leaves a Field blank
             return "Empty";
-        } else if (false) {//Checker for email duplicates
-            return "Duplicate Email";
-        } else {
+        } else if (checkTechAvailability(technicianIDassigned) >= 3) {//Checker for email duplicates
+            return "Unavailable Technician";
+        } else if(compatibilityResult != "Valid") {
+            return compatibilityResult;
+        }else {
             try {
                 // Establish connection to DB
                 Connection conn = MySQLConnector.connectDB();

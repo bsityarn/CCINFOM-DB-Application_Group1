@@ -6,7 +6,7 @@
  * Author:  marcquizon
  * Created: Nov 15, 2025
  */
--- CREATE DATABASE IF NOT EXISTS CCINFOMS24_GROUP1_DB;
+CREATE DATABASE IF NOT EXISTS CCINFOMS24_GROUP1_DB;
 DROP TABLE IF EXISTS technicians;
 DROP TABLE IF EXISTS machines;
 DROP TABLE IF EXISTS software;
@@ -66,7 +66,7 @@ CREATE TABLE software (
     softwareName VARCHAR(30) NOT NULL,
     type ENUM('Application', 'System', 'Programming', 'Network', 'Server') NOT NULL,
     version VARCHAR(30) NOT NULL,
-    releaseDate DATE NOT NULL
+    releaseDate DATE NOT NULL,
     status ENUM('Active', 'Inactive') DEFAULT 'Active'
 );
 
@@ -145,7 +145,7 @@ CREATE TABLE maintenance(
     workType ENUM('Deploy', 'Rollback'),
     patchID VARCHAR(6) NOT NULL,
     technicianIDassigned VARCHAR(6) NOT NULL,
-    dateAssigned DATE NOT NULL DEFAULT NOW(),
+    dateAssigned DATE NOT NULL DEFAULT (CURRENT_DATE()),
     targetDeadline DATE NOT NULL,
     dateFinished DATE,
     status ENUM('Not Started', 'In progress', 'Done') DEFAULT 'Not Started',

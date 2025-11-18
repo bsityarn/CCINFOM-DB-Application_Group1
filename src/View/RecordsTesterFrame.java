@@ -9,6 +9,8 @@ import Model.Tester;
 import java.awt.CardLayout;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
+import java.sql.*;
+import javax.swing.table.DefaultTableModel;
 /**
  *
  * @author marcquizon
@@ -654,6 +656,27 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
         menuTechnician.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_backBtnActionPerformed
+    
+    public void populateTable() {
+        String[] columnNames = {"Tester ID", "First Name", "Last Name", "Email"};
+        DefaultTableModel model = new DefaultTableModel(columnNames, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        try {
+            ArrayList<Tester> testers = Tester.getAllTesters(); // Model handles DB
+            for (Tester t : testers) {
+                model.addRow(new Object[]{t.getTesterID(), t.getFirstName(), t.getLastName(), t.getEmail()});
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error fetching data: " + e.getMessage());
+        }
+
+        jTable1.setModel(model);
+    }
 
     private void SearchBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SearchBtnActionPerformed
         // TODO add your handling code here:

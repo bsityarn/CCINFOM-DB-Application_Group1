@@ -55,6 +55,39 @@ public class Maintenance {
 
         return noOfTasks;
     }
+    
+    public static String checkPatchStatus(String patchID) {
+        StringBuilder query = new StringBuilder();
+        query.append(" SELECT status  ");
+        query.append(" FROM patch ");
+        query.append(" WHERE patchID = ? ");
+        String patchStatus = "";
+
+        try {
+            // Establish connection to DB
+            Connection conn = MySQLConnector.connectDB();
+
+            // Prepare SQL statement to be executed
+            PreparedStatement statement = conn.prepareStatement(query.toString());
+
+            statement.setString(1, patchID);
+
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+                patchStatus = rs.getString("status");
+            }
+            System.out.println("Patch " + patchID + " status " + patchStatus);
+            rs.close();
+            statement.close();
+            conn.close();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+            return "Invalid";
+        }
+
+        return patchStatus;
+    }
 
     public static String checkTechCompatibility(String technicianIDassigned, String patchID) {
         StringBuilder query1 = new StringBuilder();
@@ -300,6 +333,17 @@ public class Maintenance {
         query.append(" VALUES (?, ?, ?, ?, ?, ?)");
         String incrementedID = "";
         String compatibilityResult = checkTechCompatibility(technicianIDassigned, patchID);
+        String patchStatus = checkPatchStatus(patchID);
+        
+        if(workType.equals("Deploy")){
+            if(patchStatus.equals("Not Working") || patchStatus.equals("Inactive")){
+                return "Cannot Deploy Inactive/Not Working patch";
+            }
+        }else if(workType.equals("Rollback")){
+            if(patchStatus.equals("Working")){
+                return "Cannot Rollback a Working patch";
+            }
+        }
 
         if (workType.isBlank() || patchID.isBlank() || technicianIDassigned.isBlank() || targetDeadline.isBlank() || description.isBlank() || targetDeadline.isBlank()) {//Checker for when the User leaves a Field blank
             return "Empty";

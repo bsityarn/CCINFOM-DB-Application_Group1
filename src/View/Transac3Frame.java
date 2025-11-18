@@ -294,6 +294,12 @@ public class Transac3Frame extends javax.swing.JFrame {
         } else if (transac3Result == "Invalid") {
             //This is an error when the User inputs incompatible technician and patchtype
             JOptionPane.showMessageDialog(this, "Technician or Patch ID is invalid!", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (transac3Result == "Cannot Deploy Inactive/Not Working patch") {
+            //This is an error when the User inputs incompatible technician and patchtype
+            JOptionPane.showMessageDialog(this, "Cannot Deploy Inactive/Not Working patch", "Error", JOptionPane.ERROR_MESSAGE);
+        }   else if (transac3Result == "Cannot Rollback a Working patch") {
+            //This is an error when the User inputs incompatible technician and patchtype
+            JOptionPane.showMessageDialog(this, "Cannot Rollback a Working patch", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_scheduleBtnActionPerformed
 

@@ -166,8 +166,8 @@ public class Tester {
     
     public static String addTester(String firstName, String lastName, String email, String password) {
         StringBuilder query = new StringBuilder();
-        query.append(" INSERT INTO tester (testerID, firstName, lastName, email, password) ");
-        query.append(" VALUES (?, ?, ?, ?, ?)");
+        query.append(" INSERT INTO tester (testerID, firstName, lastName, email, password, status) ");
+        query.append(" VALUES (?, ?, ?, ?, ?, 'Active')");
 
         //TODO - Check for email duplicates
         if (firstName.isBlank() || lastName.isBlank() || email.isBlank() || password.isBlank()) {//Checker for when the User leaves a Field blank
@@ -236,15 +236,15 @@ public class Tester {
                     return "not Found";
                 }
                 
-                // performs deletion when tester does exist
-                PreparedStatement deleteStatement = conn.prepareStatement(query.toString());
-                deleteStatement.setString(1, testerID);
-
-                // executes deletion
-                int rowsAffected = deleteStatement.executeUpdate();
-
-                deleteStatement.close();
-                conn.close();
+                 // Soft-delete: update status to Inactive
+                   String updateQuery = "UPDATE tester SET status='Inactive' WHERE testerID=?";
+                   PreparedStatement updateStmt = conn.prepareStatement(updateQuery);
+                   
+                   updateStmt.setString(1, testerID);
+                   int rowsAffected = updateStmt.executeUpdate();
+                   
+                   updateStmt.close();
+                   conn.close();
 
                 // If no rows deleted (shouldn’t happen if count is greater than 0)
                 if (rowsAffected == 0) {
@@ -328,9 +328,46 @@ public class Tester {
         return "Valid";
     }
     
+    public static String activate(String testerID) {
+        StringBuilder query = new StringBuilder();
+        query.append(" UPDATE tester               ");
+        query.append(" SET   status = 'Active' ");
+        query.append(" WHERE   testerID = ? ");
+
+        String result = "Invalid";
+
+        if (testerID.isBlank()) {
+            result = "Empty";
+        } else {
+            try {
+                // Establish connection to DB
+                Connection conn = MySQLConnector.connectDB();
+
+                // Prepare SQL statement to be executed
+                PreparedStatement statement = conn.prepareStatement(query.toString());
+
+                statement.setString(1, testerID);
+                int rowAffected = statement.executeUpdate();
+                System.out.println(rowAffected);
+
+                if (rowAffected == 0) {
+                    result = "Missing";
+                } else if (rowAffected > 0) {
+                    result = "Valid";
+                }
+                statement.close();
+                conn.close();
+
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+                result = "Invalid";
+            }
+        }
+        return result;
+    }
     private static String generateNextTesterID() {
         // Default ID if table is empty or something fails
-        String nextID = "TS1001";
+        String nextID = "TS0001";
 
         // Query to get highest existing tester ID
         String query = "SELECT testerID FROM tester ORDER BY testerID DESC LIMIT 1";
@@ -345,14 +382,14 @@ public class Tester {
 
             // If table has at least one tester
             if (rs.next()) {
-                String lastID = rs.getString("testerID"); // e.g., "TS1033"
+                String lastID = rs.getString("testerID"); // e.g., "TS0033"
 
                 try {
                     // Remove prefix "TS" and get numeric part
-                    String numericPart = lastID.substring(2); // "1033"
-                    int num = Integer.parseInt(numericPart);  // 1033
-                    int nextNum = num + 1;                    // increment → 1034
-                    nextID = "TS" + nextNum;                  // "TS1034"
+                    String numericPart = lastID.substring(2); 
+                    int num = Integer.parseInt(numericPart);  
+                    int nextNum = num + 1;                    
+                    nextID = "TS" + nextNum;                  
                 } catch (Exception parseEx) {
                     // If format is weird or corrupted, default to TS1001
                     System.out.println("ID parse error: " + parseEx.getMessage());
@@ -368,7 +405,7 @@ public class Tester {
         } catch (SQLException e) {
             // On SQL error, fallback to TS1001
             System.out.println(e.getMessage());
-            nextID = "TS1001";
+            nextID = "TS0001";
         }
 
         return nextID; // Return the final valid ID

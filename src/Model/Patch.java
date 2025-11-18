@@ -382,7 +382,7 @@ public class Patch {
     
     public static String generateNextPatchID() {
         // Default base if there are no records or something goes wrong
-        String nextID = "PT1001";
+        String nextID = "PT0001";
 
         // SQL to get the latest patchID ordered descending (so the top row is the highest ID)
         String query = "SELECT patchID FROM patch ORDER BY patchID DESC LIMIT 1";

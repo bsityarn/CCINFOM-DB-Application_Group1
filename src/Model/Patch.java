@@ -28,51 +28,72 @@ public class Patch {
     private String type;
     
     public static DefaultTableModel displayPatchReport(int year, int month) {
-         DefaultTableModel model = new DefaultTableModel();
+        DefaultTableModel model = new DefaultTableModel();
 
-        // SQL query for patch success/failure stats
-        String query = """
-        SELECT name AS patchName,
-               type AS patchType,
-               COUNT(CASE WHEN status='Working' THEN 1 END) AS successCount,
-               COUNT(CASE WHEN status<>'Working' THEN 1 END) AS failureCount,
-               ROUND(COUNT(CASE WHEN status='Working' THEN 1 END)/COUNT(*)*100, 2) AS successRate,
-               ROUND(COUNT(CASE WHEN status<>'Working' THEN 1 END)/COUNT(*)*100, 2) AS failureRate
-        FROM patch
-        WHERE YEAR(releaseDate) = ? AND MONTH(releaseDate) = ?
-        GROUP BY name, type
-        """;
-
+        // Step 1: Get all patches for the given year and month (using releaseDate)
+        String patchQuery = "SELECT patchID, name AS patchName, type AS patchType FROM patch " +
+                            "WHERE YEAR(releaseDate) = ? AND MONTH(releaseDate) = ?";
 
         try (Connection conn = MySQLConnector.connectDB();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+             PreparedStatement patchStmt = conn.prepareStatement(patchQuery)) {
 
-            // Bind parameters for year and month
-            stmt.setInt(1, year);
-            stmt.setInt(2, month);
+            patchStmt.setInt(1, year);
+            patchStmt.setInt(2, month);
 
-            try (ResultSet rs = stmt.executeQuery()) {
-                // Build column headers dynamically
-                ResultSetMetaData metaData = rs.getMetaData();
-                int columnCount = metaData.getColumnCount();
+            try (ResultSet patchRs = patchStmt.executeQuery()) {
+
+                // Step 2: Set table headers manually
                 Vector<String> columnNames = new Vector<>();
-                for (int i = 1; i <= columnCount; i++) {
-                    columnNames.add(metaData.getColumnLabel(i));
-                }
+                columnNames.add("patchName");
+                columnNames.add("patchType");
+                columnNames.add("successCount");
+                columnNames.add("failureCount");
+                columnNames.add("successRate");
+                columnNames.add("failureRate");
                 model.setColumnIdentifiers(columnNames);
 
-                // Fill rows
-                int rowCount = 0;
-                while (rs.next()) {
-                    rowCount++;
-                    Vector<Object> rowData = new Vector<>();
-                    for (int i = 1; i <= columnCount; i++) {
-                        rowData.add(rs.getObject(i));
+                // Step 3: Loop through each patch
+                while (patchRs.next()) {
+                    String patchID = patchRs.getString("patchID");
+                    String patchName = patchRs.getString("patchName");
+                    String patchType = patchRs.getString("patchType");
+
+                    // Step 4: Count successes and failures from maintenance table
+                    String maintQuery = "SELECT status FROM maintenance WHERE patchID = ?";
+                    try (PreparedStatement maintStmt = conn.prepareStatement(maintQuery)) {
+                        maintStmt.setString(1, patchID);
+                        try (ResultSet maintRs = maintStmt.executeQuery()) {
+
+                            int successCount = 0;
+                            int failureCount = 0;
+
+                            // Step 5: Loop through maintenance records to determine success/failure
+                            while (maintRs.next()) {
+                                String status = maintRs.getString("status");
+                                if ("Done".equals(status)) { // Done = success
+                                    successCount++;
+                                } else { // Not Started or In progress = failure
+                                    failureCount++;
+                                }
+                            }
+
+                            int total = successCount + failureCount;
+                            double successRate = total > 0 ? ((double) successCount / total) * 100 : 0;
+                            double failureRate = total > 0 ? ((double) failureCount / total) * 100 : 0;
+
+                            // Step 6: Add row to table model
+                            Vector<Object> rowData = new Vector<>();
+                            rowData.add(patchName);
+                            rowData.add(patchType);
+                            rowData.add(successCount);
+                            rowData.add(failureCount);
+                            rowData.add(successRate);  // store as Double
+                            rowData.add(failureRate);  // store as Double
+                            model.addRow(rowData);
+                        }
                     }
-                    model.addRow(rowData);
                 }
 
-                System.out.println("Patch Rows found: " + rowCount);
             }
 
         } catch (SQLException ex) {
@@ -81,6 +102,7 @@ public class Patch {
 
         return model;
     }
+    
     public static String deletePatch(String patchID) {
 
         if (patchID.isBlank()) {

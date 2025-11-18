@@ -4,7 +4,9 @@
  */
 package View;
 
-import java.awt.CardLayout;
+import Model.Feedback;
+import java.util.ArrayList;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -456,6 +458,37 @@ public class RecordsFeedbackFrame extends javax.swing.JFrame {
 
     private void SearchBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SearchBtnActionPerformed
         // TODO add your handling code here:
+        // Read search ID (can be partial or full depending on model)
+        String searchID = searchIDField.getText().trim();
+
+        // Use the model's searchFeedback method which returns ArrayList<String[]>
+        // Each row expected as: { feedbackID, testerID, patchID, description, rating }
+        ArrayList<String[]> matches = Feedback.searchFeedback(searchID);
+
+        // Update label
+        resultsLbl.setText(matches.size() + " results found");
+
+        // Build table model: match columns to the searchFeedback return order
+        String[] cols = {"Feedback ID", "Tester ID", "Patch ID", "Description", "Rating"};
+        javax.swing.table.DefaultTableModel tbl = new javax.swing.table.DefaultTableModel(cols, 0);
+
+        for (String[] row : matches) {
+            // Defensive: ensure row has expected length
+            if (row.length >= 5) {
+                tbl.addRow(new Object[]{
+                    row[0], // feedbackID
+                    row[1], // testerID
+                    row[2], // patchID
+                    row[3], // description
+                    row[4] // rating
+                });
+            } else {
+                // If shape differs, still try to add what exists
+                tbl.addRow(row);
+            }
+        }
+
+        jTable1.setModel(tbl);
     }//GEN-LAST:event_SearchBtnActionPerformed
 
     private void actionComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionComboBoxActionPerformed
@@ -465,15 +498,13 @@ public class RecordsFeedbackFrame extends javax.swing.JFrame {
         if ("Edit".equals(selectedAction)) {
             editPanel.setVisible(true);
             deletePanel.setVisible(false);
-
-        } else {
+        } else { // Delete
             deletePanel.setVisible(true);
             editPanel.setVisible(false);
         }
-        
+
         mainPanel.revalidate();
         mainPanel.repaint();
-
     }//GEN-LAST:event_actionComboBoxActionPerformed
 
     private void editDescriptionFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editDescriptionFieldActionPerformed
@@ -482,6 +513,33 @@ public class RecordsFeedbackFrame extends javax.swing.JFrame {
 
     private void editConfirmBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editConfirmBtnActionPerformed
         // TODO add your handling code here:
+        // Gather inputs
+        String feedbackID = editFeedbackIDField.getText().trim();
+        String newDescription = editDescriptionField.getText().trim();
+        int newRating = editRatingSlider.getValue();
+
+        // Call model
+        String result = Feedback.edit(feedbackID, newDescription, newRating);
+
+        // Mirror TechnicianFrame style: check return codes and show user-friendly messages
+        if (result == "Valid") {
+            // Clear fields
+            editFeedbackIDField.setText("");
+            editDescriptionField.setText("");
+            editRatingSlider.setValue(1);
+
+            JOptionPane.showMessageDialog(this, "Feedback edited successfully!", "Edited Feedback", JOptionPane.INFORMATION_MESSAGE);
+        } else if (result == "Empty") {
+            JOptionPane.showMessageDialog(this, "Please fill in the information", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (result == "Invalid Rating") {
+            JOptionPane.showMessageDialog(this, "Rating must be between 1 and 10", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (result == "Missing") {
+            JOptionPane.showMessageDialog(this, "Feedback does not exist", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (result == "Patch Not Done") {
+            JOptionPane.showMessageDialog(this, "Associated patch has not completed maintenance (cannot edit).", "Error", JOptionPane.ERROR_MESSAGE);
+        } else { // covers "Invalid" and any unexpected
+            JOptionPane.showMessageDialog(this, "Invalid operation", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_editConfirmBtnActionPerformed
 
     private void addUsernameField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addUsernameField1ActionPerformed
@@ -506,6 +564,23 @@ public class RecordsFeedbackFrame extends javax.swing.JFrame {
 
     private void deleteFeedbackBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteFeedbackBtnActionPerformed
         // TODO add your handling code here:
+        String feedbackID = deleteFeedbackIDField.getText().trim();
+
+        // Call delete
+        String result = Feedback.delete(feedbackID);
+
+        // Mirror TechnicianFrame delete handling
+        if (result == "Valid") {
+            // Clear field(s)
+            deleteFeedbackIDField.setText("");
+            JOptionPane.showMessageDialog(this, "Feedback deleted successfully!", "Deleted Feedback", JOptionPane.INFORMATION_MESSAGE);
+        } else if (result == "Empty") {
+            JOptionPane.showMessageDialog(this, "Please fill in the information", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (result == "Missing") {
+            JOptionPane.showMessageDialog(this, "Feedback does not exist", "Error", JOptionPane.ERROR_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "Invalid operation", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_deleteFeedbackBtnActionPerformed
 
     private void editFeedbackIDFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editFeedbackIDFieldActionPerformed
@@ -514,6 +589,24 @@ public class RecordsFeedbackFrame extends javax.swing.JFrame {
 
     private void editEnterBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editEnterBtnActionPerformed
         // TODO add your handling code here:
+        String feedbackID = editFeedbackIDField.getText().trim();
+
+        if (feedbackID.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter Feedback ID", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Use the model's getInfo (keeps consistency with Technician.getInfo)
+        Feedback fb = Feedback.getInfo(feedbackID);
+
+        // Depending on your model, getInfo returns an empty Feedback with null fields if not found.
+        // Check the feedbackID field (like Technician frame does).
+        if (fb.getFeedbackID() != null) {
+            editDescriptionField.setText(fb.getDescription());
+            editRatingSlider.setValue(fb.getRating());
+        } else {
+            JOptionPane.showMessageDialog(this, "Feedback ID not found", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_editEnterBtnActionPerformed
 
     /**

@@ -5,6 +5,8 @@
 package Model;
 
 import java.sql.*;
+import java.util.Vector;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -20,6 +22,100 @@ public class Technician {
     private String currentPassword;
     private String newPassword;
     private String status;
+
+    public static DefaultTableModel displayRecord(String technicianID) {
+        DefaultTableModel model = new DefaultTableModel();
+        StringBuilder query = new StringBuilder();
+        query.append(" SELECT  *               ");
+        query.append(" FROM    technicians ");
+        query.append(" WHERE   technicianID = ? ");
+
+        try {
+            // Establish connection to DB
+            Connection conn = MySQLConnector.connectDB();
+
+            PreparedStatement statement = conn.prepareStatement(query.toString());
+
+            statement.setString(1, technicianID);
+            ResultSet rs = statement.executeQuery();
+
+            // 1. Use executeQuery() and get the ResultSet
+            ResultSetMetaData metaData = rs.getMetaData();
+            int columnCount = metaData.getColumnCount();
+            Vector<String> columnNames = new Vector<>();
+
+            for (int i = 1; i <= columnCount; i++) {
+                columnNames.add(metaData.getColumnName(i));
+            }
+
+            int rowCount = 0;
+            model.setColumnIdentifiers(columnNames);
+
+            while (rs.next()) {
+                rowCount++;
+                Vector<Object> rowData = new Vector<>();
+                for (int i = 1; i <= columnCount; i++) {
+                    rowData.add(rs.getObject(i));
+                }
+                model.addRow(rowData);
+            }
+
+            System.out.println("Rows found: " + rowCount); // DEBUG CHECK 3
+
+            //Closing the connections to avoid DB app slow down in performance
+//            rs.close();
+//            statement.close();
+//            conn.close();
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+
+        return model;
+    }
+
+    public static DefaultTableModel displayTable() {
+        DefaultTableModel model = new DefaultTableModel();
+        StringBuilder query = new StringBuilder();
+        query.append(" SELECT  *               ");
+        query.append(" FROM    technicians ");
+
+        try {
+            // Establish connection to DB
+            Connection conn = MySQLConnector.connectDB();
+
+            PreparedStatement statement = conn.prepareStatement(query.toString());
+
+            ResultSet rs = statement.executeQuery();
+
+            // 1. Use executeQuery() and get the ResultSet
+            ResultSetMetaData metaData = rs.getMetaData();
+            int columnCount = metaData.getColumnCount();
+            Vector<String> columnNames = new Vector<>();
+
+            for (int i = 1; i <= columnCount; i++) {
+                columnNames.add(metaData.getColumnName(i));
+            }
+            model.setColumnIdentifiers(columnNames);
+
+            while (rs.next()) {
+                Vector<Object> rowData = new Vector<>();
+                for (int i = 1; i <= columnCount; i++) {
+                    rowData.add(rs.getObject(i));
+                }
+                model.addRow(rowData);
+            }
+
+
+            //Closing the connections to avoid DB app slow down in performance
+//            rs.close();
+//            statement.close();
+//            conn.close();
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+
+        return model;
+    }
 
     public static boolean checkEmailDuplicates(String email, String technicianID) {//used when editing a technician
         StringBuilder query = new StringBuilder();

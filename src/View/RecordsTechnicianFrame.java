@@ -8,6 +8,7 @@ import javax.swing.JLayeredPane;
 import Controller.*;
 import Model.Technician;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -46,7 +47,7 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
         jSeparator1 = new javax.swing.JSeparator();
         resultsLbl = new javax.swing.JLabel();
         searchIDField = new javax.swing.JTextField();
-        SearchBtn = new javax.swing.JButton();
+        viewAllBtn = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         jLabel4 = new javax.swing.JLabel();
@@ -90,6 +91,7 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
         jLabel8 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         activateTechnicianBtn = new javax.swing.JButton();
+        SearchBtn = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -134,30 +136,41 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
         resultsLbl.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         resultsLbl.setText("Results found");
         mainPanel.add(resultsLbl, new org.netbeans.lib.awtextra.AbsoluteConstraints(334, 62, 178, 28));
-        mainPanel.add(searchIDField, new org.netbeans.lib.awtextra.AbsoluteConstraints(334, 31, 178, -1));
+        mainPanel.add(searchIDField, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 30, 110, -1));
 
-        SearchBtn.setFont(new java.awt.Font("Krungthep", 0, 14)); // NOI18N
-        SearchBtn.setText("Search");
-        SearchBtn.setBorderPainted(false);
-        SearchBtn.setOpaque(true);
-        SearchBtn.addActionListener(new java.awt.event.ActionListener() {
+        viewAllBtn.setFont(new java.awt.Font("Krungthep", 0, 10)); // NOI18N
+        viewAllBtn.setText("View All");
+        viewAllBtn.setBorderPainted(false);
+        viewAllBtn.setOpaque(true);
+        viewAllBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                SearchBtnActionPerformed(evt);
+                viewAllBtnActionPerformed(evt);
             }
         });
-        mainPanel.add(SearchBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(524, 31, -1, -1));
+        mainPanel.add(viewAllBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 30, 100, 30));
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "technicianID", "firstName", "lastName", "email", "position", "password", "status"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         jScrollPane1.setViewportView(jTable1);
 
         mainPanel.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 100, 830, 236));
@@ -166,7 +179,7 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
         jLabel4.setForeground(new java.awt.Color(255, 255, 255));
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jLabel4.setText("Search ID:");
-        mainPanel.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 28, 88, 28));
+        mainPanel.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 30, 88, 28));
 
         actionComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Add", "Edit", "Delete" }));
         actionComboBox.addActionListener(new java.awt.event.ActionListener() {
@@ -212,7 +225,7 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
                     .addGroup(deletePanelLayout.createSequentialGroup()
                         .addGap(207, 207, 207)
                         .addComponent(deleteTechnicianBtn)))
-                .addContainerGap(11, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         deletePanelLayout.setVerticalGroup(
             deletePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -332,7 +345,7 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
                                 .addComponent(emailSuffixLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(34, 34, 34)
                         .addComponent(addTechnicianBtn)))
-                .addContainerGap(64, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         addPanelLayout.setVerticalGroup(
             addPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -588,6 +601,17 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
         });
         mainPanel.add(activateTechnicianBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(700, 340, -1, -1));
 
+        SearchBtn.setFont(new java.awt.Font("Krungthep", 0, 12)); // NOI18N
+        SearchBtn.setText("Search");
+        SearchBtn.setBorderPainted(false);
+        SearchBtn.setOpaque(true);
+        SearchBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SearchBtnActionPerformed(evt);
+            }
+        });
+        mainPanel.add(SearchBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 30, 90, 30));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -611,11 +635,14 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
         this.dispose();
     }//GEN-LAST:event_backBtnActionPerformed
 
-    private void SearchBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SearchBtnActionPerformed
+    private void viewAllBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewAllBtnActionPerformed
         // TODO add your handling code here:
         String technicianID = searchIDField.getText();
 
-    }//GEN-LAST:event_SearchBtnActionPerformed
+        DefaultTableModel model = Technician.displayTable();
+        jTable1.setModel(model);
+
+    }//GEN-LAST:event_viewAllBtnActionPerformed
 
     private void actionComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionComboBoxActionPerformed
         // TODO add your handling code here:
@@ -781,15 +808,15 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
             Technician currentInfo = new Technician(); //Initialize a currentInfo Technician variable
             currentInfo = Technician.getInfo(technicianID); //Gets the information from the getInfo function
             String email = currentInfo.getEmail();//gets the full email
-            
+
             if (email.endsWith(suffix)) {//removes the suffix
                 email = email.substring(0, email.length() - suffix.length());
             }
-            
-            if(currentInfo.getStatus().equals("Inactive")){//Shows the option to activate the techncian
+
+            if (currentInfo.getStatus().equals("Inactive")) {//Shows the option to activate the techncian
                 inactiveTechnicianLabel.setText("This technician is inactive, click the button to");
                 activateTechnicianBtn.setVisible(true);
-            }else{
+            } else {
                 inactiveTechnicianLabel.setText("");
                 activateTechnicianBtn.setVisible(false);
             }
@@ -821,6 +848,19 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Invalid information", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_activateTechnicianBtnActionPerformed
+
+    private void SearchBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SearchBtnActionPerformed
+        // TODO add your handling code here:
+        String technicianID = searchIDField.getText();
+
+        if (technicianID.isBlank()) {
+            JOptionPane.showMessageDialog(this, "Please fill in the information", "Error", JOptionPane.ERROR_MESSAGE);
+        } else {
+            DefaultTableModel model = Technician.displayRecord(technicianID);
+            jTable1.setModel(model);
+        }
+
+    }//GEN-LAST:event_SearchBtnActionPerformed
 
     /**
      * @param args the command line arguments
@@ -900,5 +940,6 @@ public class RecordsTechnicianFrame extends javax.swing.JFrame {
     private javax.swing.JTextField oldPasswordField;
     private javax.swing.JLabel resultsLbl;
     private javax.swing.JTextField searchIDField;
+    private javax.swing.JButton viewAllBtn;
     // End of variables declaration//GEN-END:variables
 }

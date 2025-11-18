@@ -4,7 +4,14 @@
  */
 package View;
 
+import Model.Feedback;
+import Model.Maintenance;
+import Model.MySQLConnector;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -14,6 +21,8 @@ public class Transac2Frame extends javax.swing.JFrame {
 
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Transac2Frame.class.getName());
     private static String displayIDnumber;
+    
+    private String testerID = displayIDnumber;
 
     /**
      * Creates new form AdminMenuFrame
@@ -144,6 +153,12 @@ public class Transac2Frame extends javax.swing.JFrame {
         jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jLabel6.setText("Enter Patch ID:");
 
+        patchIDField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                patchIDFieldActionPerformed(evt);
+            }
+        });
+
         searchBtn.setFont(new java.awt.Font("Krungthep", 0, 10)); // NOI18N
         searchBtn.setText("Search");
         searchBtn.addActionListener(new java.awt.event.ActionListener() {
@@ -255,6 +270,79 @@ public class Transac2Frame extends javax.swing.JFrame {
 
     private void transac2BtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_transac2BtnActionPerformed
         // TODO add your handling code here:
+        String patchID = patchIDField.getText().trim();
+        String description = descriptionField.getText().trim();
+        int rating = ratingSlider.getValue();
+
+        if (patchID.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Enter a Patch ID first.");
+            return;
+        }
+
+        if (description.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Description cannot be empty.");
+            return;
+        }
+
+        // CHECK IF PATCH HAS DONE MAINTENANCE
+        boolean isPatchValid = false;
+
+        try {
+            Connection conn = MySQLConnector.connectDB();
+            String sql = "SELECT * FROM maintenance WHERE patchID = ? AND status = 'Done'";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, patchID);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                isPatchValid = true;
+            }
+
+            rs.close();
+            ps.close();
+            conn.close();
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error verifying patch: " + e.getMessage());
+            return;
+        }
+
+        if (!isPatchValid) {
+            JOptionPane.showMessageDialog(this,
+                    "This patch has NO completed maintenance.\n"
+                    + "You cannot send feedback until it is DONE.");
+            return;
+        }
+
+        // Pass to model
+        String result = Feedback.add(testerID, patchID, description, rating);
+
+        switch (result) {
+            case "Valid":
+                JOptionPane.showMessageDialog(this, "Feedback Sent!");
+                descriptionField.setText("");
+                ratingSlider.setValue(1);
+                break;
+
+            case "Feedback Exists":
+                JOptionPane.showMessageDialog(this,
+                        "You already submitted feedback for this patch.");
+                break;
+
+            case "Patch Not Done":
+                JOptionPane.showMessageDialog(this,
+                        "Patch does not meet DONE requirement.");
+                break;
+
+            case "Empty Inputs":
+                JOptionPane.showMessageDialog(this,
+                        "Some fields are empty.");
+                break;
+
+            default:
+                JOptionPane.showMessageDialog(this,
+                        "Feedback submission failed.");
+        }
 
     }//GEN-LAST:event_transac2BtnActionPerformed
 
@@ -273,7 +361,59 @@ public class Transac2Frame extends javax.swing.JFrame {
 
     private void searchBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchBtnActionPerformed
         // TODO add your handling code here:
+        String patchID = patchIDField.getText().trim();
+
+        if (patchID.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter a Patch ID.");
+            return;
+        }
+
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        model.setRowCount(0);
+
+        try {
+            Connection conn = MySQLConnector.connectDB();
+
+            String sql = """
+                SELECT maintenanceID, patchID, status, dateFinished
+                FROM maintenance
+                WHERE patchID = ? AND status = 'Done'
+            """;
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, patchID);
+
+            ResultSet rs = ps.executeQuery();
+
+            boolean found = false;
+            while (rs.next()) {
+                found = true;
+                model.addRow(new Object[]{
+                    rs.getString("maintenanceID"),
+                    rs.getString("patchID"),
+                    rs.getString("status"),
+                    rs.getString("dateFinished")
+                });
+            }
+
+            if (!found) {
+                JOptionPane.showMessageDialog(this,
+                        "No COMPLETED maintenance found for this Patch ID.\n"
+                        + "Tester can only send feedback for completed patches.");
+            }
+
+            rs.close();
+            ps.close();
+            conn.close();
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error loading patch: " + e.getMessage());
+        }
     }//GEN-LAST:event_searchBtnActionPerformed
+
+    private void patchIDFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_patchIDFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_patchIDFieldActionPerformed
 
     /**
      * @param args the command line arguments

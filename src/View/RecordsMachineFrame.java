@@ -4,7 +4,11 @@
  */
 package View;
 
-import java.awt.CardLayout;
+import Model.Machine;
+import java.util.Vector;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 
 /**
  *
@@ -521,6 +525,36 @@ public class RecordsMachineFrame extends javax.swing.JFrame {
 
     private void SearchBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SearchBtnActionPerformed
         // TODO add your handling code here:
+        String machineID = searchIDField.getText().trim();
+
+        if (machineID.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Enter a Machine ID to search", "Search", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        try {
+            Machine m = Machine.getInfo(machineID);
+
+            if (m.getMachineID() == null || m.getMachineID().isBlank()) {
+                resultsLbl.setText("0 results found");
+                JOptionPane.showMessageDialog(this, "Machine ID not found", "Search", JOptionPane.INFORMATION_MESSAGE);
+                // clear table
+                jTable1.setModel(new DefaultTableModel(new Object[][]{}, new String[]{"Machine ID", "Machine Name", "Device Type", "Status"}));
+            } else {
+                resultsLbl.setText("1 result found");
+                DefaultTableModel tbl = new DefaultTableModel(new String[]{"Machine ID", "Machine Name", "Device Type", "Status"}, 0);
+                tbl.addRow(new Object[]{
+                    m.getMachineID(),
+                    m.getMachineName(),
+                    m.getDeviceType(),
+                    m.getStatus()
+                });
+                jTable1.setModel(tbl);
+            }
+        } catch (Exception ex) {
+            logger.log(java.util.logging.Level.SEVERE, "Search error", ex);
+            JOptionPane.showMessageDialog(this, "Error during search: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_SearchBtnActionPerformed
 
     private void actionComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionComboBoxActionPerformed
@@ -554,6 +588,46 @@ public class RecordsMachineFrame extends javax.swing.JFrame {
 
     private void addMachineBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addMachineBtnActionPerformed
         // TODO add your handling code here:
+        String machineName = addMachineNameField.getText().trim();
+        String type = (String) addTypeComboBox.getSelectedItem();
+        // For add, status should default to Healthy per DB design. But model.add requires a status param.
+        // We'll set default status "Healthy" (model enforces only Healthy/Vulnerable).
+        String defaultStatus = "Healthy";
+
+        if (machineName.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Machine name is required.", "Add Machine", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            String result = Machine.add(machineName, type, defaultStatus);
+
+            switch (result) {
+                case "Valid":
+                    JOptionPane.showMessageDialog(this, "Machine added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    // clear input and optionally refresh table by searching for the added name not available, so just clear
+                    addMachineNameField.setText("");
+                    resultsLbl.setText("Machine added");
+                    break;
+                case "Empty":
+                    JOptionPane.showMessageDialog(this, "Please fill all required fields.", "Error", JOptionPane.ERROR_MESSAGE);
+                    break;
+                case "Duplicate Name":
+                    JOptionPane.showMessageDialog(this, "Machine name already exists.", "Error", JOptionPane.ERROR_MESSAGE);
+                    break;
+                case "Invalid Status":
+                    JOptionPane.showMessageDialog(this, "Invalid status provided.", "Error", JOptionPane.ERROR_MESSAGE);
+                    break;
+                case "Invalid":
+                    JOptionPane.showMessageDialog(this, "Database error while adding machine.", "Error", JOptionPane.ERROR_MESSAGE);
+                    break;
+                default:
+                    JOptionPane.showMessageDialog(this, "Unknown response: " + result, "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception ex) {
+            logger.log(java.util.logging.Level.SEVERE, "Add error", ex);
+            JOptionPane.showMessageDialog(this, "Error adding machine: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_addMachineBtnActionPerformed
 
     private void addUsernameField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addUsernameField1ActionPerformed
@@ -578,6 +652,47 @@ public class RecordsMachineFrame extends javax.swing.JFrame {
 
     private void deleteMachineBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteMachineBtnActionPerformed
         // TODO add your handling code here:
+        String machineID = deleteMachineIDField.getText().trim();
+
+        if (machineID.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter a Machine ID to delete.", "Delete", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete (set Inactive) machine " + machineID + "?", "Confirm Delete", JOptionPane.YES_NO_OPTION);
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        try {
+            String result = Machine.delete(machineID);
+
+            switch (result) {
+                case "Valid":
+                    JOptionPane.showMessageDialog(this, "Machine deleted (set to Inactive).", "Deleted", JOptionPane.INFORMATION_MESSAGE);
+                    deleteMachineIDField.setText("");
+                    resultsLbl.setText("Machine deleted");
+                    break;
+                case "Empty":
+                    JOptionPane.showMessageDialog(this, "Please enter Machine ID.", "Error", JOptionPane.ERROR_MESSAGE);
+                    break;
+                case "Missing":
+                    JOptionPane.showMessageDialog(this, "Machine not found.", "Error", JOptionPane.ERROR_MESSAGE);
+                    break;
+                case "Blocked":
+                    JOptionPane.showMessageDialog(this, "Machine has active maintenance records and cannot be deleted.", "Blocked", JOptionPane.ERROR_MESSAGE);
+                    break;
+                case "Invalid":
+                    JOptionPane.showMessageDialog(this, "Database error while deleting machine.", "Error", JOptionPane.ERROR_MESSAGE);
+                    break;
+                default:
+                    JOptionPane.showMessageDialog(this, "Unknown response: " + result, "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+        } catch (Exception ex) {
+            logger.log(java.util.logging.Level.SEVERE, "Delete error", ex);
+            JOptionPane.showMessageDialog(this, "Error deleting machine: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_deleteMachineBtnActionPerformed
 
     private void editMachineNameFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editMachineNameFieldActionPerformed
@@ -586,6 +701,47 @@ public class RecordsMachineFrame extends javax.swing.JFrame {
 
     private void editConfirmBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editConfirmBtnActionPerformed
         // TODO add your handling code here:
+        String machineID = editMachineIDField.getText().trim();
+        String machineName = editMachineNameField.getText().trim();
+        String deviceType = (String) editTypeComboBox.getSelectedItem();
+        String status = (String) editStatusComboBox.getSelectedItem();
+
+        if (machineID.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Machine ID is required.", "Edit", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            String result = Machine.edit(machineID, machineName, deviceType, status);
+
+            switch (result) {
+                case "Valid":
+                    JOptionPane.showMessageDialog(this, "Machine updated successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    resultsLbl.setText("Machine updated.");
+                    break;
+                case "Missing":
+                    JOptionPane.showMessageDialog(this, "Machine not found.", "Error", JOptionPane.ERROR_MESSAGE);
+                    break;
+                case "Empty":
+                    JOptionPane.showMessageDialog(this, "Required fields are empty.", "Error", JOptionPane.ERROR_MESSAGE);
+                    break;
+                case "Invalid Status":
+                    JOptionPane.showMessageDialog(this, "Invalid status selected.", "Error", JOptionPane.ERROR_MESSAGE);
+                    break;
+                case "Duplicate Name":
+                    JOptionPane.showMessageDialog(this, "Another machine with that name exists.", "Error", JOptionPane.ERROR_MESSAGE);
+                    break;
+                case "Invalid":
+                    JOptionPane.showMessageDialog(this, "Database error while updating machine.", "Error", JOptionPane.ERROR_MESSAGE);
+                    break;
+                default:
+                    JOptionPane.showMessageDialog(this, "Unknown response: " + result, "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+        } catch (Exception ex) {
+            logger.log(java.util.logging.Level.SEVERE, "Edit error", ex);
+            JOptionPane.showMessageDialog(this, "Error updating machine: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_editConfirmBtnActionPerformed
 
     private void editMachineIDFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editMachineIDFieldActionPerformed
@@ -594,6 +750,36 @@ public class RecordsMachineFrame extends javax.swing.JFrame {
 
     private void editEnterBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editEnterBtnActionPerformed
         // TODO add your handling code here:
+        String machineID = editMachineIDField.getText().trim();
+
+        if (machineID.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Enter Machine ID", "Edit", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            Machine m = Machine.getInfo(machineID);
+
+            if (m.getMachineID() == null || m.getMachineID().isBlank()) {
+                JOptionPane.showMessageDialog(this, "Machine ID not found", "Edit", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // populate fields
+            editMachineNameField.setText(m.getMachineName());
+            editTypeComboBox.setSelectedItem(m.getDeviceType());
+            // status may be null in DB; protect against that
+            if (m.getStatus() != null && (m.getStatus().equals("Healthy") || m.getStatus().equals("Vulnerable"))) {
+                editStatusComboBox.setSelectedItem(m.getStatus());
+            } else {
+                editStatusComboBox.setSelectedIndex(0);
+            }
+            resultsLbl.setText("Machine loaded for edit.");
+
+        } catch (Exception ex) {
+            logger.log(java.util.logging.Level.SEVERE, "Load machine error", ex);
+            JOptionPane.showMessageDialog(this, "Error loading machine: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_editEnterBtnActionPerformed
 
     /**

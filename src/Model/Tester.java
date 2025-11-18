@@ -19,46 +19,46 @@ public class Tester {
     private String password;
     private String status;
     
-    // Constructor
-    public Tester() {
-         this.testerID = "";
-        this.firstName = "";
-        this.lastName = "";
-        this.email = "";
-        this.password = "";
-        this.status = "";
-    }
+//    // Constructor
+//    public Tester() {
+//         this.testerID = "";
+//        this.firstName = "";
+//        this.lastName = "";
+//        this.email = "";
+//        this.password = "";
+//        this.status = "";
+//    }
     // Fetch all testers from DB
-    public static ArrayList<Tester> getAllTesters() throws SQLException {
-        ArrayList<Tester> testers = new ArrayList<>();
-
-        String url = "jdbc:mysql://localhost:3306/CCINFOMS24_SQL"; // your DB URL
-        String user = "root";
-        String password = "VFXc465vfxC!";
-
-        Connection conn = DriverManager.getConnection(url, user, password);
-        String query = "SELECT testerID, firstName, lastName, email, password, status FROM tester";
-
-        Statement stmt = conn.createStatement();
-        ResultSet rs = stmt.executeQuery(query);
-
-        while (rs.next()) {
-            testers.add(new Tester(
-                rs.getString("testerID"),
-                rs.getString("firstName"),
-                rs.getString("lastName"),
-                rs.getString("email"),
-                rs.getString("password"),
-                rs.getString("status")
-            ));
-        }
-
-        rs.close();
-        stmt.close();
-        conn.close();
-
-        return testers;
-    }
+//    public static ArrayList<Tester> getAllTesters() throws SQLException {
+//        ArrayList<Tester> testers = new ArrayList<>();
+//
+//        String url = "jdbc:mysql://localhost:3306/CCINFOMS24_SQL"; // your DB URL
+//        String user = "root";
+//        String password = "VFXc465vfxC!";
+//
+//        Connection conn = DriverManager.getConnection(url, user, password);
+//        String query = "SELECT testerID, firstName, lastName, email, password, status FROM tester";
+//
+//        Statement stmt = conn.createStatement();
+//        ResultSet rs = stmt.executeQuery(query);
+//
+//        while (rs.next()) {
+//            testers.add(new Tester(
+//                rs.getString("testerID"),
+//                rs.getString("firstName"),
+//                rs.getString("lastName"),
+//                rs.getString("email"),
+//                rs.getString("password"),
+//                rs.getString("status")
+//            ));
+//        }
+//
+//        rs.close();
+//        stmt.close();
+//        conn.close();
+//
+//        return testers;
+//    }
 
     public static boolean checkEmailDuplicates(String email) {
         StringBuilder query = new StringBuilder();

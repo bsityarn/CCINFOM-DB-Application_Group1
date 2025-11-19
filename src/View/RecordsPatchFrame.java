@@ -529,13 +529,14 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
          String patchID = editPatchIDField.getText();
         String technicianID = editTechnicianIDField.getText();
+        String softwareID = editSoftwareIDField.getText();
         String machineID = editMachineIDField.getText();
         String description = editDescriptionField.getText();
         String patchName = editPatchNameField.getText();
         String patchStatus = (String) patchStatusField.getSelectedItem(); // JComboBox
         String patchType = (String) editPatchTypeComboBox1.getSelectedItem(); // JComboBox
 
-        String result = Patch.editPatch(patchID, technicianID, machineID, description, patchName, patchStatus, patchType);
+        String result = Patch.editPatch(patchID, technicianID, softwareID, machineID, description, patchName, patchStatus, patchType);
 
         if (result.equals("Valid")) {
             JOptionPane.showMessageDialog(this, "Patch info updated successfully!", "Edited Patch", JOptionPane.INFORMATION_MESSAGE);
@@ -543,10 +544,11 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
             // clear fields
             editPatchIDField.setText("");
             editTechnicianIDField.setText("");
+            editSoftwareIDField.setText("");
             editMachineIDField.setText("");
             editDescriptionField.setText("");
             editPatchNameField.setText("");
-            patchStatusField.setSelectedIndex(1);
+            patchStatusField.setSelectedIndex(0);
             editPatchTypeComboBox1.setSelectedIndex(0);
 
         } else if (result.equals("Empty")) {
@@ -623,45 +625,52 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
     private void editEnterBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editEnterBtnActionPerformed
         // TODO add your handling code here:
         String patchID = editPatchIDField.getText();
-        
+
         if (patchID.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Enter Patch ID");
-            
+            return;
         }
-        else {
-            try {
-                Patch patch = Patch.getPatchByID(patchID);
-                
-                if (patch != null) {
-                    // populates the input boxes of the default info
-                    editTechnicianIDField.setText(patch.getTechnicianID());
-                    editDescriptionField.setText(patch.getDescription());
-                    editMachineIDField.setText(patch.getMachineID());
-                    editPatchNameField.setText(patch.getPatchName());
-                    editSoftwareIDField.setText(patch.getSoftwareID());
-                    
-                    patchStatusField.setSelectedItem(patch.getStatus()); 
-                    editPatchTypeComboBox1.setSelectedItem(patch.getType());
-                    
 
-                    // lets the user edit the provided input boxes
-                    editTechnicianIDField.setEnabled(true);
-                    editDescriptionField.setEnabled(true);
-                    editMachineIDField.setEnabled(true);
-                    editPatchNameField.setEnabled(true);
-                    editSoftwareIDField.setEnabled(true);
-                    patchStatusField.setEnabled(true);
-                    editPatchTypeComboBox1.setEnabled(true);
-                    editConfirmBtn.setEnabled(true);
+        try {
+            Patch patch = Patch.getPatchByID(patchID);
+
+            if (patch != null && patch.getPatchID() != null) {
+                // Populate input boxes
+                editTechnicianIDField.setText(patch.getTechnicianID());
+                editDescriptionField.setText(patch.getDescription());
+                editMachineIDField.setText(patch.getMachineID());
+                editPatchNameField.setText(patch.getPatchName());       
+                editSoftwareIDField.setText(patch.getSoftwareID());
+
+               // Set combo boxes safely
+                if (patch.getStatus() != null) {
+                    patchStatusField.setSelectedItem(patch.getStatus());
+                } else {
+                    patchStatusField.setSelectedIndex(-1); // no selection
                 }
-                else {
-                    JOptionPane.showMessageDialog(this, "Patch ID not found");
+
+                if (patch.getType() != null) {
+                    editPatchTypeComboBox1.setSelectedItem(patch.getType());
+                } else {
+                    editPatchTypeComboBox1.setSelectedIndex(-1); // no selection
                 }
+
+                // Enable fields for editing
+                editTechnicianIDField.setEnabled(true);
+                editDescriptionField.setEnabled(true);
+                editMachineIDField.setEnabled(true);
+                editPatchNameField.setEnabled(true);
+                editSoftwareIDField.setEnabled(true);
+                patchStatusField.setEnabled(true);
+                editPatchTypeComboBox1.setEnabled(true);
+                editConfirmBtn.setEnabled(true);
+
+            } else {
+                JOptionPane.showMessageDialog(this, "Patch ID not found");
             }
-            catch (Exception Ex) {
-                JOptionPane.showMessageDialog(this, "Database error: " + Ex.getMessage());
-            }
-            
+
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage());
         }
     }//GEN-LAST:event_editEnterBtnActionPerformed
 

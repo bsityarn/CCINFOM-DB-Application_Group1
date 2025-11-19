@@ -221,19 +221,14 @@ public class Patch {
         return "Valid";
     }
     
-    public static String editPatch(String patchID, String technicianID, String machineID, String description, String patchName, String status, String type) {
-        StringBuilder query = new StringBuilder();
-        query.append("UPDATE patch ");
-        query.append("SET technicianID = ?, machineID = ?, description = ?, patchName = ?, status = ?, type = ? ");
-        query.append("WHERE patchID = ?");
-
+    public static String editPatch(String patchID, String technicianID, String softwareID, String machineID, String description, String patchName, String status, String type) {
         // Check for empty fields
         if (patchID.isBlank() || technicianID.isBlank() || machineID.isBlank() ||
-            description.isBlank() || patchName.isBlank() || status.isBlank() || type.isBlank()) {
+            description.isBlank() || patchName.isBlank() || status == null || type == null || softwareID.isBlank()) {
             return "Empty";
         }
 
-        // Normalize values from combo boxes
+        // Trim values
         status = status.trim();
         type = type.trim();
 
@@ -244,9 +239,12 @@ public class Patch {
         }
 
         // Validate status
-        if (!status.equalsIgnoreCase("Active") && !status.equalsIgnoreCase("Inactive")) {
+        List<String> allowedStatuses = Arrays.asList("New", "Working", "Not Working", "Inactive");
+        if (!allowedStatuses.contains(status)) {
             return "Invalid Status";
         }
+
+        String query = "UPDATE patch SET technicianID = ?, machineID = ?, description = ?, name = ?, softwareID = ?, status = ?, type = ? WHERE patchID = ?";
 
         try {
             Connection conn = MySQLConnector.connectDB();
@@ -267,14 +265,15 @@ public class Patch {
             }
 
             // Update patch
-            PreparedStatement statement = conn.prepareStatement(query.toString());
+            PreparedStatement statement = conn.prepareStatement(query);
             statement.setString(1, technicianID);
             statement.setString(2, machineID);
             statement.setString(3, description);
-            statement.setString(4, patchName);
-            statement.setString(5, status);
-            statement.setString(6, type);
-            statement.setString(7, patchID);
+            statement.setString(4, patchName);           // Correct column
+            statement.setString(5, softwareID);     // Include softwareID
+            statement.setString(6, status);
+            statement.setString(7, type);
+            statement.setString(8, patchID);
 
             int rowsAffected = statement.executeUpdate();
             statement.close();
@@ -283,8 +282,9 @@ public class Patch {
             if (rowsAffected == 0) {
                 return "Update Failed";
             }
+
         } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
+            System.out.println("DEBUG: SQL Exception: " + ex.getMessage());
             return "Invalid";
         }
 
@@ -333,33 +333,34 @@ public class Patch {
     }
     public static Patch getPatchByID(String patchID) {
         StringBuilder query = new StringBuilder();
-        query.append(" SELECT  *               ");
-        query.append(" FROM    patch ");
-        query.append(" WHERE   patchID = ? ");
-        Patch resultPatch = new Patch();
-
+        query.append(" SELECT * ");
+        query.append(" FROM patch ");
+        query.append(" WHERE patchID = ? ");
+        // Patch resultPatch = new Patch();
+        Patch resultPatch = null;
         try {
             // Establish connection to DB
             Connection conn = MySQLConnector.connectDB();
 
             PreparedStatement statement = conn.prepareStatement(query.toString());
-
             statement.setString(1, patchID);
 
-            // 1. Use executeQuery() and get the ResultSet
+            // Execute query and get ResultSet
             ResultSet rs = statement.executeQuery();
 
-            if (rs.next()) {//"if (rs.next)" will return true when AT LEAST 1 record is found. Hence, the tester is found
+            if (rs.next()) { // if at least 1 record is found
+                resultPatch = new Patch();
                 resultPatch.setPatchID(rs.getString("patchID"));
                 resultPatch.setTechnicianID(rs.getString("technicianID"));
                 resultPatch.setMachineID(rs.getString("machineID"));
                 resultPatch.setDescription(rs.getString("description"));
-                resultPatch.setPatchName(rs.getString("patchName"));
-                resultPatch.setStatus(rs.getString("status")); // should be "Active" or "Inactive"
-                resultPatch.setType(rs.getString("type")); // must be one of Application, System, Programming, Network, Server
-            } 
+                resultPatch.setPatchName(rs.getString("name"));
+                resultPatch.setSoftwareID(rs.getString("softwareID")); // include if exists
+                resultPatch.setStatus(rs.getString("status")); // should be "Working" or "Not Working"
+                resultPatch.setType(rs.getString("type")); // must match enum values
+            }
 
-            //Closing the connections to avoid DB app slow down in performance
+            // Close connections to avoid DB performance issues
             rs.close();
             statement.close();
             conn.close();
@@ -367,6 +368,7 @@ public class Patch {
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
         }
+
         return resultPatch;
     }
     
@@ -616,6 +618,9 @@ public class Patch {
         this.patchID = patchID;
     }
     
+    public void setSoftwareID(String softwareID) {
+        this.softwareID = softwareID;
+    }
     public void setTechnicianID(String technicianID) {
         this.technicianID = technicianID;
     }

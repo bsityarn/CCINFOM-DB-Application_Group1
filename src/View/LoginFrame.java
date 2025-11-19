@@ -163,7 +163,6 @@ public class LoginFrame extends javax.swing.JFrame {
                 this.dispose();
             } else if (AppController.loginTester(idnumber, password) == true) {
                 MenuTesterFrame menuTester = new MenuTesterFrame(idnumber);
-                menuTester.setVisible(true);
                 this.dispose();
             } else {
                 resultLabel.setText("Invalid credentials! Please retry or sign up.");

@@ -769,34 +769,40 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
     private void editConfirmBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editConfirmBtnActionPerformed
         // TODO add your handling code here:
         String testerID = editTesterIDField.getText();
-        Tester tester = new Tester();
-        tester = Tester.getTesterByID(testerID); // assuming this is equivalent to Technician.getInfo
-        String suffix = "@ptrackerdb.com";
+        String firstName = editFirstNameField.getText();
+        String lastName = editLastNameField.getText();
+        String email = editEmailField.getText() + "@ptrackerdb.com"; // add suffix
+        String currentPassword = oldPasswordField.getText();
+        String newPassword = editPasswordField.getText();
 
-        if (tester.getTesterID() != null) {
-            Tester currentInfo = new Tester();
-            currentInfo = Tester.getTesterByID(testerID);
-            String email = currentInfo.getEmail();
+        String result = Tester.editTester(testerID, lastName, firstName, email, currentPassword, newPassword);
 
-            if (email.endsWith(suffix)) {
-                email = email.substring(0, email.length() - suffix.length());
-            }
-
-            if (currentInfo.getStatus().equals("Inactive")) {
-                inactiveTesterLabel.setText("This tester is inactive, click the button to activate");
-                ActivateTesterBtn.setVisible(true);
-            } else {
-                inactiveTesterLabel.setText("");
-                ActivateTesterBtn.setVisible(false);
-            }
-
-            editFirstNameField.setText(currentInfo.getFirstName());
-            editLastNameField.setText(currentInfo.getLastName());
-            editEmailField.setText(email); // email without suffix
-            System.out.println("EDIT: Tester ID " + currentInfo.getTesterID() + " current info retrieved");
-        } else {
-            JOptionPane.showMessageDialog(this, "Tester ID not found", "Error", JOptionPane.ERROR_MESSAGE);
-            System.out.println("EDIT: Tester ID " + testerID + " does not exist");
+        switch(result) {
+            case "Valid":
+                JOptionPane.showMessageDialog(this, "Tester edited successfully!", "Edited Tester", JOptionPane.INFORMATION_MESSAGE);
+                // Clear fields
+                editTesterIDField.setText("");
+                editFirstNameField.setText("");
+                editLastNameField.setText("");
+                editEmailField.setText("");
+                oldPasswordField.setText("");
+                editPasswordField.setText("");
+                break;
+            case "Empty":
+                JOptionPane.showMessageDialog(this, "Please fill in all the fields", "Error", JOptionPane.ERROR_MESSAGE);
+                break;
+            case "Duplicate Email":
+                JOptionPane.showMessageDialog(this, "Duplicate email found, please change", "Error", JOptionPane.ERROR_MESSAGE);
+                break;
+            case "Wrong password":
+                oldPasswordField.setText("");
+                JOptionPane.showMessageDialog(this, "Wrong password", "Error", JOptionPane.ERROR_MESSAGE);
+                break;
+            case "Invalid":
+                JOptionPane.showMessageDialog(this, "Database error while updating tester", "Error", JOptionPane.ERROR_MESSAGE);
+                break;
+            default:
+                JOptionPane.showMessageDialog(this, "Unknown error", "Error", JOptionPane.ERROR_MESSAGE);
         }
         
     }//GEN-LAST:event_editConfirmBtnActionPerformed

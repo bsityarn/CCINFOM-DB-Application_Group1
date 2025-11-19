@@ -113,35 +113,31 @@ public class Tester {
         return model;
     }
     
-    public static boolean checkEmailDuplicates(String email) {
+    public static boolean checkEmailDuplicates(String email, String ignoreTesterID) {
+        boolean duplicateResult = false;
         StringBuilder query = new StringBuilder();
-        query.append(" SELECT  *               ");
-        query.append(" FROM    tester ");
-        query.append(" WHERE   email = ? ");
-        Boolean duplicateResult = false;
+        query.append("SELECT testerID FROM tester WHERE email = ?");
 
         try {
-            // Establish connection to DB
             Connection conn = MySQLConnector.connectDB();
-
             PreparedStatement statement = conn.prepareStatement(query.toString());
-
             statement.setString(1, email);
-
-            // 1. Use executeQuery() and get the ResultSet
             ResultSet rs = statement.executeQuery();
 
-            if (rs.next()) {//This command will return true when AT LEAST 1 record is found. Hence, duplicate is true
-                duplicateResult = true;
+            while (rs.next()) {
+                String id = rs.getString("testerID");
+                if (ignoreTesterID == null || !id.equals(ignoreTesterID)) {
+                    duplicateResult = true; // duplicate found in another tester
+                    break;
+                }
             }
 
-            //Closing the connections to avoid DB app slow down in performance
             rs.close();
             statement.close();
             conn.close();
-
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
+            duplicateResult = true; // fail-safe
         }
 
         return duplicateResult;
@@ -267,12 +263,13 @@ public class Tester {
         query.append(" VALUES (?, ?, ?, ?, ?, 'Active')");
 
         //TODO - Check for email duplicates
+        String testerID = generateNextTesterID(); // generate first
         if (firstName.isBlank() || lastName.isBlank() || email.isBlank() || password.isBlank()) {//Checker for when the User leaves a Field blank
             return "Empty";
-        } else if (checkEmailDuplicates(email) == true) {
+        } else if (checkEmailDuplicates(email, testerID) == true) {
             return "Duplicate Email";
         } else {
-            String testerID = generateNextTesterID();
+            
             try {
                 // Establish connection to DB
                 Connection conn = MySQLConnector.connectDB();
@@ -365,7 +362,7 @@ public class Tester {
         if (firstName.isBlank() || lastName.isBlank() || email.isBlank()
                 || (currentPassword.isBlank() && !newPassword.isBlank()) || (!currentPassword.isBlank() && newPassword.isBlank())) {
             return "Empty";
-        } else if (checkEmailDuplicates(email) == true) { // email duplicate check
+        } else if (checkEmailDuplicates(email, testerID) == true) { // email duplicate check
             return "Duplicate Email";
         } else if (currentPassword.isBlank() && newPassword.isBlank()) {
             try {

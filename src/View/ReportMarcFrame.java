@@ -45,6 +45,10 @@ public class ReportMarcFrame extends javax.swing.JFrame {
         JLbl1 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         explanationTextArea = new javax.swing.JTextArea();
+        JLbl3 = new javax.swing.JLabel();
+        monthComboBox = new javax.swing.JComboBox<>();
+        JLbl4 = new javax.swing.JLabel();
+        yearComboBox = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -94,7 +98,7 @@ public class ReportMarcFrame extends javax.swing.JFrame {
                 generateBtnActionPerformed(evt);
             }
         });
-        jPanel1.add(generateBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 70, 274, 50));
+        jPanel1.add(generateBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 70, 274, 50));
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -131,14 +135,32 @@ public class ReportMarcFrame extends javax.swing.JFrame {
         JLbl1.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
         JLbl1.setForeground(new java.awt.Color(255, 255, 255));
         JLbl1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        JLbl1.setText("Choose a field to see the");
-        jPanel1.add(JLbl1, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 550, 210, 30));
+        JLbl1.setText("Select Month:");
+        jPanel1.add(JLbl1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 90, -1, 30));
 
         explanationTextArea.setColumns(20);
         explanationTextArea.setRows(5);
         jScrollPane2.setViewportView(explanationTextArea);
 
         jPanel1.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 560, 340, 110));
+
+        JLbl3.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
+        JLbl3.setForeground(new java.awt.Color(255, 255, 255));
+        JLbl3.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        JLbl3.setText("Choose a field to see the");
+        jPanel1.add(JLbl3, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 550, 210, 30));
+
+        monthComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Jan", "Feb", "March", "April", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec" }));
+        jPanel1.add(monthComboBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 90, 110, -1));
+
+        JLbl4.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
+        JLbl4.setForeground(new java.awt.Color(255, 255, 255));
+        JLbl4.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        JLbl4.setText("Select Month:");
+        jPanel1.add(JLbl4, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 90, -1, 30));
+
+        yearComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "2020", "2021", "2022", "2023", "2024", "2025" }));
+        jPanel1.add(yearComboBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 90, 110, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -165,8 +187,11 @@ public class ReportMarcFrame extends javax.swing.JFrame {
 
     private void generateBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generateBtnActionPerformed
         // TODO add your handling code here:
+        int monthNo = monthComboBox.getSelectedIndex();
+        String year = (String) yearComboBox.getSelectedItem();
+        String month = Integer.toString(monthNo);
         
-        DefaultTableModel model = Technician.displayReport();
+        DefaultTableModel model = Technician.displayReport(month, year);
         jTable1.setModel(model);
     }//GEN-LAST:event_generateBtnActionPerformed
 
@@ -221,6 +246,8 @@ public class ReportMarcFrame extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel JLbl1;
     private javax.swing.JLabel JLbl2;
+    private javax.swing.JLabel JLbl3;
+    private javax.swing.JLabel JLbl4;
     private javax.swing.JButton backBtn;
     private javax.swing.JTextArea explanationTextArea;
     private javax.swing.JButton generateBtn;
@@ -232,5 +259,7 @@ public class ReportMarcFrame extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTable jTable1;
+    private javax.swing.JComboBox<String> monthComboBox;
+    private javax.swing.JComboBox<String> yearComboBox;
     // End of variables declaration//GEN-END:variables
 }

@@ -23,7 +23,7 @@ public class Technician {
     private String newPassword;
     private String status;
 
-    public static DefaultTableModel displayReport() {
+    public static DefaultTableModel displayReport(String month, String year) {
         DefaultTableModel model = new DefaultTableModel();
         StringBuilder query = new StringBuilder();
         query.append(" SELECT\n"
@@ -48,6 +48,8 @@ public class Technician {
                 + "    SUM(CASE WHEN status = 'Working' THEN 1 ELSE 0 END) AS Working_Patches,\n"
                 + "    SUM(CASE WHEN status = 'Not Working' THEN 1 ELSE 0 END) AS NotWorking_Patches\n"
                 + "    FROM patch\n"
+                + "    WHERE MONTH(releaseDate) = ? \n"
+                + "	AND YEAR(releaseDate) = ?\n"
                 + "    GROUP BY technicianID\n"
                 + ") p ON p.technicianID = t.technicianID\n"
                 + "\n"
@@ -61,11 +63,17 @@ public class Technician {
                 + "    SUM(CASE WHEN status = 'Done' AND dateFinished < targetDeadline THEN 1 ELSE 0 END) AS Punctual_Maintenance\n"
                 + "    \n"
                 + "    FROM maintenance\n"
+                + "    WHERE MONTH(dateAssigned) = ? \n"
+                + "	AND YEAR(dateAssigned) = ?\n"
                 + "    GROUP BY technicianIDassigned\n"
-                + ") m ON m.technicianIDassigned = t.technicianID;\n"
-                + "");
+                + ") m ON m.technicianIDassigned = t.technicianID;");
 
         try (Connection conn = MySQLConnector.connectDB(); PreparedStatement statement = conn.prepareStatement(query.toString())) {
+            statement.setString(1, month);
+            statement.setString(2, year);
+            statement.setString(3, month);
+            statement.setString(4, year);
+
 
             // Execute query inside the try block
             try (ResultSet rs = statement.executeQuery()) {

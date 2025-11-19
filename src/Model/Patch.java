@@ -223,72 +223,57 @@ public class Patch {
     
     public static String editPatch(String patchID, String technicianID, String softwareID, String machineID, String description, String patchName, String status, String type) {
         // Check for empty fields
-        if (patchID.isBlank() || technicianID.isBlank() || machineID.isBlank() ||
-            description.isBlank() || patchName.isBlank() || status == null || type == null || softwareID.isBlank()) {
-            return "Empty";
-        }
+    if (patchID.isBlank() || technicianID.isBlank() || machineID.isBlank() ||
+        description.isBlank() || patchName.isBlank() || softwareID.isBlank() ||
+        status == null || type == null) {
+        return "Empty";
+    }
 
-        // Trim values
-        status = status.trim();
-        type = type.trim();
+    // Trim values
+    status = status.trim();
+    type = type.trim();
 
-        // Validate type
-        List<String> allowedTypes = Arrays.asList("Application", "System", "Programming", "Network", "Server");
-        if (!allowedTypes.contains(type)) {
-            return "Invalid Type";
-        }
+    // Validate type
+    List<String> allowedTypes = Arrays.asList("Application", "System", "Programming", "Network", "Server");
+    if (!allowedTypes.contains(type)) return "Invalid Type";
 
-        // Validate status
-        List<String> allowedStatuses = Arrays.asList("New", "Working", "Not Working", "Inactive");
-        if (!allowedStatuses.contains(status)) {
-            return "Invalid Status";
-        }
+    // Validate status
+    List<String> allowedStatuses = Arrays.asList("New", "Working", "Not Working", "Inactive");
+    if (!allowedStatuses.contains(status)) return "Invalid Status";
 
-        String query = "UPDATE patch SET technicianID = ?, machineID = ?, description = ?, name = ?, softwareID = ?, status = ?, type = ? WHERE patchID = ?";
+    String query = "UPDATE patch SET technicianID = ?, machineID = ?, description = ?, name = ?, softwareID = ?, status = ?, type = ? WHERE patchID = ?";
 
-        try {
-            Connection conn = MySQLConnector.connectDB();
-
-            // Check if patch exists
-            String checkSQL = "SELECT COUNT(*) FROM patch WHERE patchID = ?";
-            PreparedStatement checkStatement = conn.prepareStatement(checkSQL);
-            checkStatement.setString(1, patchID);
-            ResultSet rs = checkStatement.executeQuery();
+    try (Connection conn = MySQLConnector.connectDB()) {
+        // Check if patch exists
+        String checkSQL = "SELECT COUNT(*) FROM patch WHERE patchID = ?";
+        try (PreparedStatement checkStmt = conn.prepareStatement(checkSQL)) {
+            checkStmt.setString(1, patchID);
+            ResultSet rs = checkStmt.executeQuery();
             rs.next();
-            int count = rs.getInt(1);
-            rs.close();
-            checkStatement.close();
-
-            if (count == 0) {
-                conn.close();
-                return "not Found";
-            }
-
-            // Update patch
-            PreparedStatement statement = conn.prepareStatement(query);
-            statement.setString(1, technicianID);
-            statement.setString(2, machineID);
-            statement.setString(3, description);
-            statement.setString(4, patchName);           // Correct column
-            statement.setString(5, softwareID);     // Include softwareID
-            statement.setString(6, status);
-            statement.setString(7, type);
-            statement.setString(8, patchID);
-
-            int rowsAffected = statement.executeUpdate();
-            statement.close();
-            conn.close();
-
-            if (rowsAffected == 0) {
-                return "Update Failed";
-            }
-
-        } catch (SQLException ex) {
-            System.out.println("DEBUG: SQL Exception: " + ex.getMessage());
-            return "Invalid";
+            if (rs.getInt(1) == 0) return "Not Found";
         }
 
-        return "Valid";
+        // Update patch
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, technicianID);
+            stmt.setString(2, machineID);
+            stmt.setString(3, description);
+            stmt.setString(4, patchName);
+            stmt.setString(5, softwareID);
+            stmt.setString(6, status);
+            stmt.setString(7, type);
+            stmt.setString(8, patchID);
+
+            int rows = stmt.executeUpdate();
+            if (rows == 0) return "Update Failed";
+        }
+
+    } catch (SQLException ex) {
+        System.out.println("DEBUG: SQL Exception: " + ex.getMessage());
+        return "Invalid";
+    }
+
+    return "Valid";
     }
     
     public static ArrayList<String[]> searchPatch(String patchID) {
@@ -332,44 +317,32 @@ public class Patch {
         return results;
     }
     public static Patch getPatchByID(String patchID) {
-        StringBuilder query = new StringBuilder();
-        query.append(" SELECT * ");
-        query.append(" FROM patch ");
-        query.append(" WHERE patchID = ? ");
-        // Patch resultPatch = new Patch();
-        Patch resultPatch = null;
-        try {
-            // Establish connection to DB
-            Connection conn = MySQLConnector.connectDB();
+         String query = "SELECT * FROM patch WHERE patchID = ?";
+    Patch resultPatch = null;
 
-            PreparedStatement statement = conn.prepareStatement(query.toString());
-            statement.setString(1, patchID);
+    try (Connection conn = MySQLConnector.connectDB();
+         PreparedStatement stmt = conn.prepareStatement(query)) {
 
-            // Execute query and get ResultSet
-            ResultSet rs = statement.executeQuery();
+        stmt.setString(1, patchID);
+        ResultSet rs = stmt.executeQuery();
 
-            if (rs.next()) { // if at least 1 record is found
-                resultPatch = new Patch();
-                resultPatch.setPatchID(rs.getString("patchID"));
-                resultPatch.setTechnicianID(rs.getString("technicianID"));
-                resultPatch.setMachineID(rs.getString("machineID"));
-                resultPatch.setDescription(rs.getString("description"));
-                resultPatch.setPatchName(rs.getString("name"));
-                resultPatch.setSoftwareID(rs.getString("softwareID")); // include if exists
-                resultPatch.setStatus(rs.getString("status")); // should be "Working" or "Not Working"
-                resultPatch.setType(rs.getString("type")); // must match enum values
-            }
-
-            // Close connections to avoid DB performance issues
-            rs.close();
-            statement.close();
-            conn.close();
-
-        } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
+        if (rs.next()) {
+            resultPatch = new Patch();
+            resultPatch.setPatchID(rs.getString("patchID"));
+            resultPatch.setTechnicianID(rs.getString("technicianID"));
+            resultPatch.setMachineID(rs.getString("machineID"));
+            resultPatch.setDescription(rs.getString("description"));
+            resultPatch.setPatchName(rs.getString("name"));
+            resultPatch.setSoftwareID(rs.getString("softwareID"));
+            resultPatch.setStatus(rs.getString("status"));
+            resultPatch.setType(rs.getString("type"));
         }
 
-        return resultPatch;
+    } catch (SQLException ex) {
+        System.out.println(ex.getMessage());
+    }
+
+    return resultPatch;
     }
     
     public static boolean releasePatch(String patchName, String patchType, String softwareID, String machineID, String technicianID, String description) {

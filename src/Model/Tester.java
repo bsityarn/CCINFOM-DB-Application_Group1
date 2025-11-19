@@ -206,6 +206,7 @@ public class Tester {
                 resultTester.setFirstName(rs.getString("firstName"));
                 resultTester.setLastName(rs.getString("lastName"));
                 resultTester.setEmail(rs.getString("email"));
+                resultTester.setStatus(rs.getString("status")); 
             } 
 
             //Closing the connections to avoid DB app slow down in performance
@@ -243,6 +244,7 @@ public class Tester {
             String fn = rs.getString("firstName");
             String ln = rs.getString("lastName");
             String email = rs.getString("email");
+            
 
             String fullName = fn + " " + ln;
 
@@ -349,36 +351,30 @@ public class Tester {
     }
 
     public static String editTester(String testerID, String lastName, String firstName, String email, String currentPassword, String newPassword) {
-        StringBuilder query1 = new StringBuilder();//This command is used when the user wants to keep the password the same
-        query1.append(" UPDATE tester ");
-        query1.append(" SET firstName = ?, lastName = ?, email = ? ");
-        query1.append(" WHERE testerID = ? ");
-        
-        StringBuilder query2 = new StringBuilder();//This command is used when the user want to change their password
-        query2.append(" UPDATE tester ");
-        query2.append(" SET firstName = ?, lastName = ?, email = ?, password = ? ");
-        query2.append(" WHERE testerID = ? "); 
+        StringBuilder query1 = new StringBuilder(); // update without password
+        query1.append("UPDATE tester ");
+        query1.append("SET firstName = ?, lastName = ?, email = ? ");
+        query1.append("WHERE testerID = ?");
 
-        //Checker for when the User leaves a Field blank
-        //We allow the currentPassword and newPassword field to BOTH be blank, but we do not allow ONLY 1 of them to be blank
+        StringBuilder query2 = new StringBuilder(); // update with new password
+        query2.append("UPDATE tester ");
+        query2.append("SET firstName = ?, lastName = ?, email = ?, password = ? ");
+        query2.append("WHERE testerID = ?");
+
         if (firstName.isBlank() || lastName.isBlank() || email.isBlank()
                 || (currentPassword.isBlank() && !newPassword.isBlank()) || (!currentPassword.isBlank() && newPassword.isBlank())) {
             return "Empty";
-        } else if (checkEmailDuplicates(email) == true) {//Checker for email duplicates
+        } else if (checkEmailDuplicates(email) == true) { // email duplicate check
             return "Duplicate Email";
         } else if (currentPassword.isBlank() && newPassword.isBlank()) {
             try {
-                // Establish connection to DB
                 Connection conn = MySQLConnector.connectDB();
-
-                // Prepare SQL statement to be executed
                 PreparedStatement statement1 = conn.prepareStatement(query1.toString());
 
                 statement1.setString(1, firstName);
                 statement1.setString(2, lastName);
                 statement1.setString(3, email);
                 statement1.setString(4, testerID);
-                
 
                 statement1.executeUpdate();
 
@@ -390,10 +386,7 @@ public class Tester {
             }
         } else if (checkMatchCurrentPassword(testerID, currentPassword) == true) {
             try {
-                // Establish connection to DB
                 Connection conn = MySQLConnector.connectDB();
-
-                // Prepare SQL statement to be executed
                 PreparedStatement statement2 = conn.prepareStatement(query2.toString());
 
                 statement2.setString(1, firstName);
@@ -402,19 +395,18 @@ public class Tester {
                 statement2.setString(4, newPassword);
                 statement2.setString(5, testerID);
 
-
                 statement2.executeUpdate();
 
                 statement2.close();
                 conn.close();
-
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
                 return "Invalid";
             }
-        } else if (checkMatchCurrentPassword(testerID, currentPassword) == false){
+        } else if (checkMatchCurrentPassword(testerID, currentPassword) == false) {
             return "Wrong password";
         }
+
         return "Valid";
     }
     
@@ -581,5 +573,9 @@ public class Tester {
     
     public void setPassword(String password) {
         this.password = password;
+    }
+    
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

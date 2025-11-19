@@ -769,35 +769,34 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
     private void editConfirmBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editConfirmBtnActionPerformed
         // TODO add your handling code here:
         String testerID = editTesterIDField.getText();
-        String firstName = editFirstNameField.getText();
-        String lastName = editLastNameField.getText();
-        String email = editEmailField.getText() + jLabel21.getText();
-        String currentPassword = oldPasswordField.getText();
-        String newPassword = editPasswordField.getText();
-        
-        String result = Tester.editTester(testerID, lastName, firstName, email, currentPassword, newPassword);
-        
-        if (result.startsWith("TS")) {
-            //Makes the textfields blank again
-            editTesterIDField.setText("");
-            editFirstNameField.setText("");
-            editLastNameField.setText("");
-            editEmailField.setText("");
-            oldPasswordField.setText("");
-            editPasswordField.setText("");
-            
-            JOptionPane.showMessageDialog(this, "Tester edited successfully!", "Edited Tester", JOptionPane.INFORMATION_MESSAGE);
-            System.out.println("EDIT: Tester " + firstName + " " + lastName + "edited");
-        } else if ("Empty".equals(result)) {
-            //This is an error when the User leaves a certain field blank
-            JOptionPane.showMessageDialog(this, "Please fill in the information", "Error", JOptionPane.ERROR_MESSAGE);
-        } else if ("Duplicate Email".equals(result)) {
-            //This is an error when the User inputs a duplicate email
-            JOptionPane.showMessageDialog(this, "Duplicate email found, please change", "Error", JOptionPane.ERROR_MESSAGE);
-        } else if ("Wrong password".equals(result)) {
-            //This is an error when the User wanted to change the password, but inputted the wrong old password
-            oldPasswordField.setText("");
-            JOptionPane.showMessageDialog(this, "Wrong password", "Error", JOptionPane.ERROR_MESSAGE);
+        Tester tester = new Tester();
+        tester = Tester.getTesterByID(testerID); // assuming this is equivalent to Technician.getInfo
+        String suffix = "@ptrackerdb.com";
+
+        if (tester.getTesterID() != null) {
+            Tester currentInfo = new Tester();
+            currentInfo = Tester.getTesterByID(testerID);
+            String email = currentInfo.getEmail();
+
+            if (email.endsWith(suffix)) {
+                email = email.substring(0, email.length() - suffix.length());
+            }
+
+            if (currentInfo.getStatus().equals("Inactive")) {
+                inactiveTesterLabel.setText("This tester is inactive, click the button to activate");
+                ActivateTesterBtn.setVisible(true);
+            } else {
+                inactiveTesterLabel.setText("");
+                ActivateTesterBtn.setVisible(false);
+            }
+
+            editFirstNameField.setText(currentInfo.getFirstName());
+            editLastNameField.setText(currentInfo.getLastName());
+            editEmailField.setText(email); // email without suffix
+            System.out.println("EDIT: Tester ID " + currentInfo.getTesterID() + " current info retrieved");
+        } else {
+            JOptionPane.showMessageDialog(this, "Tester ID not found", "Error", JOptionPane.ERROR_MESSAGE);
+            System.out.println("EDIT: Tester ID " + testerID + " does not exist");
         }
         
     }//GEN-LAST:event_editConfirmBtnActionPerformed

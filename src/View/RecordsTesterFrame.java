@@ -852,48 +852,51 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
     private void editEnterBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editEnterBtnActionPerformed
         // TODO add your handling code here:
         String testerID = editTesterIDField.getText();
-        
+        String suffix = "@ptrackerdb.com";
+
         if (testerID.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Enter tester ID");
-            
-        }
-        else {
-            try {
-                Tester tester = Tester.getTesterByID(testerID);
-                
-                if (tester != null) {
-                    // populates the input boxes of the default info
-                    editFirstNameField.setText(tester.getFirstName());
-                    editLastNameField.setText(tester.getLastName());
-                    editEmailField.setText(tester.getEmail());
-                    editPasswordField.setText(tester.getPassword());
-
-                    // lets the user edit the provided input boxes
-                    editFirstNameField.setEnabled(true);
-                    editLastNameField.setEnabled(true);
-                    editEmailField.setEnabled(true);
-                    editPasswordField.setEnabled(true);
-                    editConfirmBtn.setEnabled(true);
-                    
-                    // Show activation option if tester is inactive
-                    if (tester.getStatus().equals("Inactive")) {
-                        inactiveTesterLabel.setText("This tester is inactive, click the button to activate");
-                        ActivateTesterBtn.setVisible(true);
-                    } else {
-                        inactiveTesterLabel.setText("");
-                        ActivateTesterBtn.setVisible(false);
-                    }
-                } 
-                else {
-                    JOptionPane.showMessageDialog(this, "Tester ID not found");
-                }
-            }
-            catch (Exception Ex) {
-                JOptionPane.showMessageDialog(this, "Database error: " + Ex.getMessage());
-            }
-            
+            return;
         }
 
+        Tester tester = new Tester();
+        tester = Tester.getTesterByID(testerID);
+
+        if (tester != null && tester.getTesterID() != null) {
+
+            Tester currentInfo = new Tester();
+            currentInfo = Tester.getTesterByID(testerID);
+            String email = currentInfo.getEmail();
+
+            if (email.endsWith(suffix)) {
+                email = email.substring(0, email.length() - suffix.length());
+            }
+
+            if (currentInfo.getStatus().equals("Inactive")) {
+                inactiveTesterLabel.setText("This tester is inactive, click the button to activate");
+                ActivateTesterBtn.setVisible(true);
+            } else {
+                inactiveTesterLabel.setText("");
+                ActivateTesterBtn.setVisible(false);
+            }
+
+            editFirstNameField.setText(currentInfo.getFirstName());
+            editLastNameField.setText(currentInfo.getLastName());
+            editEmailField.setText(email); // without suffix
+            editPasswordField.setText(currentInfo.getPassword());
+
+            editFirstNameField.setEnabled(true);
+            editLastNameField.setEnabled(true);
+            editEmailField.setEnabled(true);
+            editPasswordField.setEnabled(true);
+            editConfirmBtn.setEnabled(true);
+
+            System.out.println("EDIT: Tester ID " + currentInfo.getTesterID() + " current info retrieved");
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Tester ID not found", "Error", JOptionPane.ERROR_MESSAGE);
+            System.out.println("EDIT: Tester ID " + testerID + " does not exist");
+        }
     }//GEN-LAST:event_editEnterBtnActionPerformed
 
     private void addLastNameFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addLastNameFieldActionPerformed

@@ -276,56 +276,82 @@ public class Transac1Frame extends javax.swing.JFrame {
     }//GEN-LAST:event_technicianIDFieldActionPerformed
 
     private void releaseBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_releaseBtnActionPerformed
-        // TODO add your handling code here:
         String patchName = patchNameField.getText();
         String patchType = (String) patchTypeComboBox.getSelectedItem();
         String softwareID = softwareIDField.getText();
         String machineID = machineIDField.getText();
         String technicianID = technicianIDField.getText();
         String description = descriptionField.getText();
-        
-        // if there's no testerID inputted, it just prompts again
+
+        // Check for empty fields
         if (patchName.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "missing patch Name; input one first");
-        }
-        else if (patchType.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "unfilled patch Type; input one first");
-        }
-        else if (softwareID.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "missing software ID; input one first");
-        }
-        else if (machineID.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "missing machine ID; input one first");
-        }
-        else if (technicianID.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "missing technician ID; input one first");
-        }
-        else if (description.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "missing description; input one first");
-        }
-        else {
-            // a failsafe action just in case
+            JOptionPane.showMessageDialog(this, "Missing patch Name; input one first");
+        } else if (patchType.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Unfilled patch Type; input one first");
+        } else if (softwareID.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Missing software ID; input one first");
+        } else if (machineID.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Missing machine ID; input one first");
+        } else if (technicianID.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Missing technician ID; input one first");
+        } else if (description.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Missing description; input one first");
+        } else {
             try {
-                
-               boolean success = Patch.releasePatch(patchName, patchType, softwareID, machineID, technicianID, description);
-               
-               if (success) {
-                   JOptionPane.showMessageDialog(this, "Patch has been released successfully!");
-                   
-                   // clears the fields again
-                   patchNameField.setText("");
-                   patchTypeComboBox.setSelectedIndex(0);
-                   softwareIDField.setText("");
-                   machineIDField.setText("");
-                   technicianIDField.setText("");
-                   descriptionField.setText("");
-               }
-               else {
-                   JOptionPane.showMessageDialog(this, "Failed to release patch.");
-               }
-            }
-            catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
+                String result = Patch.releasePatch(patchName, patchType, softwareID, machineID, technicianID, description);
+
+                switch (result) {
+                    case "Valid":
+                        JOptionPane.showMessageDialog(this, "Patch has been released successfully!");
+                        // Clear fields
+                        patchNameField.setText("");
+                        patchTypeComboBox.setSelectedIndex(0);
+                        softwareIDField.setText("");
+                        machineIDField.setText("");
+                        technicianIDField.setText("");
+                        descriptionField.setText("");
+                        break;
+                    case "Empty Fields":
+                        JOptionPane.showMessageDialog(this, "Please fill in all fields", "Error", JOptionPane.ERROR_MESSAGE);
+                        break;
+                    case "Invalid Patch Type":
+                        JOptionPane.showMessageDialog(this, "Patch type is invalid", "Error", JOptionPane.ERROR_MESSAGE);
+                        break;
+                    case "Software Not Found":
+                        JOptionPane.showMessageDialog(this, "Software ID not found", "Error", JOptionPane.ERROR_MESSAGE);
+                        break;
+                    case "Software Not Active":
+                        JOptionPane.showMessageDialog(this, "Software is not active", "Error", JOptionPane.ERROR_MESSAGE);
+                        break;
+                    case "Machine Not Found":
+                        JOptionPane.showMessageDialog(this, "Machine ID not found", "Error", JOptionPane.ERROR_MESSAGE);
+                        break;
+                    case "Machine Not Ready for Patch":
+                        JOptionPane.showMessageDialog(this, "Machine is not ready for patch", "Error", JOptionPane.ERROR_MESSAGE);
+                        break;
+                    case "Technician Not Found":
+                        JOptionPane.showMessageDialog(this, "Technician ID not found", "Error", JOptionPane.ERROR_MESSAGE);
+                        break;
+                    case "Technician Role Mismatch":
+                        JOptionPane.showMessageDialog(this, "Technician role is not compatible with machine", "Error", JOptionPane.ERROR_MESSAGE);
+                        break;
+                    case "Technician Not Available":
+                        JOptionPane.showMessageDialog(this, "Technician is not available for patching", "Error", JOptionPane.ERROR_MESSAGE);
+                        break;
+                    case "Patch Type Does Not Match Software Type":
+                        JOptionPane.showMessageDialog(this, "Patch type does not match software type", "Error", JOptionPane.ERROR_MESSAGE);
+                        break;
+                    case "Software Not Compatible with Machine Type":
+                        JOptionPane.showMessageDialog(this, "Software type is not compatible with machine type", "Error", JOptionPane.ERROR_MESSAGE);
+                        break;
+                    case "Insert Failed":
+                        JOptionPane.showMessageDialog(this, "Database insert failed", "Error", JOptionPane.ERROR_MESSAGE);
+                        break;
+                    default:
+                        JOptionPane.showMessageDialog(this, "Database error: " + result, "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }//GEN-LAST:event_releaseBtnActionPerformed

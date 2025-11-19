@@ -6,6 +6,8 @@ package Model;
 
 import java.util.ArrayList;
 import java.sql.*;
+import javax.swing.table.DefaultTableModel;
+import java.util.Vector;
 /**
  *
  * @author anton
@@ -16,37 +18,126 @@ public class Tester {
     private String firstName;
     private String lastName;
     private String email;
-    private String password;
+    private String currentPassword;
+    private String newPassword;
+    private String status;
     
-    public static boolean checkEmailDuplicates(String email) {
+    
+     public static DefaultTableModel displayRecord(String testerID) {
+        DefaultTableModel model = new DefaultTableModel();
         StringBuilder query = new StringBuilder();
-        query.append(" SELECT  *               ");
-        query.append(" FROM    tester ");
-        query.append(" WHERE   email = ? ");
-        Boolean duplicateResult = false;
+        query.append(" SELECT * FROM tester ");
+        query.append(" WHERE testerID = ? ");
 
-        try {
-            // Establish connection to DB
-            Connection conn = MySQLConnector.connectDB();
+        try (Connection conn = MySQLConnector.connectDB();
+             PreparedStatement statement = conn.prepareStatement(query.toString())) {
 
-            PreparedStatement statement = conn.prepareStatement(query.toString());
+            statement.setString(1, testerID);
 
-            statement.setString(1, email);
+            // Execute query inside the try block
+            try (ResultSet rs = statement.executeQuery()) {
 
-            // 1. Use executeQuery() and get the ResultSet
-            ResultSet rs = statement.executeQuery();
+                ResultSetMetaData metaData = rs.getMetaData();
+                int columnCount = metaData.getColumnCount();
+                Vector<String> columnNames = new Vector<>();
 
-            if (rs.next()) {//This command will return true when AT LEAST 1 record is found. Hence, duplicate is true
-                duplicateResult = true;
+                for (int i = 1; i <= columnCount; i++) {
+                    columnNames.add(metaData.getColumnName(i));
+                }
+
+
+                model.setColumnIdentifiers(columnNames); 
+
+                int rowCount = 0;
+                while (rs.next()) {
+                    rowCount++;
+                    Vector<Object> rowData = new Vector<>();
+                    for (int i = 1; i <= columnCount; i++) {
+                        rowData.add(rs.getObject(i));
+                    }
+                    model.addRow(rowData);
+                }
+
+                System.out.println("Tester Rows found: " + rowCount);
             }
-
-            //Closing the connections to avoid DB app slow down in performance
-            rs.close();
-            statement.close();
-            conn.close();
 
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
+            ex.printStackTrace();
+        }
+
+        return model;
+    }
+    
+    public static DefaultTableModel displayTable() {
+        DefaultTableModel model = new DefaultTableModel();
+        StringBuilder query = new StringBuilder();
+        query.append(" SELECT * FROM tester ");
+
+        try (Connection conn = MySQLConnector.connectDB();
+             PreparedStatement statement = conn.prepareStatement(query.toString())) {
+
+
+            // Execute query inside the try block
+            try (ResultSet rs = statement.executeQuery()) {
+
+                ResultSetMetaData metaData = rs.getMetaData();
+                int columnCount = metaData.getColumnCount();
+                Vector<String> columnNames = new Vector<>();
+
+                for (int i = 1; i <= columnCount; i++) {
+                    columnNames.add(metaData.getColumnName(i));
+                }
+
+
+                model.setColumnIdentifiers(columnNames); 
+
+                int rowCount = 0;
+                while (rs.next()) {
+                    rowCount++;
+                    Vector<Object> rowData = new Vector<>();
+                    for (int i = 1; i <= columnCount; i++) {
+                        rowData.add(rs.getObject(i));
+                    }
+                    model.addRow(rowData);
+                }
+
+                System.out.println("Tester Rows found: " + rowCount);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+            ex.printStackTrace();
+        }
+
+        return model;
+    }
+    
+    public static boolean checkEmailDuplicates(String email, String ignoreTesterID) {
+        boolean duplicateResult = false;
+        StringBuilder query = new StringBuilder();
+        query.append("SELECT testerID FROM tester WHERE email = ?");
+
+        try {
+            Connection conn = MySQLConnector.connectDB();
+            PreparedStatement statement = conn.prepareStatement(query.toString());
+            statement.setString(1, email);
+            ResultSet rs = statement.executeQuery();
+
+            while (rs.next()) {
+                String id = rs.getString("testerID");
+                if (ignoreTesterID == null || !id.equals(ignoreTesterID)) {
+                    duplicateResult = true; // duplicate found in another tester
+                    break;
+                }
+            }
+
+            rs.close();
+            statement.close();
+            conn.close();
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+            duplicateResult = true; // fail-safe
         }
 
         return duplicateResult;
@@ -112,6 +203,7 @@ public class Tester {
                 resultTester.setFirstName(rs.getString("firstName"));
                 resultTester.setLastName(rs.getString("lastName"));
                 resultTester.setEmail(rs.getString("email"));
+                resultTester.setStatus(rs.getString("status")); 
             } 
 
             //Closing the connections to avoid DB app slow down in performance
@@ -149,6 +241,7 @@ public class Tester {
             String fn = rs.getString("firstName");
             String ln = rs.getString("lastName");
             String email = rs.getString("email");
+            
 
             String fullName = fn + " " + ln;
 
@@ -165,32 +258,87 @@ public class Tester {
     }
     
     public static String addTester(String firstName, String lastName, String email, String password) {
-         StringBuilder query = new StringBuilder();
-        query.append(" INSERT INTO tester (firstName, lastName, email, password) ");
-        query.append(" VALUES (?, ?, ?, ?)");
+        StringBuilder query = new StringBuilder();
+        query.append(" INSERT INTO tester (testerID, firstName, lastName, email, password, status) ");
+        query.append(" VALUES (?, ?, ?, ?, ?, 'Active')");
 
         //TODO - Check for email duplicates
+        String testerID = generateNextTesterID(); // generate first
         if (firstName.isBlank() || lastName.isBlank() || email.isBlank() || password.isBlank()) {//Checker for when the User leaves a Field blank
             return "Empty";
-        } else if (checkEmailDuplicates(email) == true) {
+        } else if (checkEmailDuplicates(email, testerID) == true) {
             return "Duplicate Email";
         } else {
+            
             try {
                 // Establish connection to DB
                 Connection conn = MySQLConnector.connectDB();
 
                 // Prepare SQL statement to be executed
                 PreparedStatement statement = conn.prepareStatement(query.toString());
-
-                statement.setString(1, firstName);
-                statement.setString(2, lastName);
-                statement.setString(3, email);
-                statement.setString(4, password);
+                
+                statement.setString(1, testerID);
+                statement.setString(2, firstName);
+                statement.setString(3, lastName);
+                statement.setString(4, email);
+                statement.setString(5, password);
 
                 statement.executeUpdate();
-
+                
+                
                 statement.close();
                 conn.close();
+                return testerID;
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+                return "Invalid";
+            }
+        }
+        
+    }
+    
+    public static String deleteTester(String testerID) {
+         StringBuilder query = new StringBuilder();
+        query.append(" DELETE FROM tester ");
+        query.append(" WHERE testerID = ? ");
+
+        if (testerID.isBlank()) {
+            return "Empty";
+        } else {
+            try {
+                Connection conn = MySQLConnector.connectDB();
+
+                // Use the actual checkSQL here
+                String checkSQL = "SELECT COUNT(*) FROM tester WHERE testerID = ?";
+                PreparedStatement checkStatement = conn.prepareStatement(checkSQL);
+
+                checkStatement.setString(1, testerID);
+                ResultSet rs = checkStatement.executeQuery();
+
+                rs.next();
+                int count = rs.getInt(1);
+
+                rs.close();
+                checkStatement.close();
+
+                if (count == 0) {
+                    conn.close();
+                    return "not Found";
+                }
+
+                // Soft delete
+                String updateQuery = "UPDATE tester SET status='Inactive' WHERE testerID=?";
+                PreparedStatement updateStmt = conn.prepareStatement(updateQuery);
+
+                updateStmt.setString(1, testerID);
+                int rowsAffected = updateStmt.executeUpdate();
+
+                updateStmt.close();
+                conn.close();
+
+                if (rowsAffected == 0) {
+                    return "Delete Failed";
+                }
 
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
@@ -199,93 +347,32 @@ public class Tester {
         }
         return "Valid";
     }
-    
-    public static String deleteTester(String testerID) {
-        StringBuilder query = new StringBuilder();
-        query.append(" DELETE FROM tester               ");
-        query.append(" WHERE   testerID = ? ");
-
-        if (testerID.isBlank()) {
-            return "Empty";
-        } else {
-            try {
-                // Establish connection to DB
-                Connection conn = MySQLConnector.connectDB();
-
-                // Prepare SQL statement to be executed
-                String checkSQL = "SELECT COUNT(*) FROM tester WHERE testerID = ?";
-                PreparedStatement checkStatement = conn.prepareStatement(query.toString());
-
-                // replaces ? with testerID itself
-                checkStatement.setString(1, testerID);
-                
-                // executes the query before returning a result set (rows)
-                ResultSet rs = checkStatement.executeQuery();
-                rs.next();
-                int count = rs.getInt(1);
-                
-                rs.close();
-                checkStatement.close();
-
-                // nothing detected so connection is closed and returns not found
-                if (count == 0) {
-                    conn.close();
-                    return "not Found";
-                }
-                
-                // performs deletion when tester does exist
-                PreparedStatement deleteStatement = conn.prepareStatement(query.toString());
-                deleteStatement.setString(1, testerID);
-
-                // executes deletion
-                int rowsAffected = deleteStatement.executeUpdate();
-
-                deleteStatement.close();
-                conn.close();
-
-                // If no rows deleted (shouldn’t happen if count is greater than 0)
-                if (rowsAffected == 0) {
-                    return "Delete Failed";
-                }
-                } catch (SQLException ex) {
-                    System.out.println(ex.getMessage());
-                    return "Invalid";
-                }
-        }
-        return "Valid";
-    }
 
     public static String editTester(String testerID, String lastName, String firstName, String email, String currentPassword, String newPassword) {
-        StringBuilder query1 = new StringBuilder();//This command is used when the user wants to keep the password the same
-        query1.append(" UPDATE tester ");
-        query1.append(" SET firstName = ?, lastName = ?, email = ? ");
-        query1.append(" WHERE testerID = ? ");
-        
-        StringBuilder query2 = new StringBuilder();//This command is used when the user want to change their password
-        query2.append(" UPDATE tester ");
-        query2.append(" SET firstName = ?, lastName = ?, email = ?, password = ? ");
-        query2.append(" WHERE testerID = ? "); 
+        StringBuilder query1 = new StringBuilder(); // update without password
+        query1.append("UPDATE tester ");
+        query1.append("SET firstName = ?, lastName = ?, email = ? ");
+        query1.append("WHERE testerID = ?");
 
-        //Checker for when the User leaves a Field blank
-        //We allow the currentPassword and newPassword field to BOTH be blank, but we do not allow ONLY 1 of them to be blank
+        StringBuilder query2 = new StringBuilder(); // update with new password
+        query2.append("UPDATE tester ");
+        query2.append("SET firstName = ?, lastName = ?, email = ?, password = ? ");
+        query2.append("WHERE testerID = ?");
+
         if (firstName.isBlank() || lastName.isBlank() || email.isBlank()
                 || (currentPassword.isBlank() && !newPassword.isBlank()) || (!currentPassword.isBlank() && newPassword.isBlank())) {
             return "Empty";
-        } else if (checkEmailDuplicates(email) == true) {//Checker for email duplicates
+        } else if (checkEmailDuplicates(email, testerID) == true) { // email duplicate check
             return "Duplicate Email";
         } else if (currentPassword.isBlank() && newPassword.isBlank()) {
             try {
-                // Establish connection to DB
                 Connection conn = MySQLConnector.connectDB();
-
-                // Prepare SQL statement to be executed
                 PreparedStatement statement1 = conn.prepareStatement(query1.toString());
 
                 statement1.setString(1, firstName);
                 statement1.setString(2, lastName);
                 statement1.setString(3, email);
                 statement1.setString(4, testerID);
-                
 
                 statement1.executeUpdate();
 
@@ -297,10 +384,7 @@ public class Tester {
             }
         } else if (checkMatchCurrentPassword(testerID, currentPassword) == true) {
             try {
-                // Establish connection to DB
                 Connection conn = MySQLConnector.connectDB();
-
-                // Prepare SQL statement to be executed
                 PreparedStatement statement2 = conn.prepareStatement(query2.toString());
 
                 statement2.setString(1, firstName);
@@ -309,25 +393,100 @@ public class Tester {
                 statement2.setString(4, newPassword);
                 statement2.setString(5, testerID);
 
-
                 statement2.executeUpdate();
 
                 statement2.close();
                 conn.close();
-
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
                 return "Invalid";
             }
-        } else if (checkMatchCurrentPassword(testerID, currentPassword) == false){
+        } else if (checkMatchCurrentPassword(testerID, currentPassword) == false) {
             return "Wrong password";
         }
+
         return "Valid";
     }
     
+    public static boolean login(String testerID, char[] password) {
+        StringBuilder query = new StringBuilder();
+        query.append(" SELECT password ");
+        query.append(" FROM tester ");
+        query.append(" WHERE testerID = ? AND status = 'Active' ");
+
+        boolean result = false;
+
+        try {
+            Connection conn = MySQLConnector.connectDB();
+            PreparedStatement statement = conn.prepareStatement(query.toString());
+
+            statement.setString(1, testerID);
+
+            ResultSet rs = statement.executeQuery();
+
+            if (rs.next()) {
+                String passwordFromDB = rs.getString("password");
+
+                // convert char[] to String for comparison
+                String passwordInput = new String(password);
+
+                if (passwordFromDB.equals(passwordInput)) {
+                    result = true;
+                }
+            }
+
+            rs.close();
+            statement.close();
+            conn.close();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+            result = false;
+        }
+
+        return result;
+    }
+
+    public static String activate(String testerID) {
+        StringBuilder query = new StringBuilder();
+        query.append(" UPDATE tester               ");
+        query.append(" SET   status = 'Active' ");
+        query.append(" WHERE   testerID = ? ");
+
+        String result = "Invalid";
+
+        if (testerID.isBlank()) {
+            result = "Empty";
+        } else {
+            try {
+                // Establish connection to DB
+                Connection conn = MySQLConnector.connectDB();
+
+                // Prepare SQL statement to be executed
+                PreparedStatement statement = conn.prepareStatement(query.toString());
+
+                statement.setString(1, testerID);
+                int rowAffected = statement.executeUpdate();
+                System.out.println(rowAffected);
+
+                if (rowAffected == 0) {
+                    result = "Missing";
+                } else if (rowAffected > 0) {
+                    result = "Valid";
+                }
+                statement.close();
+                conn.close();
+
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+                result = "Invalid";
+            }
+        }
+        return result;
+    }
     private static String generateNextTesterID() {
         // Default ID if table is empty or something fails
-        String nextID = "TS1001";
+        String nextID = "TS0001";
 
         // Query to get highest existing tester ID
         String query = "SELECT testerID FROM tester ORDER BY testerID DESC LIMIT 1";
@@ -342,18 +501,18 @@ public class Tester {
 
             // If table has at least one tester
             if (rs.next()) {
-                String lastID = rs.getString("testerID"); // e.g., "TS1033"
+                String lastID = rs.getString("testerID"); // e.g., "TS0033"
 
                 try {
                     // Remove prefix "TS" and get numeric part
-                    String numericPart = lastID.substring(2); // "1033"
-                    int num = Integer.parseInt(numericPart);  // 1033
-                    int nextNum = num + 1;                    // increment → 1034
-                    nextID = "TS" + nextNum;                  // "TS1034"
+                    String numericPart = lastID.substring(2); 
+                    int num = Integer.parseInt(numericPart);  
+                    int nextNum = num + 1;                    
+                    nextID = String.format("TS%04d", nextNum);                 
                 } catch (Exception parseEx) {
                     // If format is weird or corrupted, default to TS1001
                     System.out.println("ID parse error: " + parseEx.getMessage());
-                    nextID = "TS1001";
+                    nextID = "TS0001";
                 }
             }
 
@@ -363,9 +522,9 @@ public class Tester {
             conn.close();
 
         } catch (SQLException e) {
-            // On SQL error, fallback to TS1001
+            // On SQL error, fallback to TS0001
             System.out.println(e.getMessage());
-            nextID = "TS1001";
+            nextID = "TS0001";
         }
 
         return nextID; // Return the final valid ID
@@ -387,10 +546,17 @@ public class Tester {
         return email;
     }
     
-    public String getPassword() {
-        return password;
+    public String getcurrentPassword() {
+        return currentPassword;
     }
     
+    public String getnewPassword() {
+        return newPassword;
+    }
+    
+    public String getStatus() {
+        return status;
+    }
     public void setID(String testerID) {
         this.testerID = testerID;
     }
@@ -407,7 +573,15 @@ public class Tester {
         this.email = email;
     }
     
-    public void setPassword(String password) {
-        this.password = password;
+    public void setCurrentPassword(String currentPassword) {
+        this.currentPassword = currentPassword;
+    }
+
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
+    }
+    
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

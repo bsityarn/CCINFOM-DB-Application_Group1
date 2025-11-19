@@ -11,6 +11,8 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Vector;
 import javax.swing.table.DefaultTableModel;
+import java.sql.Date;
+import java.time.LocalDate;
 
 /**
  *
@@ -117,63 +119,84 @@ public class Patch {
         return model;
     }
     
-    public static DefaultTableModel displayPatchReport(int year, int month) {
+   public static DefaultTableModel displayPatchReport(String year, String month) {
         DefaultTableModel model = new DefaultTableModel();
+    Vector<String> columnNames = new Vector<>();
+    columnNames.add("Patch Name");
+    columnNames.add("Patch Type");
+    columnNames.add("Success Deployments");
+    columnNames.add("Failed/Pending");
+    columnNames.add("Success Rate (%)");
+    columnNames.add("Fail Rate (%)");
+    model.setColumnIdentifiers(columnNames);
+    
+    int rowCount = 0;
+    
+    String query = "SELECT p.patchID, p.name AS patchName, p.type AS patchType, " +
+                    "SUM(CASE WHEN m.status = 'Done' THEN 1 ELSE 0 END) AS successCount, " +
+                    "SUM(CASE WHEN m.status IN ('Not Started', 'In progress') THEN 1 ELSE 0 END) AS failureCount " +
+                    "FROM patch p " +
+                    "INNER JOIN maintenance m ON p.patchID = m.patchID " +
+                    "WHERE YEAR(m.dateAssigned) = ? AND MONTH(m.dateAssigned) = ? " +
+                    "GROUP BY p.patchID, p.name, p.type " +
+                    "HAVING COUNT(m.maintenanceID) > 0 " + 
+                    "ORDER BY p.name";
 
-        // Set table headers
-        Vector<String> columnNames = new Vector<>();
-        columnNames.add("Patch Name");
-        columnNames.add("Patch Type");
-        columnNames.add("Success Deployments");
-        columnNames.add("Failed Deployments");
-        columnNames.add("Success Rate");
-        columnNames.add("Fail Rate");
-        model.setColumnIdentifiers(columnNames);
+    try (Connection conn = MySQLConnector.connectDB();
+         PreparedStatement stmt = conn.prepareStatement(query)) {
 
-        // SQL query: join patch -> machine -> maintenance
-        String query = "SELECT p.patchID, p.name AS patchName, p.type AS patchType, " +
-               "COALESCE(SUM(CASE WHEN m.status = 'Done' THEN 1 ELSE 0 END), 0) AS successCount, " +
-               "COALESCE(SUM(CASE WHEN m.status IN ('Not Started', 'In progress') THEN 1 ELSE 0 END), 0) AS failureCount " +
-               "FROM patch p " +
-               "LEFT JOIN maintenance m ON p.patchID = m.patchID " +
-               "WHERE YEAR(p.releaseDate) = ? AND MONTH(p.releaseDate) = ? " +
-               "GROUP BY p.patchID, p.name, p.type " +
-               "ORDER BY p.name";
+        // 3. Set Year/Month parameters (Using setInt for safety, as YEAR() and MONTH() return integers)
+        
+        // This line attempts to convert the strings. If the combo box values are clean, it works.
+        int yearInt = Integer.parseInt(year);
+        int monthInt = Integer.parseInt(month);
+        
+        stmt.setInt(1, yearInt);
+        stmt.setInt(2, monthInt);
 
-        try (Connection conn = MySQLConnector.connectDB();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                // ... (rest of your result set processing is correct) ...
+                String patchName = rs.getString("patchName");
+                String patchType = rs.getString("patchType");
 
-            stmt.setInt(1, year);
-            stmt.setInt(2, month);
+                int successCount = rs.getInt("successCount"); 
+                int failureCount = rs.getInt("failureCount");
+                int total = successCount + failureCount;
 
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    String patchName = rs.getString("patchName");
-                    String patchType = rs.getString("patchType");
-                    int successCount = rs.getInt("successCount");
-                    int failureCount = rs.getInt("failureCount");
+                double successRate = 0.0;
+                double failureRate = 0.0;
 
-                    int total = successCount + failureCount;
-                    double successRate = total > 0 ? ((double) successCount / total) * 100 : 0;
-                    double failureRate = total > 0 ? ((double) failureCount / total) * 100 : 0;
-
-                    Vector<Object> rowData = new Vector<>();
-                    rowData.add(patchName);
-                    rowData.add(patchType);
-                    rowData.add(successCount);
-                    rowData.add(failureCount);
-                    rowData.add(String.format("%.2f", successRate));
-                    rowData.add(String.format("%.2f", failureRate));
-
-                    model.addRow(rowData);
+                if (total > 0) {
+                    successRate = ((double) successCount / total) * 100;
+                    failureRate = ((double) failureCount / total) * 100;
                 }
-            }
 
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+                Vector<Object> rowData = new Vector<>();
+                rowData.add(patchName);
+                rowData.add(patchType);
+                rowData.add(successCount);
+                rowData.add(failureCount);
+                rowData.add(String.format("%.2f", successRate));
+                rowData.add(String.format("%.2f", failureRate));
+
+                model.addRow(rowData);
+                rowCount++;
+            }
+            System.out.println("Patch Report Rows found: " + rowCount);
         }
 
-        return model;
+    } catch (NumberFormatException e) {
+        // Catch if year/month were somehow passed as non-numeric strings
+        throw new RuntimeException("Invalid number format for year or month parameter.", e);
+    } catch (SQLException ex) {
+        System.err.println("Error generating report: " + ex.getMessage());
+        ex.printStackTrace();
+        throw new RuntimeException("Database Error in displayPatchReport: " + ex.getMessage(), ex);
+    }
+
+    return model;
+   
     }
 
 
@@ -223,57 +246,92 @@ public class Patch {
     
     public static String editPatch(String patchID, String technicianID, String softwareID, String machineID, String description, String patchName, String status, String type) {
         // Check for empty fields
-    if (patchID.isBlank() || technicianID.isBlank() || machineID.isBlank() ||
-        description.isBlank() || patchName.isBlank() || softwareID.isBlank() ||
-        status == null || type == null) {
-        return "Empty";
-    }
-
-    // Trim values
-    status = status.trim();
-    type = type.trim();
-
-    // Validate type
-    List<String> allowedTypes = Arrays.asList("Application", "System", "Programming", "Network", "Server");
-    if (!allowedTypes.contains(type)) return "Invalid Type";
-
-    // Validate status
-    List<String> allowedStatuses = Arrays.asList("New", "Working", "Not Working", "Inactive");
-    if (!allowedStatuses.contains(status)) return "Invalid Status";
-
-    String query = "UPDATE patch SET technicianID = ?, machineID = ?, description = ?, name = ?, softwareID = ?, status = ?, type = ? WHERE patchID = ?";
-
-    try (Connection conn = MySQLConnector.connectDB()) {
-        // Check if patch exists
-        String checkSQL = "SELECT COUNT(*) FROM patch WHERE patchID = ?";
-        try (PreparedStatement checkStmt = conn.prepareStatement(checkSQL)) {
-            checkStmt.setString(1, patchID);
-            ResultSet rs = checkStmt.executeQuery();
-            rs.next();
-            if (rs.getInt(1) == 0) return "Not Found";
+        // Check for empty fields
+        if (patchID.isBlank() || technicianID.isBlank() || machineID.isBlank() ||
+             description.isBlank() || patchName.isBlank() || softwareID.isBlank() ||
+             status == null || type == null) {
+             return "Empty";
         }
 
-        // Update patch
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, technicianID);
-            stmt.setString(2, machineID);
-            stmt.setString(3, description);
-            stmt.setString(4, patchName);
-            stmt.setString(5, softwareID);
-            stmt.setString(6, status);
-            stmt.setString(7, type);
-            stmt.setString(8, patchID);
+        // Trim values
+        status = status.trim();
+        type = type.trim();
 
-            int rows = stmt.executeUpdate();
-            if (rows == 0) return "Update Failed";
+        // Validate type
+        List<String> allowedTypes = Arrays.asList("Application", "System", "Programming", "Network", "Server");
+        if (!allowedTypes.contains(type)) return "Invalid Type";
+
+        // Validate status
+        List<String> allowedStatuses = Arrays.asList("New", "Working", "Not Working", "Inactive");
+        if (!allowedStatuses.contains(status)) return "Invalid Status";
+
+        try (Connection conn = MySQLConnector.connectDB()) {
+            // Check if patch exists and get its current status
+            String checkSQL = "SELECT status FROM patch WHERE patchID = ?";
+            String currentStatus;
+            try (PreparedStatement checkStmt = conn.prepareStatement(checkSQL)) {
+                 checkStmt.setString(1, patchID);
+                 ResultSet rs = checkStmt.executeQuery();
+                 if (!rs.next()) return "Not Found";
+                 currentStatus = rs.getString("status");
+             }
+
+             // Prevent changing from Inactive to Working/Not Working
+             if ("Inactive".equalsIgnoreCase(currentStatus) &&
+                 ("Working".equalsIgnoreCase(status) || "Not Working".equalsIgnoreCase(status))) {
+                 return "Cannot change status from Inactive to Working/Not Working";
+             }
+
+             // Update patch
+             String query = "UPDATE patch SET technicianID = ?, machineID = ?, description = ?, name = ?, softwareID = ?, status = ?, type = ? WHERE patchID = ?";
+             try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                 stmt.setString(1, technicianID);
+                 stmt.setString(2, machineID);
+                 stmt.setString(3, description);
+                 stmt.setString(4, patchName);
+                 stmt.setString(5, softwareID);
+                 stmt.setString(6, status);
+                 stmt.setString(7, type);
+                 stmt.setString(8, patchID);
+
+                 int rows = stmt.executeUpdate();
+                 if (rows == 0) return "Update Failed";
+             }
+
+         } catch (SQLException ex) {
+             System.out.println("DEBUG: SQL Exception: " + ex.getMessage());
+             return "Invalid";
+         }
+
+         return "Success";
+    }
+    
+    public static String activate(String patchID) {
+        if (patchID.isBlank()) {
+            return "Empty";
         }
 
-    } catch (SQLException ex) {
-        System.out.println("DEBUG: SQL Exception: " + ex.getMessage());
-        return "Invalid";
-    }
+        String query = "UPDATE patch SET status = 'New' WHERE patchID = ?";
+        String result = "Invalid";
 
-    return "Valid";
+        try (Connection conn = MySQLConnector.connectDB();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, patchID);
+            int rowsAffected = stmt.executeUpdate();
+
+            if (rowsAffected == 0) {
+                result = "Not Found";  // patchID does not exist
+            } else {
+                result = "Valid"; // successfully activated
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("SQL Exception: " + ex.getMessage());
+            result = "Invalid";
+        }
+
+        return result;
     }
     
     public static ArrayList<String[]> searchPatch(String patchID) {
@@ -345,52 +403,48 @@ public class Patch {
     return resultPatch;
     }
     
-    public static boolean releasePatch(String patchName, String patchType, String softwareID, String machineID, String technicianID, String description) {
-        
+    public static String releasePatch(String patchName, String patchType, String softwareID, String machineID, String technicianID, String description) {
+    
         // 1. Basic input validation
         if (patchName.isBlank() || patchType.isBlank() || softwareID.isBlank() ||
             machineID.isBlank() || technicianID.isBlank() || description.isBlank()) {
-            return false;
+            return "Empty Fields";
         }
 
         // 2. Validate patch type
         List<String> allowedPatchTypes = Arrays.asList("Application", "System", "Programming", "Network", "Server");
         if (!allowedPatchTypes.contains(patchType)) {
-            return false;
+            return "Invalid Patch Type";
         }
 
         try {
             Connection conn = MySQLConnector.connectDB();
 
             // 3. Verify the software exists and get its type
-            String softwareQuery = "SELECT type FROM software WHERE softwareID = ?";
+            String softwareQuery = "SELECT type, status FROM software WHERE softwareID = ?";
             PreparedStatement softwareStmt = conn.prepareStatement(softwareQuery);
             softwareStmt.setString(1, softwareID);
             ResultSet rsSoftware = softwareStmt.executeQuery();
-            
-            // 
+
             if (!rsSoftware.next()) {
                 rsSoftware.close();
                 softwareStmt.close();
                 conn.close();
-                return false; // Software does not exist
+                return "Software Not Found";
             }
 
             String softwareType = rsSoftware.getString("type");
             String softwareStatus = rsSoftware.getString("status");
-       
+
             if (!softwareStatus.equals("Active")) {
                 rsSoftware.close();
                 softwareStmt.close();
                 conn.close();
-                return false; // Software not active
+                return "Software Not Active";
             }
-    
-            rsSoftware.close();
-            softwareStmt.close();
-            
+
             // 4. Verify the machine exists, its type, and status
-            String machineQuery = "SELECT type, status FROM machine WHERE machineID = ?";
+            String machineQuery = "SELECT deviceType, status FROM machines WHERE machineID = ?";
             PreparedStatement machineStmt = conn.prepareStatement(machineQuery);
             machineStmt.setString(1, machineID);
             ResultSet rsMachine = machineStmt.executeQuery();
@@ -399,22 +453,19 @@ public class Patch {
                 rsMachine.close();
                 machineStmt.close();
                 conn.close();
-                return false; // Machine does not exist
+                return "Machine Not Found";
             }
 
-            String machineType = rsMachine.getString("type");
+            String machineType = rsMachine.getString("deviceType");
             String machineStatus = rsMachine.getString("status");
-            
+
             if (!machineStatus.equals("Vulnerable")) {
                 rsMachine.close();
                 machineStmt.close();
                 conn.close();
-                return false; // Machine not ready for patch
+                return "Machine Not Ready for Patch";
             }
-            
-            rsSoftware.close();
-            softwareStmt.close();
-            
+
             // 5. Verify the technician exists, role matches machine, and availability
             String techQuery = "SELECT position, status FROM technicians WHERE technicianID = ?";
             PreparedStatement techStmt = conn.prepareStatement(techQuery);
@@ -425,86 +476,82 @@ public class Patch {
                 rsTech.close();
                 techStmt.close();
                 conn.close();
-                return false; // Technician does not exist
+                return "Technician Not Found";
             }
 
             String techPosition = rsTech.getString("position");
             String techStatus = rsTech.getString("status");
-            
-            // Check role compatibility
+
+            // Role compatibility
             if ((techPosition.equals("Desktop Support") && !machineType.equals("PC")) ||
                 (techPosition.equals("Network Admin") && !(machineType.equals("Switch") || machineType.equals("Router"))) ||
                 (techPosition.equals("System Admin") && !machineType.equals("Server"))) {
                 rsTech.close();
                 techStmt.close();
                 conn.close();
-                return false; // Technician role mismatch
+                return "Technician Role Mismatch";
             }
-            
-             // Check availability (assuming Available means less than 3 assigned patch works)
+
+            // Availability
             if (!techStatus.equals("Available")) {
                 rsTech.close();
                 techStmt.close();
                 conn.close();
-                return false; // Technician not available
+                return "Technician Not Available";
             }
 
-            rsTech.close();
-            techStmt.close();
-            
             // 6. Check that patch type matches software type
             if (!patchType.equals(softwareType)) {
                 conn.close();
-                return false; // Patch type must match software type
+                return "Patch Type Does Not Match Software Type";
             }
 
             // 7. Check software type compatibility with machine type
-            if (softwareType.equals("Application") || softwareType.equals("System") || softwareType.equals("Programming")) {
-                if (!machineType.equals("PC")) {
-                    conn.close();
-                    return false; // PC-only software
-                }
-            } else if (softwareType.equals("Network")) {
-                if (!machineType.equals("Router") && !machineType.equals("Switch")) {
-                    conn.close();
-                    return false; // Network software only for Router or Switch
-                }
-            } else if (softwareType.equals("Server")) {
-                if (!machineType.equals("Server")) {
-                    conn.close();
-                    return false; // Server software only for Server
-                }
+            if ((softwareType.equals("Application") || softwareType.equals("System") || softwareType.equals("Programming")) && !machineType.equals("PC")) {
+                conn.close();
+                return "Software Not Compatible with Machine Type";
+            } else if (softwareType.equals("Network") && !(machineType.equals("Router") || machineType.equals("Switch"))) {
+                conn.close();
+                return "Software Not Compatible with Machine Type";
+            } else if (softwareType.equals("Server") && !machineType.equals("Server")) {
+                conn.close();
+                return "Software Not Compatible with Machine Type";
             }
 
             // 8. Generate next patchID
             String nextPatchID = generateNextPatchID();
-            
+
             // 9. Get current date for releaseDate
             java.sql.Date releaseDate = new java.sql.Date(System.currentTimeMillis());
-            
+
             // 10. Insert the patch record with default status "New"
-            String insertQuery = "INSERT INTO patch (patchID, patchName, type, softwareID, machineID, technicianID, description, status, releaseDate) " +
-                                 "VALUES (?, ?, ?, ?, ?, ?, ?, 'New', ?)";
+            String insertQuery = "INSERT INTO patch (patchID, name, type, description, releaseDate, status, softwareID, machineID, technicianID) " +
+                                 "VALUES (?, ?, ?, ?, ?, 'New', ?, ?, ?)";
             PreparedStatement insertStmt = conn.prepareStatement(insertQuery);
             insertStmt.setString(1, nextPatchID);
             insertStmt.setString(2, patchName);
             insertStmt.setString(3, patchType);
-            insertStmt.setString(4, softwareID);
-            insertStmt.setString(5, machineID);
-            insertStmt.setString(6, technicianID);
-            insertStmt.setString(7, description);
-            insertStmt.setDate(8, releaseDate);
-             
+            insertStmt.setString(4, description);
+            insertStmt.setDate(5, releaseDate);
+            insertStmt.setString(6, softwareID);
+            insertStmt.setString(7, machineID);
+            insertStmt.setString(8, technicianID);
+
             int rows = insertStmt.executeUpdate();
+
             insertStmt.close();
-            
-            
+            rsTech.close();
+            techStmt.close();
+            rsMachine.close();
+            machineStmt.close();
+            rsSoftware.close();
+            softwareStmt.close();
             conn.close();
-            return rows > 0; // true if insert succeeded
+
+            return (rows > 0) ? "Valid" : "Insert Failed";
 
         } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
-            return false;
+            return "Database Error: " + ex.getMessage();
         }
     }
     

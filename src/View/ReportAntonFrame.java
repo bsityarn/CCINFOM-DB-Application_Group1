@@ -46,10 +46,10 @@ public class ReportAntonFrame extends javax.swing.JFrame {
         generateBtn = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
         jTable2 = new javax.swing.JTable();
-        yearField = new javax.swing.JTextField();
-        monthField = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
+        yearComboBox = new javax.swing.JComboBox<>();
+        monthComboBox = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -115,12 +115,6 @@ public class ReportAntonFrame extends javax.swing.JFrame {
         });
         jScrollPane3.setViewportView(jTable2);
 
-        yearField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                yearFieldActionPerformed(evt);
-            }
-        });
-
         jLabel4.setFont(new java.awt.Font("Monospaced", 0, 18)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(255, 255, 255));
         jLabel4.setText("Year");
@@ -128,6 +122,15 @@ public class ReportAntonFrame extends javax.swing.JFrame {
         jLabel5.setFont(new java.awt.Font("Monospaced", 0, 18)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(255, 255, 255));
         jLabel5.setText("Month");
+
+        yearComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "2020", "2021", "2022", "2023", "2024", "2025" }));
+        yearComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                yearComboBoxActionPerformed(evt);
+            }
+        });
+
+        monthComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" }));
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -161,10 +164,10 @@ public class ReportAntonFrame extends javax.swing.JFrame {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jLabel5)
                             .addComponent(jLabel4))
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(yearField, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(monthField, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGap(41, 41, 41)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(yearComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(monthComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addGap(0, 0, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -188,13 +191,13 @@ public class ReportAntonFrame extends javax.swing.JFrame {
                         .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(yearField, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel4))
-                        .addGap(49, 49, 49)
+                            .addComponent(jLabel4)
+                            .addComponent(yearComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(55, 55, 55)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel5)
-                            .addComponent(monthField, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(113, 113, 113)
+                            .addComponent(monthComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(117, 117, 117)
                         .addComponent(generateBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 147, Short.MAX_VALUE)
                 .addComponent(backBtn)
@@ -228,28 +231,50 @@ public class ReportAntonFrame extends javax.swing.JFrame {
 
     private void generateBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generateBtnActionPerformed
         // TODO add your handling code here:
-       
-        try {
-        int year = Integer.parseInt(yearField.getText().trim());
-        int month = Integer.parseInt(monthField.getText().trim());
-
-        if (month < 1 || month > 12) {
-            JOptionPane.showMessageDialog(this, "Month must be a number between 1 and 12.", "Input Error", JOptionPane.ERROR_MESSAGE);
+        // TODO add your handling code here:
+    try {
+        // Validate selections
+        if (yearComboBox.getSelectedItem() == null || monthComboBox.getSelectedItem() == null) {
+            JOptionPane.showMessageDialog(this, 
+                "Please select both Year and Month.", 
+                "Invalid Selection", JOptionPane.WARNING_MESSAGE);
             return;
         }
+        
+        // Get selected year and month - directly parse the values
+        String year = (String) yearComboBox.getSelectedItem();
+        String month = (String) monthComboBox.getSelectedItem(); 
 
+        // Log the exact values being sent to the database
+        System.out.println("DEBUG: Querying Year=[" + year + "], Month=[" + month + "]");
+        
+        // Generate report
         DefaultTableModel model = Patch.displayPatchReport(year, month);
         jTable2.setModel(model);
-
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Please enter valid numeric values for year and month.", "Input Error", JOptionPane.ERROR_MESSAGE);
+        
+        if (model.getRowCount() == 0) {
+            JOptionPane.showMessageDialog(this, 
+                "No patch records found for the selected period.", 
+                "No Data", JOptionPane.INFORMATION_MESSAGE);
         }
-
+        
+    } catch (RuntimeException ex) { // ⬅️ CATCHES THE DATABASE ERROR FROM displayPatchReport
+        // Display the actual database error message
+        JOptionPane.showMessageDialog(this, 
+            "REPORT FAILED! Database Error: " + ex.getMessage(), 
+            "CRITICAL DB ERROR", JOptionPane.ERROR_MESSAGE);
+        ex.printStackTrace(); // Prints the full stack trace to the console for debugging
+    } catch (Exception e) {
+        // Catches unexpected errors like NullPointerExceptions
+        JOptionPane.showMessageDialog(this, 
+            "An unexpected error occurred: " + e.getMessage(), 
+            "General Error", JOptionPane.ERROR_MESSAGE);
+    }
     }//GEN-LAST:event_generateBtnActionPerformed
 
-    private void yearFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_yearFieldActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_yearFieldActionPerformed
+    private void yearComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_yearComboBoxActionPerformed
+        
+    }//GEN-LAST:event_yearComboBoxActionPerformed
 
     /**
      * @param args the command line arguments
@@ -288,7 +313,7 @@ public class ReportAntonFrame extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTable jTable2;
-    private javax.swing.JTextField monthField;
-    private javax.swing.JTextField yearField;
+    private javax.swing.JComboBox<String> monthComboBox;
+    private javax.swing.JComboBox<String> yearComboBox;
     // End of variables declaration//GEN-END:variables
 }

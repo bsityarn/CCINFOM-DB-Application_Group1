@@ -84,6 +84,7 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
         editPatchTypeComboBox1 = new javax.swing.JComboBox<>();
         jLabel5 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
+        ActivateBtn = new javax.swing.JButton();
 
         plainPanel.setBackground(new java.awt.Color(40, 48, 143));
 
@@ -460,6 +461,14 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
         });
         mainPanel.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 70, -1, -1));
 
+        ActivateBtn.setText("Activate");
+        ActivateBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ActivateBtnActionPerformed(evt);
+            }
+        });
+        mainPanel.add(ActivateBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 340, -1, -1));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -526,47 +535,55 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_editSoftwareIDFieldActionPerformed
 
     private void editConfirmBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editConfirmBtnActionPerformed
-        // TODO add your handling code here:
-         String patchID = editPatchIDField.getText();
+        String patchID = editPatchIDField.getText();
         String technicianID = editTechnicianIDField.getText();
         String softwareID = editSoftwareIDField.getText();
         String machineID = editMachineIDField.getText();
         String description = editDescriptionField.getText();
         String patchName = editPatchNameField.getText();
-        String patchStatus = (String) patchStatusField.getSelectedItem(); // JComboBox
-        String patchType = (String) editPatchTypeComboBox1.getSelectedItem(); // JComboBox
+        String patchStatus = (String) patchStatusField.getSelectedItem();
+        String patchType = (String) editPatchTypeComboBox1.getSelectedItem();
 
         String result = Patch.editPatch(patchID, technicianID, softwareID, machineID, description, patchName, patchStatus, patchType);
 
-        if (result.equals("Valid")) {
-            JOptionPane.showMessageDialog(this, "Patch info updated successfully!", "Edited Patch", JOptionPane.INFORMATION_MESSAGE);
-
-            // clear fields
-            editPatchIDField.setText("");
-            editTechnicianIDField.setText("");
-            editSoftwareIDField.setText("");
-            editMachineIDField.setText("");
-            editDescriptionField.setText("");
-            editPatchNameField.setText("");
-            patchStatusField.setSelectedIndex(0);
-            editPatchTypeComboBox1.setSelectedIndex(0);
-
-        } else if (result.equals("Empty")) {
-            JOptionPane.showMessageDialog(this, "Please fill in all the fields", "Error", JOptionPane.ERROR_MESSAGE);
-        } else if (result.equals("not Found")) {
-            JOptionPane.showMessageDialog(this, "Patch ID not found", "Error", JOptionPane.ERROR_MESSAGE);
-        } else if (result.equals("Invalid Type")) {
-            JOptionPane.showMessageDialog(this, "Invalid patch type selected", "Error", JOptionPane.ERROR_MESSAGE);
-        } else if (result.equals("Invalid Status")) {
-            JOptionPane.showMessageDialog(this, "Invalid patch status selected", "Error", JOptionPane.ERROR_MESSAGE);
-        } else if (result.equals("Update Failed")) {
-            JOptionPane.showMessageDialog(this, "Database update did not affect any row", "Error", JOptionPane.ERROR_MESSAGE);
-        } else if (result.equals("Invalid")) {
-            JOptionPane.showMessageDialog(this, "Database error while updating patch", "Error", JOptionPane.ERROR_MESSAGE);
-        } else {
-            JOptionPane.showMessageDialog(this, "Unknown error", "Error", JOptionPane.ERROR_MESSAGE);
+        switch (result) {
+            case "Success":
+                JOptionPane.showMessageDialog(this, "Patch info updated successfully!", "Edited Patch", JOptionPane.INFORMATION_MESSAGE);
+                // Clear fields
+                editPatchIDField.setText("");
+                editTechnicianIDField.setText("");
+                editSoftwareIDField.setText("");
+                editMachineIDField.setText("");
+                editDescriptionField.setText("");
+                editPatchNameField.setText("");
+                patchStatusField.setSelectedIndex(0);
+                editPatchTypeComboBox1.setSelectedIndex(0);
+                break;
+            case "Empty":
+                JOptionPane.showMessageDialog(this, "Please fill in all the fields", "Error", JOptionPane.ERROR_MESSAGE);
+                break;
+            case "Not Found":
+                JOptionPane.showMessageDialog(this, "Patch ID not found", "Error", JOptionPane.ERROR_MESSAGE);
+                break;
+            case "Invalid Type":
+                JOptionPane.showMessageDialog(this, "Invalid patch type selected", "Error", JOptionPane.ERROR_MESSAGE);
+                break;
+            case "Invalid Status":
+                JOptionPane.showMessageDialog(this, "Invalid patch status selected", "Error", JOptionPane.ERROR_MESSAGE);
+                break;
+            case "Update Failed":
+                JOptionPane.showMessageDialog(this, "Database update did not affect any row", "Error", JOptionPane.ERROR_MESSAGE);
+                break;
+            case "Invalid":
+                JOptionPane.showMessageDialog(this, "Database error while updating patch", "Error", JOptionPane.ERROR_MESSAGE);
+                break;
+            case "Cannot change status from Inactive to Working/Not Working":
+                JOptionPane.showMessageDialog(this, "Cannot change patch status from Inactive. It needs to be activated first.", "Error", JOptionPane.ERROR_MESSAGE);
+                break;
+            default:
+                JOptionPane.showMessageDialog(this, "Unknown error", "Error", JOptionPane.ERROR_MESSAGE);
+                break;
         }
-
     }//GEN-LAST:event_editConfirmBtnActionPerformed
 
     private void addUsernameField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addUsernameField1ActionPerformed
@@ -630,21 +647,45 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
         return;
     }
 
-    Patch patch = Patch.getPatchByID(patchID);
+    Patch patch = Patch.getPatchByID(patchID); // Make sure this method returns null if not found
 
-    if (patch != null && patch.getPatchID() != null) {
-        // Populate fields safely
+    if (patch != null) {
+        // Populate text fields
         editTechnicianIDField.setText(patch.getTechnicianID() != null ? patch.getTechnicianID() : "");
         editMachineIDField.setText(patch.getMachineID() != null ? patch.getMachineID() : "");
         editDescriptionField.setText(patch.getDescription() != null ? patch.getDescription() : "");
         editPatchNameField.setText(patch.getPatchName() != null ? patch.getPatchName() : "");
         editSoftwareIDField.setText(patch.getSoftwareID() != null ? patch.getSoftwareID() : "");
 
-        // Combo boxes
-        patchStatusField.setSelectedItem(patch.getStatus() != null ? patch.getStatus() : null);
-        editPatchTypeComboBox1.setSelectedItem(patch.getType() != null ? patch.getType() : null);
+        // Populate Status ComboBox safely
+        String status = patch.getStatus() != null ? patch.getStatus().trim() : "";
+        boolean statusSet = false;
+        for (int i = 0; i < patchStatusField.getItemCount(); i++) {
+            if (patchStatusField.getItemAt(i).equalsIgnoreCase(status)) {
+                patchStatusField.setSelectedIndex(i);
+                statusSet = true;
+                break;
+            }
+        }
+        if (!statusSet && patchStatusField.getItemCount() > 0) {
+            patchStatusField.setSelectedIndex(0);
+        }
 
-        // Enable editing
+        // Populate Type ComboBox safely
+        String type = patch.getType() != null ? patch.getType().trim() : "";
+        boolean typeSet = false;
+        for (int i = 0; i < editPatchTypeComboBox1.getItemCount(); i++) {
+            if (editPatchTypeComboBox1.getItemAt(i).equalsIgnoreCase(type)) {
+                editPatchTypeComboBox1.setSelectedIndex(i);
+                typeSet = true;
+                break;
+            }
+        }
+        if (!typeSet && editPatchTypeComboBox1.getItemCount() > 0) {
+            editPatchTypeComboBox1.setSelectedIndex(0);
+        }
+
+        // Enable fields and confirm button
         editTechnicianIDField.setEnabled(true);
         editMachineIDField.setEnabled(true);
         editDescriptionField.setEnabled(true);
@@ -683,6 +724,23 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
         jTable1.setModel(model);
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void ActivateBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ActivateBtnActionPerformed
+        // TODO add your handling code here:
+        // TODO add your handling code here:
+        String patchID = editPatchIDField.getText();
+        String result = Patch.activate(patchID);
+
+        if (result.equals("Valid")) {
+            JOptionPane.showMessageDialog(this, "Tester activated successfully!", "Activated Tester", JOptionPane.INFORMATION_MESSAGE);
+        } else if (result.equals("Empty")) {
+            JOptionPane.showMessageDialog(this, "Please fill in the information", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (result.equals("Missing")) {
+            JOptionPane.showMessageDialog(this, "Tester does not exist", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (result.equals("Invalid")) {
+            JOptionPane.showMessageDialog(this, "Invalid information", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_ActivateBtnActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -709,6 +767,7 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton ActivateBtn;
     private javax.swing.JButton SearchBtn;
     private javax.swing.JComboBox<String> actionComboBox;
     private javax.swing.JTextField addEmailField1;

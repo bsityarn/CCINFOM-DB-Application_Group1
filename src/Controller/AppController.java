@@ -36,14 +36,15 @@ public class AppController {
     }
 
     public static boolean loginTester(String idnumber, char[] password) {
-        if (false) {//TODO create function under MODEL to check if a Tester exists
+        boolean isLoggedIn = Tester.login(idnumber, password);
+        
+        if (isLoggedIn) {
             MenuTesterFrame menuUser = new MenuTesterFrame(idnumber);
             menuUser.setVisible(true);
             System.out.println("Tester ID " + idnumber + " Logged in");
 
-            return true;
         }
-        return false;
+        return isLoggedIn;
     }
    
 }

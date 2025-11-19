@@ -9,6 +9,8 @@ import Model.Tester;
 import java.awt.CardLayout;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
+import java.sql.*;
+import javax.swing.table.DefaultTableModel;
 /**
  *
  * @author marcquizon
@@ -26,6 +28,7 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
         addPanel.setVisible(false);
         editPanel.setVisible(false);
         deletePanel.setVisible(false);
+        ActivateTesterBtn.setVisible(false);
 
     }
 
@@ -73,6 +76,7 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
         addtesterBtn = new javax.swing.JButton();
         jLabel18 = new javax.swing.JLabel();
         addLastNameField = new javax.swing.JTextField();
+        jLabel20 = new javax.swing.JLabel();
         editPanel = new javax.swing.JPanel();
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
@@ -89,6 +93,10 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
         jLabel17 = new javax.swing.JLabel();
         jLabel19 = new javax.swing.JLabel();
         editLastNameField = new javax.swing.JTextField();
+        jLabel21 = new javax.swing.JLabel();
+        ActivateTesterBtn = new javax.swing.JButton();
+        inactiveTesterLabel = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
 
         plainPanel.setBackground(new java.awt.Color(40, 48, 143));
 
@@ -196,7 +204,7 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel2.setText("Tester Records");
-        mainPanel.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(651, 0, 199, 85));
+        mainPanel.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 0, 199, 85));
 
         jLabel3.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(255, 255, 255));
@@ -374,43 +382,41 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
             }
         });
 
+        jLabel20.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
+        jLabel20.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel20.setText("ptrackerdb.com");
+
         javax.swing.GroupLayout addPanelLayout = new javax.swing.GroupLayout(addPanel);
         addPanel.setLayout(addPanelLayout);
         addPanelLayout.setHorizontalGroup(
             addPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(addPanelLayout.createSequentialGroup()
-                .addGap(131, 131, 131)
-                .addGroup(addPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(addPanelLayout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addComponent(jLabel18)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(addLastNameField, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(addPanelLayout.createSequentialGroup()
-                        .addGroup(addPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(addPanelLayout.createSequentialGroup()
-                                .addComponent(jLabel5)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(addFirstNameField, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(addPanelLayout.createSequentialGroup()
-                                .addGroup(addPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(addPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(addPasswordField, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(addEmailField, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addGap(26, 26, 26)
-                        .addComponent(addtesterBtn)))
-                .addContainerGap(250, Short.MAX_VALUE))
+                .addGap(82, 82, 82)
+                .addGroup(addPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel18)
+                    .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel5)
+                    .addComponent(jLabel6))
+                .addGap(18, 18, 18)
+                .addGroup(addPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(addFirstNameField)
+                    .addComponent(addLastNameField)
+                    .addComponent(addPasswordField, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, addPanelLayout.createSequentialGroup()
+                        .addComponent(addEmailField, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel20)))
+                .addGap(46, 46, 46)
+                .addComponent(addtesterBtn)
+                .addContainerGap(257, Short.MAX_VALUE))
         );
         addPanelLayout.setVerticalGroup(
             addPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(addPanelLayout.createSequentialGroup()
                 .addGap(15, 15, 15)
                 .addGroup(addPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(addFirstNameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(addFirstNameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGroup(addPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(addPanelLayout.createSequentialGroup()
                         .addGap(14, 14, 14)
@@ -421,11 +427,12 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
                         .addGroup(addPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel18, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(addLastNameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(addPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(addEmailField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addComponent(addEmailField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel20, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, 13, Short.MAX_VALUE)
                         .addGroup(addPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(addPasswordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -527,6 +534,10 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
             }
         });
 
+        jLabel21.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
+        jLabel21.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel21.setText("@ptrackerdb.com");
+
         javax.swing.GroupLayout editPanelLayout = new javax.swing.GroupLayout(editPanel);
         editPanel.setLayout(editPanelLayout);
         editPanelLayout.setHorizontalGroup(
@@ -549,12 +560,15 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(editLastNameField, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 8, Short.MAX_VALUE))
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(editPanelLayout.createSequentialGroup()
                         .addGroup(editPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(editFirstNameField, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(editEmailField, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(84, 84, 84)
+                            .addGroup(editPanelLayout.createSequentialGroup()
+                                .addComponent(editEmailField, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel21)))
+                        .addGap(35, 35, 35)
                         .addGroup(editPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(editPanelLayout.createSequentialGroup()
                                 .addGap(0, 0, Short.MAX_VALUE)
@@ -602,11 +616,32 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(editPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(editEmailField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(editEmailField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel21))
                         .addGap(36, 36, 36))))
         );
 
         mainPanel.add(editPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 380, 830, -1));
+
+        ActivateTesterBtn.setText("Activate");
+        ActivateTesterBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ActivateTesterBtnActionPerformed(evt);
+            }
+        });
+        mainPanel.add(ActivateTesterBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 340, -1, -1));
+
+        inactiveTesterLabel.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
+        inactiveTesterLabel.setForeground(new java.awt.Color(255, 255, 255));
+        mainPanel.add(inactiveTesterLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 340, 330, -1));
+
+        jButton1.setText("View All");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        mainPanel.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 70, -1, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -630,6 +665,7 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
         menuTechnician.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_backBtnActionPerformed
+    
 
     private void SearchBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SearchBtnActionPerformed
         // TODO add your handling code here:
@@ -642,19 +678,12 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
         
         else {
             // a failsafe action just in case
-            try {
-                
-                // placeholder since need to declare a method in Model for searching database
-                ArrayList<String[]> matches = Tester.searchTester(testerID);
-               
-                System.out.println("Found " + matches.size() + " matches.");
-            }
-            catch (Exception ex) {
-                System.out.println("Error during search: " + ex.getMessage());
-            }
+            DefaultTableModel model = Tester.displayRecord(testerID);
+            jTable1.setModel(model);
         }
 
     }//GEN-LAST:event_SearchBtnActionPerformed
+     
 
     private void actionComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionComboBoxActionPerformed
         // TODO add your handling code here:
@@ -697,12 +726,13 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
         String firstName = addFirstNameField.getText();
         String lastName = addLastNameField.getText();
-        String email = addEmailField.getText();
+        String email = addEmailField.getText() + jLabel21.getText();
+;
         String password = addPasswordField.getText();
         
         String result = Tester.addTester(firstName, lastName, email, password);
         
-        if ("Valid".equals(result)) {
+        if (result.startsWith("TS")) {
             //Makes the textfields blank again
             addFirstNameField.setText("");
             addLastNameField.setText("");
@@ -741,33 +771,38 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
         String testerID = editTesterIDField.getText();
         String firstName = editFirstNameField.getText();
         String lastName = editLastNameField.getText();
-        String email = editEmailField.getText();
+        String email = editEmailField.getText() + "@ptrackerdb.com"; // add suffix
         String currentPassword = oldPasswordField.getText();
         String newPassword = editPasswordField.getText();
-        
+
         String result = Tester.editTester(testerID, lastName, firstName, email, currentPassword, newPassword);
-        
-        if ("Valid".equals(result)) {
-            //Makes the textfields blank again
-            editTesterIDField.setText("");
-            editFirstNameField.setText("");
-            editLastNameField.setText("");
-            editEmailField.setText("");
-            oldPasswordField.setText("");
-            editPasswordField.setText("");
-            
-            JOptionPane.showMessageDialog(this, "Tester edited successfully!", "Edited Tester", JOptionPane.INFORMATION_MESSAGE);
-            System.out.println("EDIT: Technician " + firstName + " " + lastName + "edited");
-        } else if ("Empty".equals(result)) {
-            //This is an error when the User leaves a certain field blank
-            JOptionPane.showMessageDialog(this, "Please fill in the information", "Error", JOptionPane.ERROR_MESSAGE);
-        } else if ("Duplicate Email".equals(result)) {
-            //This is an error when the User inputs a duplicate email
-            JOptionPane.showMessageDialog(this, "Duplicate email found, please change", "Error", JOptionPane.ERROR_MESSAGE);
-        } else if ("Wrong password".equals(result)) {
-            //This is an error when the User wanted to change the password, but inputted the wrong old password
-            oldPasswordField.setText("");
-            JOptionPane.showMessageDialog(this, "Wrong password", "Error", JOptionPane.ERROR_MESSAGE);
+
+        switch(result) {
+            case "Valid":
+                JOptionPane.showMessageDialog(this, "Tester edited successfully!", "Edited Tester", JOptionPane.INFORMATION_MESSAGE);
+                // Clear fields
+                editTesterIDField.setText("");
+                editFirstNameField.setText("");
+                editLastNameField.setText("");
+                editEmailField.setText("");
+                oldPasswordField.setText("");
+                editPasswordField.setText("");
+                break;
+            case "Empty":
+                JOptionPane.showMessageDialog(this, "Please fill in all the fields", "Error", JOptionPane.ERROR_MESSAGE);
+                break;
+            case "Duplicate Email":
+                JOptionPane.showMessageDialog(this, "Duplicate email found, please change", "Error", JOptionPane.ERROR_MESSAGE);
+                break;
+            case "Wrong password":
+                oldPasswordField.setText("");
+                JOptionPane.showMessageDialog(this, "Wrong password", "Error", JOptionPane.ERROR_MESSAGE);
+                break;
+            case "Invalid":
+                JOptionPane.showMessageDialog(this, "Database error while updating tester", "Error", JOptionPane.ERROR_MESSAGE);
+                break;
+            default:
+                JOptionPane.showMessageDialog(this, "Unknown error", "Error", JOptionPane.ERROR_MESSAGE);
         }
         
     }//GEN-LAST:event_editConfirmBtnActionPerformed
@@ -823,39 +858,52 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
     private void editEnterBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editEnterBtnActionPerformed
         // TODO add your handling code here:
         String testerID = editTesterIDField.getText();
-        
+        String suffix = "@ptrackerdb.com";
+
         if (testerID.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Enter tester ID");
-            
-        }
-        else {
-            try {
-                Tester tester = Tester.getTesterByID(testerID);
-                
-                if (tester != null) {
-                    // populates the input boxes of the default info
-                    editFirstNameField.setText(tester.getFirstName());
-                    editLastNameField.setText(tester.getLastName());
-                    editEmailField.setText(tester.getEmail());
-                    editPasswordField.setText(tester.getPassword());
-
-                    // lets the user edit the provided input boxes
-                    editFirstNameField.setEnabled(true);
-                    editLastNameField.setEnabled(true);
-                    editEmailField.setEnabled(true);
-                    editPasswordField.setEnabled(true);
-                    editConfirmBtn.setEnabled(true);
-                }
-                else {
-                    JOptionPane.showMessageDialog(this, "Tester ID not found");
-                }
-            }
-            catch (Exception Ex) {
-                JOptionPane.showMessageDialog(this, "Database error: " + Ex.getMessage());
-            }
-            
+            return;
         }
 
+        Tester tester = new Tester();
+        tester = Tester.getTesterByID(testerID);
+
+        if (tester != null && tester.getTesterID() != null) {
+
+            Tester currentInfo = new Tester();
+            currentInfo = Tester.getTesterByID(testerID);
+            String email = currentInfo.getEmail();
+
+            if (email.endsWith(suffix)) {
+                email = email.substring(0, email.length() - suffix.length());
+            }
+
+            if (currentInfo.getStatus().equals("Inactive")) {
+                inactiveTesterLabel.setText("This tester is inactive, click the button to activate");
+                ActivateTesterBtn.setVisible(true);
+            } else {
+                inactiveTesterLabel.setText("");
+                ActivateTesterBtn.setVisible(false);
+            }
+
+            editFirstNameField.setText(currentInfo.getFirstName());
+            editLastNameField.setText(currentInfo.getLastName());
+            editEmailField.setText(email); // without suffix
+            oldPasswordField.setText(currentInfo.getcurrentPassword()); // current password
+          //  newPasswordField.setText(""); // user can enter new password
+
+            editFirstNameField.setEnabled(true);
+            editLastNameField.setEnabled(true);
+            editEmailField.setEnabled(true);
+            editPasswordField.setEnabled(true);
+            editConfirmBtn.setEnabled(true);
+
+            System.out.println("EDIT: Tester ID " + currentInfo.getTesterID() + " current info retrieved");
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Tester ID not found", "Error", JOptionPane.ERROR_MESSAGE);
+            System.out.println("EDIT: Tester ID " + testerID + " does not exist");
+        }
     }//GEN-LAST:event_editEnterBtnActionPerformed
 
     private void addLastNameFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addLastNameFieldActionPerformed
@@ -866,6 +914,30 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
         //Here is the new function to add your code in
     }//GEN-LAST:event_editLastNameFieldActionPerformed
+
+    private void ActivateTesterBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ActivateTesterBtnActionPerformed
+        // TODO add your handling code here:
+        String testerID = editTesterIDField.getText();
+        String result = Tester.activate(testerID);
+
+        if (result.equals("Valid")) {
+            JOptionPane.showMessageDialog(this, "Tester activated successfully!", "Activated Tester", JOptionPane.INFORMATION_MESSAGE);
+        } else if (result.equals("Empty")) {
+            JOptionPane.showMessageDialog(this, "Please fill in the information", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (result.equals("Missing")) {
+            JOptionPane.showMessageDialog(this, "Tester does not exist", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (result.equals("Invalid")) {
+            JOptionPane.showMessageDialog(this, "Invalid information", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_ActivateTesterBtnActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        String testerID = searchIDField.getText();
+
+        DefaultTableModel model = Tester.displayTable();
+        jTable1.setModel(model);
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -893,6 +965,7 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton ActivateTesterBtn;
     private javax.swing.JButton SearchBtn;
     private javax.swing.JComboBox<String> actionComboBox;
     private javax.swing.JTextField addEmailField;
@@ -917,6 +990,8 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
     private javax.swing.JPanel editPanel;
     private javax.swing.JTextField editPasswordField;
     private javax.swing.JTextField editTesterIDField;
+    private javax.swing.JLabel inactiveTesterLabel;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -929,6 +1004,8 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel20;
+    private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;

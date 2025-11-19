@@ -5,6 +5,8 @@
 package Model;
 
 import java.sql.*;
+import java.util.Vector;
+import javax.swing.table.DefaultTableModel;
 /**
  *
  * @author Bernard Llagas
@@ -86,6 +88,97 @@ public class Machine {
 
         return result;
     }
+    
+    // -----------------------------------------------------
+    // DISPLAY METHODS
+    // -----------------------------------------------------
+    public static DefaultTableModel displayTable() {
+        DefaultTableModel model = new DefaultTableModel();
+        StringBuilder query = new StringBuilder();
+        query.append(" SELECT * FROM machines ");
+
+        try (Connection conn = MySQLConnector.connectDB(); PreparedStatement statement = conn.prepareStatement(query.toString())) {
+
+            try (ResultSet rs = statement.executeQuery()) {
+
+                ResultSetMetaData metaData = rs.getMetaData();
+                int columnCount = metaData.getColumnCount();
+
+                Vector<String> columnNames = new Vector<>();
+                for (int i = 1; i <= columnCount; i++) {
+                    columnNames.add(metaData.getColumnName(i));
+                }
+
+                model.setColumnIdentifiers(columnNames);
+
+                int rowCount = 0;
+                while (rs.next()) {
+                    rowCount++;
+                    Vector<Object> rowData = new Vector<>();
+                    for (int i = 1; i <= columnCount; i++) {
+                        rowData.add(rs.getObject(i));
+                    }
+                    model.addRow(rowData);
+                }
+
+                System.out.println("Machine rows found: " + rowCount);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+            ex.printStackTrace();
+        }
+
+        return model;
+    }
+
+    public static DefaultTableModel displayRecord(String machineID) {
+        DefaultTableModel model = new DefaultTableModel();
+        StringBuilder query = new StringBuilder();
+        query.append(" SELECT * FROM machines ");
+        query.append(" WHERE machineID = ? ");
+
+        try (Connection conn = MySQLConnector.connectDB(); PreparedStatement statement = conn.prepareStatement(query.toString())) {
+
+            statement.setString(1, machineID);
+
+            try (ResultSet rs = statement.executeQuery()) {
+
+                ResultSetMetaData metaData = rs.getMetaData();
+                int columnCount = metaData.getColumnCount();
+
+                Vector<String> columnNames = new Vector<>();
+                for (int i = 1; i <= columnCount; i++) {
+                    columnNames.add(metaData.getColumnName(i));
+                }
+
+                model.setColumnIdentifiers(columnNames);
+
+                int rowCount = 0;
+                while (rs.next()) {
+                    rowCount++;
+                    Vector<Object> rowData = new Vector<>();
+                    for (int i = 1; i <= columnCount; i++) {
+                        rowData.add(rs.getObject(i));
+                    }
+                    model.addRow(rowData);
+                }
+
+                System.out.println("Machine rows found: " + rowCount);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+            ex.printStackTrace();
+        }
+
+        return model;
+    }
+
+    public static DefaultTableModel displayReport() {
+        return displayTable();
+    }
+
 
     // -----------------------------------------------------
     // ADD MACHINE
@@ -198,7 +291,7 @@ public class Machine {
     }
 
     // -----------------------------------------------------
-    // DELETE MACHINE (Soft Delete → set Inactive)
+    // DELETE MACHINE
     // -----------------------------------------------------
 
     public static String delete(String machineID) {

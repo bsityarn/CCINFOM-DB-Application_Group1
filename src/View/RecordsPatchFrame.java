@@ -8,6 +8,8 @@ import java.awt.CardLayout;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import Model.Patch;
+import Model.Tester;
+import javax.swing.table.DefaultTableModel;
 /**
  *
  * @author marcquizon
@@ -81,6 +83,7 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
         jLabel19 = new javax.swing.JLabel();
         editPatchTypeComboBox1 = new javax.swing.JComboBox<>();
         jLabel5 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
 
         plainPanel.setBackground(new java.awt.Color(40, 48, 143));
 
@@ -449,6 +452,14 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
         jLabel5.setText("Select Action");
         mainPanel.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 338, 118, 28));
 
+        jButton1.setText("View All");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        mainPanel.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 70, -1, -1));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -478,21 +489,13 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
         
         // if there's no testerID inputted, it just prompts again
         if (patchID.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Enter a patch ID to search");
+            JOptionPane.showMessageDialog(this, "Enter a tester ID to search");
         }
         
         else {
             // a failsafe action just in case
-            try {
-                
-                // placeholder since need to declare a method in Model for searching database
-                ArrayList<String[]> matches = Patch.searchPatch(patchID);
-               
-                System.out.println("Found " + matches.size() + " matches.");
-            }
-            catch (Exception ex) {
-                System.out.println("Error during search: " + ex.getMessage());
-            }
+            DefaultTableModel model = Patch.displayRecord(patchID);
+            jTable1.setModel(model);
         }
     }//GEN-LAST:event_SearchBtnActionPerformed
 
@@ -678,6 +681,14 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_editPatchTypeComboBox1ActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        String patchID = searchIDField.getText();
+
+        DefaultTableModel model = Patch.displayTable();
+        jTable1.setModel(model);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -724,6 +735,7 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> editPatchTypeComboBox1;
     private javax.swing.JTextField editSoftwareIDField;
     private javax.swing.JTextField editTechnicianIDField;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;

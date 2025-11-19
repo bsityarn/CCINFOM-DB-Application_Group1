@@ -4,7 +4,13 @@
  */
 package View;
 
+import Model.Feedback;
+import Model.MySQLConnector;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -14,6 +20,8 @@ public class Transac2Frame extends javax.swing.JFrame {
 
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Transac2Frame.class.getName());
     private static String displayIDnumber;
+    
+    private String testerID = displayIDnumber;
 
     /**
      * Creates new form AdminMenuFrame
@@ -22,6 +30,42 @@ public class Transac2Frame extends javax.swing.JFrame {
         initComponents();
         this.setResizable(false);
 
+    }
+    
+    private void refreshMaintenanceTable(String patchID) {
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        model.setRowCount(0);
+
+        try (Connection conn = MySQLConnector.connectDB()) {
+            String sql = "SELECT maintenanceID, patchID, status, dateFinished "
+                    + "FROM maintenance WHERE patchID = ? AND status = 'Done'";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, patchID);
+            ResultSet rs = ps.executeQuery();
+
+            boolean found = false;
+            while (rs.next()) {
+                found = true;
+                model.addRow(new Object[]{
+                    rs.getString("maintenanceID"),
+                    rs.getString("patchID"),
+                    rs.getString("status"),
+                    rs.getString("dateFinished")
+                });
+            }
+
+            if (!found) {
+                JOptionPane.showMessageDialog(this,
+                        "No COMPLETED maintenance found for this Patch ID.\n"
+                        + "Tester can only send feedback for completed patches.",
+                        "Info",
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error refreshing maintenance table: " + e.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     /**
@@ -134,7 +178,7 @@ public class Transac2Frame extends javax.swing.JFrame {
                 {null, null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "testerID", "patchID", "description", "rating"
             }
         ));
         jScrollPane1.setViewportView(jTable1);
@@ -255,7 +299,44 @@ public class Transac2Frame extends javax.swing.JFrame {
 
     private void transac2BtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_transac2BtnActionPerformed
         // TODO add your handling code here:
+        String patchID = patchIDField.getText().trim();
+        String description = descriptionField.getText().trim();
+        int rating = ratingSlider.getValue();
 
+        // Call the model
+        String result = Feedback.add(testerID, patchID, description, rating);
+
+        switch (result) {
+            case "Valid":
+                JOptionPane.showMessageDialog(this, "Feedback Sent!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                descriptionField.setText("");
+                ratingSlider.setValue(1);
+                refreshMaintenanceTable(patchID);
+                break;
+
+            case "Empty":
+                JOptionPane.showMessageDialog(this, "Please fill in all required fields.", "Error", JOptionPane.ERROR_MESSAGE);
+                break;
+
+            case "Patch Not Done":
+                JOptionPane.showMessageDialog(this, "This patch has no completed maintenance.", "Error", JOptionPane.ERROR_MESSAGE);
+                break;
+
+            case "Tester Missing":
+                JOptionPane.showMessageDialog(this, "Tester does not exist in the system.", "Error", JOptionPane.ERROR_MESSAGE);
+                break;
+
+            case "Patch Missing":
+                JOptionPane.showMessageDialog(this, "Patch does not exist in the system.", "Error", JOptionPane.ERROR_MESSAGE);
+                break;
+
+            case "Invalid Rating":
+                JOptionPane.showMessageDialog(this, "Rating must be between 1 and 10.", "Error", JOptionPane.ERROR_MESSAGE);
+                break;
+
+            default:
+                JOptionPane.showMessageDialog(this, "Feedback submission failed.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_transac2BtnActionPerformed
 
     private void backBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backBtnActionPerformed
@@ -273,7 +354,49 @@ public class Transac2Frame extends javax.swing.JFrame {
 
     private void searchBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchBtnActionPerformed
         // TODO add your handling code here:
+        String patchID = patchIDField.getText().trim();
+        if (patchID.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter a Patch ID.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        refreshMaintenanceTable(patchID);
+
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        model.setRowCount(0);
+
+        try (Connection conn = MySQLConnector.connectDB()) {
+            String sql = "SELECT maintenanceID, patchID, status, dateFinished FROM maintenance WHERE patchID = ? AND status = 'Done'";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, patchID);
+            ResultSet rs = ps.executeQuery();
+
+            boolean found = false;
+            while (rs.next()) {
+                found = true;
+                model.addRow(new Object[]{
+                    rs.getString("maintenanceID"),
+                    rs.getString("patchID"),
+                    rs.getString("status"),
+                    rs.getString("dateFinished")
+                });
+            }
+
+            if (!found) {
+                JOptionPane.showMessageDialog(this,
+                        "No COMPLETED maintenance found for this Patch ID.\n"
+                        + "Tester can only send feedback for completed patches.",
+                        "Info",
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error loading patch: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_searchBtnActionPerformed
+
+    private void patchIDFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_patchIDFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_patchIDFieldActionPerformed
 
     /**
      * @param args the command line arguments

@@ -4,6 +4,9 @@
  */
 package View;
 
+import Model.Technician;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author marcquizon
@@ -32,30 +35,44 @@ public class ReportMarcFrame extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
+        JLbl2 = new javax.swing.JLabel();
         backBtn = new javax.swing.JButton();
         jSeparator1 = new javax.swing.JSeparator();
         generateBtn = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
+        jComboBox1 = new javax.swing.JComboBox<>();
+        JLbl1 = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        explanationTextArea = new javax.swing.JTextArea();
+        JLbl3 = new javax.swing.JLabel();
+        monthComboBox = new javax.swing.JComboBox<>();
+        JLbl4 = new javax.swing.JLabel();
+        yearComboBox = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jPanel1.setBackground(new java.awt.Color(40, 48, 143));
         jPanel1.setPreferredSize(new java.awt.Dimension(849, 599));
+        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel1.setFont(new java.awt.Font("Monospaced", 0, 36)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/View/SmallLogo.png"))); // NOI18N
+        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 0, -1, 90));
 
-        jLabel2.setFont(new java.awt.Font("Andale Mono", 0, 14)); // NOI18N
+        jLabel2.setFont(new java.awt.Font("Andale Mono", 0, 24)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel2.setText("(add Report name here)");
+        jLabel2.setText("Technician Performance Report");
+        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(454, 0, 446, 85));
 
-        jLabel3.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel3.setText("Choose a report to generate below");
+        JLbl2.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
+        JLbl2.setForeground(new java.awt.Color(255, 255, 255));
+        JLbl2.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        JLbl2.setText("explanation");
+        jPanel1.add(JLbl2, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 580, 210, 30));
 
         backBtn.setBackground(new java.awt.Color(255, 255, 204));
         backBtn.setFont(new java.awt.Font("Krungthep", 0, 18)); // NOI18N
@@ -67,8 +84,10 @@ public class ReportMarcFrame extends javax.swing.JFrame {
                 backBtnActionPerformed(evt);
             }
         });
+        jPanel1.add(backBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 748, 105, -1));
 
         jSeparator1.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel1.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 130, 888, 10));
 
         generateBtn.setFont(new java.awt.Font("Krungthep", 0, 24)); // NOI18N
         generateBtn.setText("Generate report");
@@ -79,47 +98,69 @@ public class ReportMarcFrame extends javax.swing.JFrame {
                 generateBtnActionPerformed(evt);
             }
         });
+        jPanel1.add(generateBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 70, 274, 50));
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 246, Short.MAX_VALUE)
-                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 446, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(backBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jSeparator1))
-                        .addGap(6, 6, 6))))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(generateBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 274, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(generateBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 552, Short.MAX_VALUE)
-                .addComponent(backBtn)
-                .addGap(16, 16, 16))
-        );
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null}
+            },
+            new String [] {
+                "technicianID", "Name", "Total_Patches_Released", "%WorkingPatches", "%NotWorkingPatches", "Total_MaintenanceAssigned", "Total_Pending", "Total_Completed", "%Late_completed", "%Punctual_completed"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
+        jScrollPane1.setViewportView(jTable1);
+
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 150, 880, 370));
+
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Total_Patches_Released", "%WorkingPatches", "%NotWorkingPatches", "Total_MaintenanceAssigned", "Total_Pending", "Total_Completed", "%Late_completed", "%Punctual_completed" }));
+        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox1ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 620, 180, -1));
+
+        JLbl1.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
+        JLbl1.setForeground(new java.awt.Color(255, 255, 255));
+        JLbl1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        JLbl1.setText("Select Month:");
+        jPanel1.add(JLbl1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 90, -1, 30));
+
+        explanationTextArea.setColumns(20);
+        explanationTextArea.setRows(5);
+        jScrollPane2.setViewportView(explanationTextArea);
+
+        jPanel1.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 560, 340, 110));
+
+        JLbl3.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
+        JLbl3.setForeground(new java.awt.Color(255, 255, 255));
+        JLbl3.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        JLbl3.setText("Choose a field to see the");
+        jPanel1.add(JLbl3, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 550, 210, 30));
+
+        monthComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Jan", "Feb", "March", "April", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec" }));
+        jPanel1.add(monthComboBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 90, 110, -1));
+
+        JLbl4.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
+        JLbl4.setForeground(new java.awt.Color(255, 255, 255));
+        JLbl4.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        JLbl4.setText("Select Month:");
+        jPanel1.add(JLbl4, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 90, -1, 30));
+
+        yearComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "2020", "2021", "2022", "2023", "2024", "2025" }));
+        jPanel1.add(yearComboBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 90, 110, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -146,7 +187,36 @@ public class ReportMarcFrame extends javax.swing.JFrame {
 
     private void generateBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generateBtnActionPerformed
         // TODO add your handling code here:
+        int monthNo = monthComboBox.getSelectedIndex();
+        String year = (String) yearComboBox.getSelectedItem();
+        String month = Integer.toString(monthNo);
+        
+        DefaultTableModel model = Technician.displayReport(month, year);
+        jTable1.setModel(model);
     }//GEN-LAST:event_generateBtnActionPerformed
+
+    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+        // TODO add your handling code here:
+        String selectedItem = (String) jComboBox1.getSelectedItem();
+        
+        if(selectedItem.equals("Total_Patches_Released")){
+            explanationTextArea.setText("This field is the total number of patches the Technician Released. ");
+        }else if(selectedItem.equals("%WorkingPatches")){
+            explanationTextArea.setText("This field is the percentage of the working patches released. It uses the formula Working_Patches / Total_Patches * 100");
+        }else if(selectedItem.equals("%NotWorkingPatches")){
+            explanationTextArea.setText("This field is the percentage of the not working patches released. It uses the formula NotWorking_Patches / Total_Patches * 100");
+        }else if(selectedItem.equals("Total_MaintenanceAssigned")){
+            explanationTextArea.setText("This field is the total maintenance tasks assigned to the technician");
+        }else if(selectedItem.equals("Total_Pending")){
+            explanationTextArea.setText("This field is the total maintenance tasks that are in 'Not Started' and 'In progress status'");
+        }else if(selectedItem.equals("Total_Completed")){
+            explanationTextArea.setText("This field is the total maintenance tasks that are in 'Done' status");
+        }else if(selectedItem.equals("%Late_completed")){
+            explanationTextArea.setText("This field is the total maintenance tasks completed after the targetDeadline");
+        }else if(selectedItem.equals("%Punctual_completed")){
+            explanationTextArea.setText("This field is the total maintenance tasks completed before the Deadline");
+        }
+    }//GEN-LAST:event_jComboBox1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -174,12 +244,22 @@ public class ReportMarcFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel JLbl1;
+    private javax.swing.JLabel JLbl2;
+    private javax.swing.JLabel JLbl3;
+    private javax.swing.JLabel JLbl4;
     private javax.swing.JButton backBtn;
+    private javax.swing.JTextArea explanationTextArea;
     private javax.swing.JButton generateBtn;
+    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JTable jTable1;
+    private javax.swing.JComboBox<String> monthComboBox;
+    private javax.swing.JComboBox<String> yearComboBox;
     // End of variables declaration//GEN-END:variables
 }

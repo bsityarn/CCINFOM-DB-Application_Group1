@@ -5,6 +5,8 @@
 package Model;
 
 import java.sql.*;
+import java.util.Vector;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -19,8 +21,215 @@ public class Technician {
     private String position;
     private String currentPassword;
     private String newPassword;
+    private String status;
 
-    public static boolean checkEmailDuplicates(String email) {
+    public static DefaultTableModel displayReport(String month, String year) {
+        DefaultTableModel model = new DefaultTableModel();
+        StringBuilder query = new StringBuilder();
+        query.append(" SELECT\n"
+                + "	t.technicianID,\n"
+                + "    CONCAT(t.firstName, ' ', t.lastName) AS Name,\n"
+                + "    COALESCE(p.Total_Patches, 0) AS Total_Patches_Released,\n"
+                + "    ROUND(IFNULL(p.Working_Patches / p.Total_Patches *100, 0), 2) AS '%WorkingPatches',\n"
+                + "	ROUND(IFNULL(p.NotWorking_Patches / p.Total_Patches *100, 0), 2) AS '%NotWorkingPatches',\n"
+                + "    \n"
+                + "    COALESCE(m.Total_Maintenance, 0) AS Total_MaintenanceAssigned,\n"
+                + "	COALESCE(m.Pending_Maintenance, 0) AS Total_Pending,\n"
+                + "	COALESCE(m.Completed_Maintenance, 0) AS Total_Completed,\n"
+                + "    ROUND(IFNULL(m.Late_Maintenance / m.Completed_Maintenance * 100, 0), 2) AS '%Late_completed',\n"
+                + "    ROUND(IFNULL(m.Punctual_Maintenance / m.Completed_Maintenance *100, 0), 2) AS '%Punctual_completed'\n"
+                + "\n"
+                + "FROM technicians t\n"
+                + "\n"
+                + "LEFT JOIN (\n"
+                + "	SELECT\n"
+                + "    technicianID,\n"
+                + "    COUNT(*) AS Total_Patches,\n"
+                + "    SUM(CASE WHEN status = 'Working' THEN 1 ELSE 0 END) AS Working_Patches,\n"
+                + "    SUM(CASE WHEN status = 'Not Working' THEN 1 ELSE 0 END) AS NotWorking_Patches\n"
+                + "    FROM patch\n"
+                + "    WHERE MONTH(releaseDate) = ? \n"
+                + "	AND YEAR(releaseDate) = ?\n"
+                + "    GROUP BY technicianID\n"
+                + ") p ON p.technicianID = t.technicianID\n"
+                + "\n"
+                + "LEFT JOIN(\n"
+                + "	SELECT\n"
+                + "    technicianIDassigned,\n"
+                + "    COUNT(*) AS Total_Maintenance,\n"
+                + "    SUM(CASE WHEN status IN ('In progress', 'Not Started') THEN 1 ELSE 0 END) AS Pending_Maintenance,\n"
+                + "    SUM(CASE WHEN status = 'Done' THEN 1 ELSE 0 END) AS Completed_Maintenance,\n"
+                + "    SUM(CASE WHEN status = 'Done' AND dateFinished > targetDeadline THEN 1 ELSE 0 END) AS Late_Maintenance,\n"
+                + "    SUM(CASE WHEN status = 'Done' AND dateFinished < targetDeadline THEN 1 ELSE 0 END) AS Punctual_Maintenance\n"
+                + "    \n"
+                + "    FROM maintenance\n"
+                + "    WHERE MONTH(dateAssigned) = ? \n"
+                + "	AND YEAR(dateAssigned) = ?\n"
+                + "    GROUP BY technicianIDassigned\n"
+                + ") m ON m.technicianIDassigned = t.technicianID;");
+
+        try (Connection conn = MySQLConnector.connectDB(); PreparedStatement statement = conn.prepareStatement(query.toString())) {
+            statement.setString(1, month);
+            statement.setString(2, year);
+            statement.setString(3, month);
+            statement.setString(4, year);
+
+
+            // Execute query inside the try block
+            try (ResultSet rs = statement.executeQuery()) {
+
+                ResultSetMetaData metaData = rs.getMetaData();
+                int columnCount = metaData.getColumnCount();
+                Vector<String> columnNames = new Vector<>();
+
+                for (int i = 1; i <= columnCount; i++) {
+                    columnNames.add(metaData.getColumnName(i));
+                }
+
+                model.setColumnIdentifiers(columnNames);
+
+                int rowCount = 0;
+                while (rs.next()) {
+                    rowCount++;
+                    Vector<Object> rowData = new Vector<>();
+                    for (int i = 1; i <= columnCount; i++) {
+                        rowData.add(rs.getObject(i));
+                    }
+                    model.addRow(rowData);
+                }
+
+                System.out.println("Technician Performance Report Rows found: " + rowCount);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+            ex.printStackTrace();
+        }
+
+        return model;
+    }
+
+    public static DefaultTableModel displayRecord(String technicianID) {
+        DefaultTableModel model = new DefaultTableModel();
+        StringBuilder query = new StringBuilder();
+        query.append(" SELECT * FROM technicians ");
+        query.append(" WHERE technicianID = ? ");
+
+        try (Connection conn = MySQLConnector.connectDB(); PreparedStatement statement = conn.prepareStatement(query.toString())) {
+
+            statement.setString(1, technicianID);
+
+            // Execute query inside the try block
+            try (ResultSet rs = statement.executeQuery()) {
+
+                ResultSetMetaData metaData = rs.getMetaData();
+                int columnCount = metaData.getColumnCount();
+                Vector<String> columnNames = new Vector<>();
+
+                for (int i = 1; i <= columnCount; i++) {
+                    columnNames.add(metaData.getColumnName(i));
+                }
+
+                model.setColumnIdentifiers(columnNames);
+
+                int rowCount = 0;
+                while (rs.next()) {
+                    rowCount++;
+                    Vector<Object> rowData = new Vector<>();
+                    for (int i = 1; i <= columnCount; i++) {
+                        rowData.add(rs.getObject(i));
+                    }
+                    model.addRow(rowData);
+                }
+
+                System.out.println("Technician Rows found: " + rowCount);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+            ex.printStackTrace();
+        }
+
+        return model;
+    }
+
+    public static DefaultTableModel displayTable() {
+        DefaultTableModel model = new DefaultTableModel();
+        StringBuilder query = new StringBuilder();
+        query.append(" SELECT * FROM technicians ");
+
+        try (Connection conn = MySQLConnector.connectDB(); PreparedStatement statement = conn.prepareStatement(query.toString())) {
+
+            // Execute query inside the try block
+            try (ResultSet rs = statement.executeQuery()) {
+
+                ResultSetMetaData metaData = rs.getMetaData();
+                int columnCount = metaData.getColumnCount();
+                Vector<String> columnNames = new Vector<>();
+
+                for (int i = 1; i <= columnCount; i++) {
+                    columnNames.add(metaData.getColumnName(i));
+                }
+
+                model.setColumnIdentifiers(columnNames);
+
+                int rowCount = 0;
+                while (rs.next()) {
+                    rowCount++;
+                    Vector<Object> rowData = new Vector<>();
+                    for (int i = 1; i <= columnCount; i++) {
+                        rowData.add(rs.getObject(i));
+                    }
+                    model.addRow(rowData);
+                }
+
+                System.out.println("Technician Rows found: " + rowCount);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+            ex.printStackTrace();
+        }
+
+        return model;
+    }
+
+    public static boolean checkEmailDuplicates(String email, String technicianID) {//used when editing a technician
+        StringBuilder query = new StringBuilder();
+        query.append(" SELECT  *               ");
+        query.append(" FROM    technicians ");
+        query.append(" WHERE   email = ? AND technicianID != ?");//Exempts the record of the technician we are editing
+        Boolean duplicateResult = false;
+
+        try {
+            // Establish connection to DB
+            Connection conn = MySQLConnector.connectDB();
+
+            PreparedStatement statement = conn.prepareStatement(query.toString());
+
+            statement.setString(1, email);
+            statement.setString(2, technicianID);
+
+            // 1. Use executeQuery() and get the ResultSet
+            ResultSet rs = statement.executeQuery();
+
+            if (rs.next()) {//This command will return true when AT LEAST 1 record is found. Hence, duplicate is true
+                duplicateResult = true;
+            }
+
+            //Closing the connections to avoid DB app slow down in performance
+            rs.close();
+            statement.close();
+            conn.close();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+
+        return duplicateResult;
+    }
+
+    public static boolean checkEmailDuplicates(String email) {//used when adding a new technician, no ID yet
         StringBuilder query = new StringBuilder();
         query.append(" SELECT  *               ");
         query.append(" FROM    technicians ");
@@ -97,7 +306,7 @@ public class Technician {
         query.append(" FROM    technicians ");
         query.append(" WHERE   technicianID = ? ");
         Boolean result = false;
-
+        String typedPassword = new String(password);
         try {
             // Establish connection to DB
             Connection conn = MySQLConnector.connectDB();
@@ -110,13 +319,14 @@ public class Technician {
             ResultSet rs = statement.executeQuery();
 
             if (rs.next()) {//"if (rs.next)" will return true when AT LEAST 1 record is found. Hence, the technician is found
-                if(rs.getString("password").equals(password)){//Checks if the right password was inputted
+                String passwordFromDB = rs.getString("password");
+                if (passwordFromDB.equals(typedPassword)) {//Checks if the right password was inputted
                     result = true;
-                }else{
+                } else {
                     result = false;
                 }
             }
-            
+
             rs.close();
             statement.close();
             conn.close();
@@ -129,11 +339,11 @@ public class Technician {
     }
 
     public static String add(String firstName, String lastName, String email, String position, String password) {
+        String incrementedID = "";
         StringBuilder query = new StringBuilder();
         query.append(" INSERT INTO technicians (technicianID, firstName, lastName, position, email, password) ");
         query.append(" VALUES (?, ?, ?, ?, ?, ?)");
 
-        //TODO - Check for email duplicates
         if (firstName.isBlank() || lastName.isBlank() || email.isBlank() || password.isBlank()) {//Checker for when the User leaves a Field blank
             return "Empty";
         } else if (checkEmailDuplicates(email) == true) {//Checker for email duplicates
@@ -146,7 +356,7 @@ public class Technician {
                 // Prepare SQL statement to be executed
                 PreparedStatement statement = conn.prepareStatement(query.toString());
 
-                String incrementedID = HelperFunctions.incrementID("technicians");
+                incrementedID = HelperFunctions.incrementID("technicians");
                 statement.setString(1, incrementedID);
                 statement.setString(2, firstName);
                 statement.setString(3, lastName);
@@ -164,7 +374,7 @@ public class Technician {
                 return "Invalid";
             }
         }
-        return "Valid";
+        return incrementedID;//We return the incrementedID, so the sign up frame can show the user their ID credential
     }
 
     public static String edit(String technicianID, String firstName, String lastName, String email, String position, String currentPassword, String newPassword) {
@@ -183,7 +393,7 @@ public class Technician {
         if (firstName.isBlank() || lastName.isBlank() || email.isBlank()
                 || (currentPassword.isBlank() && !newPassword.isBlank()) || (!currentPassword.isBlank() && newPassword.isBlank())) {
             return "Empty";
-        } else if (checkEmailDuplicates(email) == true) {//Checker for email duplicates
+        } else if (checkEmailDuplicates(email, technicianID) == true) {//Checker for email duplicates
             return "Duplicate Email";
         } else if (currentPassword.isBlank() && newPassword.isBlank()) {
             try {
@@ -239,8 +449,48 @@ public class Technician {
 
     public static String delete(String technicianID) {
         StringBuilder query = new StringBuilder();
-        query.append(" DELETE FROM technicians               ");
+        query.append(" UPDATE technicians               ");
+        query.append(" SET   status = 'Inactive' ");
         query.append(" WHERE   technicianID = ? ");
+
+        String result = "Invalid";
+
+        if (technicianID.isBlank()) {
+            result = "Empty";
+        } else {
+            try {
+                // Establish connection to DB
+                Connection conn = MySQLConnector.connectDB();
+
+                // Prepare SQL statement to be executed
+                PreparedStatement statement = conn.prepareStatement(query.toString());
+
+                statement.setString(1, technicianID);
+                int rowAffected = statement.executeUpdate();
+                System.out.println(rowAffected);
+
+                if (rowAffected == 0) {
+                    result = "Missing";
+                } else if (rowAffected > 0) {
+                    result = "Valid";
+                }
+                statement.close();
+                conn.close();
+
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+                result = "Invalid";
+            }
+        }
+        return result;
+    }
+
+    public static String activate(String technicianID) {
+        StringBuilder query = new StringBuilder();
+        query.append(" UPDATE technicians               ");
+        query.append(" SET   status = 'Available' ");
+        query.append(" WHERE   technicianID = ? ");
+
         String result = "Invalid";
 
         if (technicianID.isBlank()) {
@@ -299,6 +549,7 @@ public class Technician {
                 resultTechnician.setLastName(rs.getString("lastName"));
                 resultTechnician.setEmail(rs.getString("email"));
                 resultTechnician.setPosition(rs.getString("position"));
+                resultTechnician.setStatus(rs.getString("status"));
             }
 
             //Closing the connections to avoid DB app slow down in performance
@@ -342,6 +593,10 @@ public class Technician {
         return newPassword;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
     // --- Setters ---
     public void setID(String technicianID) {
         this.technicianID = technicianID;
@@ -369,6 +624,10 @@ public class Technician {
 
     public void setNewPassword(String newPassword) {
         this.newPassword = newPassword;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
 }

@@ -25,7 +25,7 @@ public class AppController {
     }
 
     public static boolean loginTechnician(String idnumber, char[] password) {
-        if (true) {//TODO add Technician.login(idnumber, password here once db connection is good
+        if (Technician.login(idnumber, password)) {
             MenuTechnicianFrame menuTechnician = new MenuTechnicianFrame(idnumber);
             menuTechnician.setVisible(true);
             System.out.println("Technician ID " + idnumber + " Logged in");
@@ -46,10 +46,5 @@ public class AppController {
         }
         return isLoggedIn;
     }
-    
-//    public static Technician editTechnician(Technician technician) {
-//        
-//        return techni
-//    }
-
+   
 }

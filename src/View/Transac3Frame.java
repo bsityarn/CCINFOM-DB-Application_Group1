@@ -4,12 +4,19 @@
  */
 package View;
 
+import Model.Maintenance;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import javax.swing.JOptionPane;
+import java.util.Calendar;
+
 /**
  *
  * @author marcquizon
  */
 public class Transac3Frame extends javax.swing.JFrame {
     
+
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Transac3Frame.class.getName());
 
     /**
@@ -18,6 +25,14 @@ public class Transac3Frame extends javax.swing.JFrame {
     public Transac3Frame() {
         initComponents();
         this.setResizable(false);
+        Calendar calendar = Calendar.getInstance();//Gets current date
+        calendar.add(Calendar.DAY_OF_MONTH, 1);//Adds 1 day
+        Date dayTomorrow = calendar.getTime();// turns into a Date variable
+
+        //Only allows user to choose tomorrow and onwards as a Deadline
+        jDateChooser1.setMinSelectableDate(dayTomorrow);
+        //Automatically choose tomorrow as the selected date to avoid null date
+        jDateChooser1.setDate(dayTomorrow);
     }
 
     /**
@@ -90,7 +105,7 @@ public class Transac3Frame extends javax.swing.JFrame {
         jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel7.setText("Technician ID:");
 
-        workTypeComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Deployment", "Rollback" }));
+        workTypeComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Deploy", "Rollback" }));
         workTypeComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 workTypeComboBoxActionPerformed(evt);
@@ -239,6 +254,53 @@ public class Transac3Frame extends javax.swing.JFrame {
 
     private void scheduleBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_scheduleBtnActionPerformed
         // TODO add your handling code here:
+        String technicianID = technicianIDField.getText();
+        String patchID = patchIDField.getText();
+        String workType = (String) workTypeComboBox.getSelectedItem();
+        String description = descriptionField.getText();
+        String targetDeadline = "";
+        java.util.Date selectedDate = jDateChooser1.getDate();
+        
+        Calendar calendar = Calendar.getInstance();//Gets current date
+        calendar.add(Calendar.DAY_OF_MONTH, 1);//Adds 1 day
+        Date dayTomorrow = calendar.getTime();// turns into a Date variable
+        
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        targetDeadline = sdf.format(selectedDate);
+        String transac3Result = Maintenance.transac3(workType, patchID, technicianID, targetDeadline, description);
+
+        if (transac3Result.startsWith("MT")) {
+            //Makes the textfields blank again
+            technicianIDField.setText("");
+            patchIDField.setText("");
+            workTypeComboBox.setSelectedItem(1);
+            descriptionField.setText("");
+            jDateChooser1.setDate(dayTomorrow);
+            
+            System.out.println("ADD: Maintenance, PatchID and TechnicianID " + patchID + " " + technicianID + " added");
+            JOptionPane.showMessageDialog(this, "Patch work assigned successfully!", "Added Maintenance", JOptionPane.INFORMATION_MESSAGE);
+        } else if (transac3Result == "Empty") {
+            //This is an error when the User leaves a certain field blank
+            JOptionPane.showMessageDialog(this, "Please fill in the information", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (transac3Result == "Unavailable Technician") {
+            //This is an error when the User inputs an unavailable technician
+            JOptionPane.showMessageDialog(this, "Technician is Unavailable", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (transac3Result.contains("cannot work with")) {
+            //This is an error when the User inputs incompatible technician and patchtype
+            JOptionPane.showMessageDialog(this, transac3Result, "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (transac3Result == "Duplicate found") {
+            //This is an error when the User inputs incompatible technician and patchtype
+            JOptionPane.showMessageDialog(this, "Duplicate Maintenance Work found!", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (transac3Result == "Invalid") {
+            //This is an error when the User inputs incompatible technician and patchtype
+            JOptionPane.showMessageDialog(this, "Technician or Patch ID is invalid!", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (transac3Result == "Cannot Deploy Inactive/Not Working patch") {
+            //This is an error when the User inputs incompatible technician and patchtype
+            JOptionPane.showMessageDialog(this, "Cannot Deploy Inactive/Not Working patch", "Error", JOptionPane.ERROR_MESSAGE);
+        }   else if (transac3Result == "Cannot Rollback a Working patch") {
+            //This is an error when the User inputs incompatible technician and patchtype
+            JOptionPane.showMessageDialog(this, "Cannot Rollback a Working patch", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_scheduleBtnActionPerformed
 
     private void workTypeComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_workTypeComboBoxActionPerformed

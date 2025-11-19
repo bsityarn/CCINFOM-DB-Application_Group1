@@ -222,72 +222,72 @@ public class Patch {
     }
     
     public static String editPatch(String patchID, String technicianID, String machineID, String description, String patchName, String status, String type) {
-        StringBuilder query = new StringBuilder();//This command is used when the user wants to keep the password the same
-        query.append(" UPDATE patch ");
-        query.append(" SET technicianID = ?, machineID = ?, description = ?, patchName = ?, status = ?, type = ? ");
-        query.append(" WHERE patchID = ?");
-        
+        StringBuilder query = new StringBuilder();
+        query.append("UPDATE patch ");
+        query.append("SET technicianID = ?, machineID = ?, description = ?, patchName = ?, status = ?, type = ? ");
+        query.append("WHERE patchID = ?");
 
-        //Checker for when the User leaves a Field blank
-        //We allow the currentPassword and newPassword field to BOTH be blank, but we do not allow ONLY 1 of them to be blank
+        // Check for empty fields
         if (patchID.isBlank() || technicianID.isBlank() || machineID.isBlank() ||
             description.isBlank() || patchName.isBlank() || status.isBlank() || type.isBlank()) {
             return "Empty";
         }
-        
+
+        // Normalize values from combo boxes
+        status = status.trim();
+        type = type.trim();
+
+        // Validate type
         List<String> allowedTypes = Arrays.asList("Application", "System", "Programming", "Network", "Server");
         if (!allowedTypes.contains(type)) {
             return "Invalid Type";
         }
-        
-        if (!status.equals("Active") && !status.equals("Inactive")) {
+
+        // Validate status
+        if (!status.equalsIgnoreCase("Active") && !status.equalsIgnoreCase("Inactive")) {
             return "Invalid Status";
         }
-        
-        // Check if patch exists
-        
-       
-            try {
-                // Establish connection to DB
-                Connection conn = MySQLConnector.connectDB();
 
-                String checkSQL = "SELECT COUNT(*) FROM patch WHERE patchID = ?";
-                PreparedStatement checkStatement = conn.prepareStatement(checkSQL);
-                checkStatement.setString(1, patchID);
-                ResultSet rs = checkStatement.executeQuery();
-                rs.next();
-                int count = rs.getInt(1);
-                rs.close();
-                checkStatement.close();
-                
-                if (count == 0) {
-                    conn.close();
-                    return "not Found";
-                }
-                
-                PreparedStatement Statement = conn.prepareStatement(query.toString());
-                
-                Statement.setString(1, technicianID);
-                Statement.setString(2, machineID);
-                Statement.setString(3, description);
-                Statement.setString(4, patchName);
-                Statement.setString(5, status);
-                Statement.setString(6, type);
-                Statement.setString(7, patchID);
-                
+        try {
+            Connection conn = MySQLConnector.connectDB();
 
-                int rowsAffected = Statement.executeUpdate();
+            // Check if patch exists
+            String checkSQL = "SELECT COUNT(*) FROM patch WHERE patchID = ?";
+            PreparedStatement checkStatement = conn.prepareStatement(checkSQL);
+            checkStatement.setString(1, patchID);
+            ResultSet rs = checkStatement.executeQuery();
+            rs.next();
+            int count = rs.getInt(1);
+            rs.close();
+            checkStatement.close();
 
-                Statement.close();
+            if (count == 0) {
                 conn.close();
-                
-                if (rowsAffected == 0) {
-                    return "Update Failed";
-                }
-            } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
-                return "Invalid";
+                return "not Found";
             }
+
+            // Update patch
+            PreparedStatement statement = conn.prepareStatement(query.toString());
+            statement.setString(1, technicianID);
+            statement.setString(2, machineID);
+            statement.setString(3, description);
+            statement.setString(4, patchName);
+            statement.setString(5, status);
+            statement.setString(6, type);
+            statement.setString(7, patchID);
+
+            int rowsAffected = statement.executeUpdate();
+            statement.close();
+            conn.close();
+
+            if (rowsAffected == 0) {
+                return "Update Failed";
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+            return "Invalid";
+        }
+
         return "Valid";
     }
     

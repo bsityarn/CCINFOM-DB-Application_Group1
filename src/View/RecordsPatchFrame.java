@@ -546,7 +546,7 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
             editMachineIDField.setText("");
             editDescriptionField.setText("");
             editPatchNameField.setText("");
-            patchStatusField.setSelectedIndex(0);
+            patchStatusField.setSelectedIndex(1);
             editPatchTypeComboBox1.setSelectedIndex(0);
 
         } else if (result.equals("Empty")) {

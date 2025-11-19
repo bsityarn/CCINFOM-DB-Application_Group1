@@ -11,7 +11,7 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author Bernard Llagas
  */
-public class Machine {
+public class Machine1 {
 
     private String machineID;
     private String machineName;
@@ -183,21 +183,27 @@ public class Machine {
     // -----------------------------------------------------
     // ADD MACHINE
     // -----------------------------------------------------
+
     public static String add(String machineName, String deviceType, String status) {
+
         if (machineName.isBlank() || deviceType.isBlank() || status.isBlank()) {
             return "Empty";
         }
+
         if (checkNameDuplicate(machineName)) {
             return "Duplicate Name";
         }
+
+        // Only Healthy/Vulnerable can be manually set
         if (!(status.equals("Healthy") || status.equals("Vulnerable"))) {
             return "Invalid Status";
         }
 
         String query = "INSERT INTO machines (machineID, machineName, deviceType, status) VALUES (?, ?, ?, ?)";
-        String result = "Invalid";
 
-        try (Connection conn = MySQLConnector.connectDB(); PreparedStatement stmt = conn.prepareStatement(query)) {
+        try {
+            Connection conn = MySQLConnector.connectDB();
+            PreparedStatement stmt = conn.prepareStatement(query);
 
             String incrementedID = HelperFunctions.incrementID("machines");
 
@@ -206,30 +212,34 @@ public class Machine {
             stmt.setString(3, deviceType);
             stmt.setString(4, status);
 
-            int rowsInserted = stmt.executeUpdate();
-            System.out.println("Rows inserted: " + rowsInserted);
+            stmt.executeUpdate();
 
-            if (rowsInserted > 0) {
-                result = "Valid";
-            }
+            stmt.close();
+            conn.close();
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+            return "Invalid";
         }
 
-        return result;
+        return "Valid";
     }
 
     // -----------------------------------------------------
     // EDIT MACHINE
     // -----------------------------------------------------
+
     public static String edit(String machineID, String machineName, String deviceType, String status) {
+
         if (!checkMachineExists(machineID)) {
             return "Missing";
         }
+
         if (machineName.isBlank() || deviceType.isBlank() || status.isBlank()) {
             return "Empty";
         }
+
+        // Only Healthy/Vulnerable can be edited manually
         if (!(status.equals("Healthy") || status.equals("Vulnerable"))) {
             return "Invalid Status";
         }
@@ -237,63 +247,58 @@ public class Machine {
         // Duplicate name check
         if (checkNameDuplicate(machineName)) {
             String checkQuery = "SELECT machineID FROM machines WHERE machineName = ?";
-            try (Connection conn = MySQLConnector.connectDB(); PreparedStatement stmt = conn.prepareStatement(checkQuery)) {
-
+            try {
+                Connection conn = MySQLConnector.connectDB();
+                PreparedStatement stmt = conn.prepareStatement(checkQuery);
                 stmt.setString(1, machineName);
-                try (ResultSet rs = stmt.executeQuery()) {
-                    if (rs.next()) {
-                        String duplicateID = rs.getString("machineID");
-                        if (!duplicateID.equals(machineID)) {
-                            return "Duplicate Name";
-                        }
-                    }
+
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    String duplicateID = rs.getString("machineID");
+                    if (!duplicateID.equals(machineID)) return "Duplicate Name";
                 }
 
+                rs.close();
+                stmt.close();
+                conn.close();
             } catch (SQLException e) {
                 System.out.println(e.getMessage());
-                return "Invalid";
             }
         }
 
         String updateQuery = "UPDATE machines SET machineName = ?, deviceType = ?, status = ? WHERE machineID = ?";
-        String result = "Invalid";
 
-        try (Connection conn = MySQLConnector.connectDB(); PreparedStatement stmt = conn.prepareStatement(updateQuery)) {
+        try {
+            Connection conn = MySQLConnector.connectDB();
+            PreparedStatement stmt = conn.prepareStatement(updateQuery);
 
             stmt.setString(1, machineName);
             stmt.setString(2, deviceType);
             stmt.setString(3, status);
             stmt.setString(4, machineID);
 
-            int rowsUpdated = stmt.executeUpdate();
-            System.out.println("Rows updated: " + rowsUpdated);
+            stmt.executeUpdate();
 
-            if (rowsUpdated > 0) {
-                result = "Valid";
-            } else {
-                result = "Missing";
-            }
+            stmt.close();
+            conn.close();
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+            return "Invalid";
         }
 
-        return result;
+        return "Valid";
     }
 
     // -----------------------------------------------------
     // DELETE MACHINE
     // -----------------------------------------------------
+
     public static String delete(String machineID) {
 
-        if (machineID.isBlank()) {
-            return "Empty";
-        }
+        if (machineID.isBlank()) return "Empty";
 
-        // Business rule: can only remove machine if it exists
-        if (!checkMachineExists(machineID)) {
-            return "Missing";
-        }
+        if (!checkMachineExists(machineID)) return "Missing";
 
         // Business rule: can only remove machine if no active maintenance
         if (hasActiveMaintenance(machineID)) {
@@ -301,36 +306,33 @@ public class Machine {
         }
 
         String query = "UPDATE machines SET status = 'Inactive' WHERE machineID = ?";
-        String result = "Invalid";
 
-        try (Connection conn = MySQLConnector.connectDB(); PreparedStatement stmt = conn.prepareStatement(query)) {
+        try {
+            Connection conn = MySQLConnector.connectDB();
+            PreparedStatement stmt = conn.prepareStatement(query);
 
             stmt.setString(1, machineID);
-            int rowsUpdated = stmt.executeUpdate();
-            System.out.println("Rows updated: " + rowsUpdated);
+            stmt.executeUpdate();
 
-            if (rowsUpdated == 0) {
-                result = "Missing";
-            } else if (rowsUpdated > 0) {
-                result = "Valid";
-            }
+            stmt.close();
+            conn.close();
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-            result = "Invalid";
+            return "Invalid";
         }
 
-        return result;
+        return "Valid";
     }
 
     // -----------------------------------------------------
     // RETRIEVE MACHINE INFO
     // -----------------------------------------------------
 
-    public static Machine getInfo(String machineID) {
+    public static Machine1 getInfo(String machineID) {
 
         String query = "SELECT * FROM machines WHERE machineID = ?";
-        Machine result = new Machine();
+        Machine1 result = new Machine1();
 
         try {
             Connection conn = MySQLConnector.connectDB();

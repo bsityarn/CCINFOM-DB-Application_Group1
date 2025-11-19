@@ -726,7 +726,8 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
         String firstName = addFirstNameField.getText();
         String lastName = addLastNameField.getText();
-        String email = addEmailField.getText();
+        String email = addEmailField.getText() + jLabel21.getText();
+;
         String password = addPasswordField.getText();
         
         String result = Tester.addTester(firstName, lastName, email, password);

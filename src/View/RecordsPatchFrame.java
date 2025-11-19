@@ -611,7 +611,7 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
         String patchID = deletePatchIDField.getText();
         
         if (patchID.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Enter a tester ID to delete");
+            JOptionPane.showMessageDialog(this, "Enter a patch ID to delete");
         }
         else {
             try {
@@ -619,10 +619,10 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
                 String success = Patch.deletePatch(patchID);
                 
                 if (success.equals("Valid")) {
-                    JOptionPane.showMessageDialog(this, "Tester Deleted");
+                    JOptionPane.showMessageDialog(this, "Patch Deleted");
                 }
                 else {
-                    JOptionPane.showMessageDialog(this, "Tester not found.");
+                    JOptionPane.showMessageDialog(this, "Patch not found.");
                 }
             }
             catch (Exception Ex) {

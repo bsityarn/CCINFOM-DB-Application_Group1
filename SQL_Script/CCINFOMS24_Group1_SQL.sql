@@ -6,7 +6,7 @@
  * Author:  marcquizon
  * Created: Nov 15, 2025
  */
-CREATE DATABASE IF NOT EXISTS CCINFOMS24_GROUP1_DB;
+CREATE DATABASE IF NOT EXISTS CCINFOMS24_GROUP1_SQL;
 DROP TABLE IF EXISTS technicians;
 DROP TABLE IF EXISTS machines;
 DROP TABLE IF EXISTS software;
@@ -44,7 +44,7 @@ CREATE TABLE machines (
     machineID VARCHAR(6) NOT NULL UNIQUE PRIMARY KEY,
     machineName VARCHAR(30) NOT NULL,
     deviceType ENUM('PC', 'Switch', 'Router', 'Server') NOT NULL,
-    status ENUM('Healthy', 'Vulnerable', 'Scheduled for patch') DEFAULT 'Healthy'
+    status ENUM('Healthy', 'Vulnerable', 'Scheduled for patch', 'Inactive') DEFAULT 'Healthy'
 );
 
 INSERT INTO machines (machineID, machineName, deviceType, status)

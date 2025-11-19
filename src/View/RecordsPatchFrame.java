@@ -738,6 +738,8 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Tester does not exist", "Error", JOptionPane.ERROR_MESSAGE);
         } else if (result.equals("Invalid")) {
             JOptionPane.showMessageDialog(this, "Invalid information", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (result.equals("Already Active")) {
+            JOptionPane.showMessageDialog(this, "Patch is already activated", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_ActivateBtnActionPerformed
 

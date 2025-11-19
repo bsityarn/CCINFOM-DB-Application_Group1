@@ -311,27 +311,46 @@ public class Patch {
             return "Empty";
         }
 
-        String query = "UPDATE patch SET status = 'New' WHERE patchID = ?";
-        String result = "Invalid";
+        try (Connection conn = MySQLConnector.connectDB()) {
 
-        try (Connection conn = MySQLConnector.connectDB();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+            // 1. Check current status
+            String checkSQL = "SELECT status FROM patch WHERE patchID = ?";
+            try (PreparedStatement checkStmt = conn.prepareStatement(checkSQL)) {
+                checkStmt.setString(1, patchID);
+                ResultSet rs = checkStmt.executeQuery();
 
-            stmt.setString(1, patchID);
-            int rowsAffected = stmt.executeUpdate();
+                if (!rs.next()) {
+                    return "Not Found";
+                }
 
-            if (rowsAffected == 0) {
-                result = "Not Found";  // patchID does not exist
-            } else {
-                result = "Valid"; // successfully activated
+                String currentStatus = rs.getString("status");
+
+                // 2. If it's already active then block
+                if (currentStatus.equals("New") ||
+                    currentStatus.equals("Working") ||
+                    currentStatus.equals("Not Working")) {
+                    return "Already Active";
+                }
+
+                // 3. Only allow activation from Inactive
+                if (!currentStatus.equals("Inactive")) {
+                    return "Invalid";
+                }
+            }
+
+            // 4. Activate
+            String query = "UPDATE patch SET status = 'New' WHERE patchID = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, patchID);
+
+                int rows = stmt.executeUpdate();
+                return rows > 0 ? "Valid" : "Not Found";
             }
 
         } catch (SQLException ex) {
             System.out.println("SQL Exception: " + ex.getMessage());
-            result = "Invalid";
+            return "Invalid";
         }
-
-        return result;
     }
     
     public static ArrayList<String[]> searchPatch(String patchID) {

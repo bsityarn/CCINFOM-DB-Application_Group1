@@ -224,7 +224,7 @@ public class Patch {
     public static String editPatch(String patchID, String technicianID, String machineID, String description, String patchName, String status, String type) {
         StringBuilder query = new StringBuilder();//This command is used when the user wants to keep the password the same
         query.append(" UPDATE patch ");
-        query.append(" SET technicianID = ?, machineID = ?, description = ?, status = ?, type = ? ");
+        query.append(" SET technicianID = ?, machineID = ?, description = ?, patchName = ?, status = ?, type = ? ");
         query.append(" WHERE patchID = ?");
         
 

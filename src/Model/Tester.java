@@ -298,56 +298,52 @@ public class Tester {
     }
     
     public static String deleteTester(String testerID) {
-        StringBuilder query = new StringBuilder();
-        query.append(" DELETE FROM tester               ");
-        query.append(" WHERE   testerID = ? ");
+         StringBuilder query = new StringBuilder();
+        query.append(" DELETE FROM tester ");
+        query.append(" WHERE testerID = ? ");
 
         if (testerID.isBlank()) {
             return "Empty";
         } else {
             try {
-                // Establish connection to DB
                 Connection conn = MySQLConnector.connectDB();
 
-                // Prepare SQL statement to be executed
+                // Use the actual checkSQL here
                 String checkSQL = "SELECT COUNT(*) FROM tester WHERE testerID = ?";
-                PreparedStatement checkStatement = conn.prepareStatement(query.toString());
+                PreparedStatement checkStatement = conn.prepareStatement(checkSQL);
 
-                // replaces ? with testerID itself
                 checkStatement.setString(1, testerID);
-                
-                // executes the query before returning a result set (rows)
                 ResultSet rs = checkStatement.executeQuery();
+
                 rs.next();
                 int count = rs.getInt(1);
-                
+
                 rs.close();
                 checkStatement.close();
 
-                // nothing detected so connection is closed and returns not found
                 if (count == 0) {
                     conn.close();
                     return "not Found";
                 }
-                
-                 // Soft-delete: update status to Inactive
-                   String updateQuery = "UPDATE tester SET status='Inactive' WHERE testerID=?";
-                   PreparedStatement updateStmt = conn.prepareStatement(updateQuery);
-                   
-                   updateStmt.setString(1, testerID);
-                   int rowsAffected = updateStmt.executeUpdate();
-                   
-                   updateStmt.close();
-                   conn.close();
 
-                // If no rows deleted (shouldn’t happen if count is greater than 0)
+                // Soft delete
+                String updateQuery = "UPDATE tester SET status='Inactive' WHERE testerID=?";
+                PreparedStatement updateStmt = conn.prepareStatement(updateQuery);
+
+                updateStmt.setString(1, testerID);
+                int rowsAffected = updateStmt.executeUpdate();
+
+                updateStmt.close();
+                conn.close();
+
                 if (rowsAffected == 0) {
                     return "Delete Failed";
                 }
-                } catch (SQLException ex) {
-                    System.out.println(ex.getMessage());
-                    return "Invalid";
-                }
+
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+                return "Invalid";
+            }
         }
         return "Valid";
     }

@@ -6,6 +6,7 @@ package View;
 
 import Model.Maintenance;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import javax.swing.JOptionPane;
 
@@ -14,7 +15,7 @@ import javax.swing.JOptionPane;
  * @author marcquizon
  */
 public class Transac4Frame extends javax.swing.JFrame {
-    
+
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Transac4Frame.class.getName());
 
     /**
@@ -23,6 +24,12 @@ public class Transac4Frame extends javax.swing.JFrame {
     public Transac4Frame() {
         initComponents();
         this.setResizable(false);
+
+        Calendar calendar = Calendar.getInstance();//Gets current date
+        calendar.add(Calendar.DAY_OF_MONTH, 1);//Adds 1 day
+        Date dayTomorrow = calendar.getTime();// turns into a Date variable
+        jDateChooser1.setDate(dayTomorrow);
+
     }
 
     /**
@@ -283,37 +290,42 @@ public class Transac4Frame extends javax.swing.JFrame {
     private void editConfirmBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editConfirmBtnActionPerformed
         // TODO add your handling code here:
         String maintenanceID = editMaintenanceIDField.getText();
-    String patchID = patchIDField.getText();
-    String workType = workTypeComboBox.getSelectedItem().toString();
-    String description = descriptionField.getText();
-    String status = statusComboBox.getSelectedItem().toString();
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-    String targetDeadline = sdf.format(jDateChooser1.getDate());
+        String patchID = patchIDField.getText();
+        String workType = workTypeComboBox.getSelectedItem().toString();
+        String description = descriptionField.getText();
+        String status = statusComboBox.getSelectedItem().toString();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String targetDeadline = sdf.format(jDateChooser1.getDate());
 
-    // Only set dateFinished if status is set to "Done"
-    String dateFinished = null;
-    if ("Done".equals(status)) {
-        dateFinished = sdf.format(new java.util.Date()); // Sets to today
-    }
+        if (maintenanceID.isBlank() || patchID.isBlank() || workType.isBlank() || description.isBlank()
+                || status.isBlank() || targetDeadline.isBlank()) {
+            JOptionPane.showMessageDialog(this, "Fill up the fields!", "Error", JOptionPane.ERROR_MESSAGE);
+        }
 
-    // Call your update function. Update its parameters to accept dateFinished!
-    String result = Maintenance.transac4Update(
-            maintenanceID,
-            workType,
-            patchID,
-            targetDeadline,
-            description,
-            status,
-            dateFinished // Pass the current date if Done
-    );
+        // Only set dateFinished if status is set to "Done"
+        String dateFinished = null;
+        if ("Done".equals(status)) {
+            dateFinished = sdf.format(new java.util.Date()); // Sets to today
+        }
 
-    if ("Success".equals(result)) {
-        JOptionPane.showMessageDialog(this, "Maintenance record updated!");
-    } else if ("Invalid".equals(result)) {
-        JOptionPane.showMessageDialog(this, "Invalid Maintenance ID!", "Error", JOptionPane.ERROR_MESSAGE);
-    } else {
-        JOptionPane.showMessageDialog(this, "Failed to update record.", "Error", JOptionPane.ERROR_MESSAGE);
-    }
+        // Call your update function. Update its parameters to accept dateFinished!
+        String result = Maintenance.transac4Update(
+                maintenanceID,
+                workType,
+                patchID,
+                targetDeadline,
+                description,
+                status,
+                dateFinished // Pass the current date if Done
+        );
+
+        if ("Success".equals(result)) {
+            JOptionPane.showMessageDialog(this, "Maintenance record updated!");
+        } else if ("Invalid".equals(result)) {
+            JOptionPane.showMessageDialog(this, "Invalid Maintenance ID!", "Error", JOptionPane.ERROR_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "Failed to update record.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_editConfirmBtnActionPerformed
 
     private void descriptionFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_descriptionFieldActionPerformed
@@ -374,7 +386,7 @@ public class Transac4Frame extends javax.swing.JFrame {
             enableEditControls();
         }
     }//GEN-LAST:event_editEnterBtnActionPerformed
-    
+
     private void disableEditControls() {
         patchIDField.setEnabled(false);
         workTypeComboBox.setEnabled(false);
@@ -392,7 +404,7 @@ public class Transac4Frame extends javax.swing.JFrame {
         statusComboBox.setEnabled(true);
         editConfirmBtn.setEnabled(true);
     }
-    
+
     /**
      * @param args the command line arguments
      */

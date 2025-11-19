@@ -883,7 +883,8 @@ public class RecordsTesterFrame extends javax.swing.JFrame {
             editFirstNameField.setText(currentInfo.getFirstName());
             editLastNameField.setText(currentInfo.getLastName());
             editEmailField.setText(email); // without suffix
-            editPasswordField.setText(currentInfo.getPassword());
+            oldPasswordField.setText(currentInfo.getcurrentPassword()); // current password
+          //  newPasswordField.setText(""); // user can enter new password
 
             editFirstNameField.setEnabled(true);
             editLastNameField.setEnabled(true);

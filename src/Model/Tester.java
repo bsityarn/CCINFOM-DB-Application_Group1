@@ -18,7 +18,8 @@ public class Tester {
     private String firstName;
     private String lastName;
     private String email;
-    private String password;
+    private String currentPassword;
+    private String newPassword;
     private String status;
     
     
@@ -548,8 +549,12 @@ public class Tester {
         return email;
     }
     
-    public String getPassword() {
-        return password;
+    public String getcurrentPassword() {
+        return currentPassword;
+    }
+    
+    public String getnewPassword() {
+        return newPassword;
     }
     
     public String getStatus() {
@@ -571,8 +576,12 @@ public class Tester {
         this.email = email;
     }
     
-    public void setPassword(String password) {
-        this.password = password;
+    public void setCurrentPassword(String currentPassword) {
+        this.currentPassword = currentPassword;
+    }
+
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
     }
     
     public void setStatus(String status) {

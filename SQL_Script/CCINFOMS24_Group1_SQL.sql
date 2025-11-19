@@ -6,6 +6,10 @@
  * Author:  marcquizon
  * Created: Nov 15, 2025
  */
+
+-- GITHUB URL
+-- https://github.com/bsityarn/CCINFOM-DB-Application_Group1.git
+
 CREATE DATABASE IF NOT EXISTS CCINFOMS24_GROUP1_SQL;
 DROP TABLE IF EXISTS technicians;
 DROP TABLE IF EXISTS machines;

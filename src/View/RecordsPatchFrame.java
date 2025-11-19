@@ -527,43 +527,43 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
 
     private void editConfirmBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editConfirmBtnActionPerformed
         // TODO add your handling code here:
-        String patchID = editPatchIDField.getText();
+         String patchID = editPatchIDField.getText();
         String technicianID = editTechnicianIDField.getText();
         String machineID = editMachineIDField.getText();
         String description = editDescriptionField.getText();
         String patchName = editPatchNameField.getText();
-        String patchStatus = (String) patchStatusField.getSelectedItem();
-        String patchType = (String) editPatchTypeComboBox1.getSelectedItem();
-        
-        Patch patch = new Patch();
-        
-        String result = patch.editPatch(patchID, technicianID, machineID, description, patchName, patchStatus, patchType);
-        
-        switch (result) {
-        case "Valid":
-            JOptionPane.showMessageDialog(this, "Patch info updated successfully!");
-            break;
-        case "Empty":
-            JOptionPane.showMessageDialog(this, "Update failed: missing info, fill in all the necessary data.");
-            break;
-        case "Invalid":
-            JOptionPane.showMessageDialog(this, "Failed to update patch info due to database error.");
-            break;
-        case "not Found":
-            JOptionPane.showMessageDialog(this, "Update failed: patch ID not found.");
-            break;
-        case "Invalid Type":
-            JOptionPane.showMessageDialog(this, "Update failed: invalid patch type selected.");
-            break;
-        case "Invalid Status":
-            JOptionPane.showMessageDialog(this, "Update failed: invalid patch status selected.");
-            break;
-        case "Update Failed":
-            JOptionPane.showMessageDialog(this, "Update failed: database update did not affect any row.");
-            break;
-        default:
-            JOptionPane.showMessageDialog(this, "Unknown error.");
-    }
+        String patchStatus = (String) patchStatusField.getSelectedItem(); // JComboBox
+        String patchType = (String) editPatchTypeComboBox1.getSelectedItem(); // JComboBox
+
+        String result = Patch.editPatch(patchID, technicianID, machineID, description, patchName, patchStatus, patchType);
+
+        if (result.equals("Valid")) {
+            JOptionPane.showMessageDialog(this, "Patch info updated successfully!", "Edited Patch", JOptionPane.INFORMATION_MESSAGE);
+
+            // clear fields
+            editPatchIDField.setText("");
+            editTechnicianIDField.setText("");
+            editMachineIDField.setText("");
+            editDescriptionField.setText("");
+            editPatchNameField.setText("");
+            patchStatusField.setSelectedIndex(0);
+            editPatchTypeComboBox1.setSelectedIndex(0);
+
+        } else if (result.equals("Empty")) {
+            JOptionPane.showMessageDialog(this, "Please fill in all the fields", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (result.equals("not Found")) {
+            JOptionPane.showMessageDialog(this, "Patch ID not found", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (result.equals("Invalid Type")) {
+            JOptionPane.showMessageDialog(this, "Invalid patch type selected", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (result.equals("Invalid Status")) {
+            JOptionPane.showMessageDialog(this, "Invalid patch status selected", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (result.equals("Update Failed")) {
+            JOptionPane.showMessageDialog(this, "Database update did not affect any row", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (result.equals("Invalid")) {
+            JOptionPane.showMessageDialog(this, "Database error while updating patch", "Error", JOptionPane.ERROR_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "Unknown error", "Error", JOptionPane.ERROR_MESSAGE);
+        }
 
     }//GEN-LAST:event_editConfirmBtnActionPerformed
 

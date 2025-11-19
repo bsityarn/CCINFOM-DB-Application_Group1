@@ -563,6 +563,32 @@ public class Technician {
 
         return resultTechnician;
     }
+    
+    public static Technician getByID(String technicianID) {
+        Technician tech = new Technician();
+        String query = "SELECT * FROM technicians WHERE technicianID=?";
+        try (Connection conn = MySQLConnector.connectDB();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, technicianID);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                tech.setID(rs.getString("technicianID"));
+                tech.setFirstName(rs.getString("firstName"));
+                tech.setLastName(rs.getString("lastName"));
+                tech.setEmail(rs.getString("email"));
+                tech.setPosition(rs.getString("position"));
+                tech.setStatus(rs.getString("status"));
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+        return tech;
+    }
+
+    public String getName() {
+        return this.firstName + " " + this.lastName;
+    }
 
     // --- Getters ---
     public String getTechnicianID() {

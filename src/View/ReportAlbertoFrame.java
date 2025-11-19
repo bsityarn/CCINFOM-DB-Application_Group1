@@ -4,12 +4,23 @@
  */
 package View;
 
+import Model.Machine;
+import Model.Maintenance;
+import Model.Technician;
+import java.util.ArrayList;
+import java.util.Map;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author marcquizon
  */
+
+
+
 public class ReportAlbertoFrame extends javax.swing.JFrame {
     
+
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ReportAlbertoFrame.class.getName());
 
     /**
@@ -36,6 +47,10 @@ public class ReportAlbertoFrame extends javax.swing.JFrame {
         backBtn = new javax.swing.JButton();
         jSeparator1 = new javax.swing.JSeparator();
         generateBtn = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        reportTable = new javax.swing.JTable();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        summaryArea = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -50,7 +65,7 @@ public class ReportAlbertoFrame extends javax.swing.JFrame {
         jLabel2.setFont(new java.awt.Font("Andale Mono", 0, 14)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel2.setText("(add Report name here)");
+        jLabel2.setText("Deployment & Patch Inventory");
 
         jLabel3.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(255, 255, 255));
@@ -80,6 +95,23 @@ public class ReportAlbertoFrame extends javax.swing.JFrame {
             }
         });
 
+        reportTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane1.setViewportView(reportTable);
+
+        summaryArea.setColumns(20);
+        summaryArea.setRows(5);
+        jScrollPane2.setViewportView(summaryArea);
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -100,9 +132,13 @@ public class ReportAlbertoFrame extends javax.swing.JFrame {
                             .addComponent(jSeparator1))
                         .addGap(6, 6, 6))))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(generateBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 274, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addGap(36, 36, 36)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 520, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(generateBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2))
+                .addGap(37, 37, 37))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -114,9 +150,14 @@ public class ReportAlbertoFrame extends javax.swing.JFrame {
                 .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(generateBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 552, Short.MAX_VALUE)
+                .addGap(25, 25, 25)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(generateBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jScrollPane2))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 539, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 43, Short.MAX_VALUE)
                 .addComponent(backBtn)
                 .addGap(16, 16, 16))
         );
@@ -146,9 +187,58 @@ public class ReportAlbertoFrame extends javax.swing.JFrame {
 
     private void generateBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generateBtnActionPerformed
         // TODO add your handling code here:
+        String[] columns = {
+        "Maintenance ID", "Patch ID",
+        "Technician Name", "Maintenance Type", "Date", "Status"
+    };
+    DefaultTableModel model = new DefaultTableModel(columns, 0);
+
+    // Pull records
+    ArrayList<Maintenance> records = Maintenance.getDeploymentAndRollbackRecords();
+    for (Maintenance m : records) {
+        Technician tech = Technician.getByID(m.getTechnicianID());
+        String technicianName = "";
+        if (tech != null) {
+            technicianName = tech.getFirstName() + " " + tech.getLastName();
+        }
+
+        model.addRow(new Object[]{
+            m.getMaintenanceID(),
+            m.getPatchID(),        
+            technicianName,
+            m.getWorkType(),
+            m.getDateAssigned(),
+            m.getStatus()
+        });
+    }
+    reportTable.setModel(model);
+
+    // Show summary stats
+    summaryArea.setText(buildSummaryStats());
     }//GEN-LAST:event_generateBtnActionPerformed
 
-    /**
+    private String buildSummaryStats() {
+        int totalPatches = Maintenance.getUniquePatchCount();
+        Map<String, Integer> patchDeployments = Maintenance.countDeploymentsPerPatch();
+        int pendingDeployments = Maintenance.countPendingDeployments();
+        Map<String, String> rollbackMap = Maintenance.getLatestWorkingPatchPerTechnician();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("Total number of patches: ").append(totalPatches).append("\n\n");
+        sb.append("Number of deployments per patch:\n");
+        for (Map.Entry<String, Integer> e : patchDeployments.entrySet()) {
+            sb.append("Patch ").append(e.getKey()).append(": ").append(e.getValue()).append(" deployments\n");
+        }
+        sb.append("\nPending deployments: ").append(pendingDeployments).append("\n\n");
+        sb.append("Latest previous working patch per technician:\n");
+        for (Map.Entry<String, String> e : rollbackMap.entrySet()) {
+            sb.append("Technician ").append(e.getKey()).append(": Patch ").append(e.getValue()).append("\n");
+        }
+        return sb.toString();
+    }
+
+
+        /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
@@ -180,6 +270,10 @@ public class ReportAlbertoFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JTable reportTable;
+    private javax.swing.JTextArea summaryArea;
     // End of variables declaration//GEN-END:variables
 }

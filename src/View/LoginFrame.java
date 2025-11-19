@@ -13,6 +13,7 @@ import Controller.*;
  */
 public class LoginFrame extends javax.swing.JFrame {
 //CHECK LNG IF WORKING
+
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(LoginFrame.class.getName());
 
     /**
@@ -154,26 +155,27 @@ public class LoginFrame extends javax.swing.JFrame {
 
     private void loginBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginBtnActionPerformed
         // TODO add your handling code here:
-        if(evt.getSource() == loginBtn){
+        if (evt.getSource() == loginBtn) {
             String idnumber = IDField.getText();
             char[] password = passwordField.getPassword();
-            
-            if(AppController.loginTechnician(idnumber, password) == true){
+
+            if (AppController.loginTechnician(idnumber, password) == true) {
                 this.dispose();
-            }else if(AppController.loginTester(idnumber, password) == true){
+            } else if (AppController.loginTester(idnumber, password) == true) {
+                MenuTesterFrame menuTester = new MenuTesterFrame(idnumber);
+                menuTester.setVisible(true);
                 this.dispose();
-            }else{
+            } else {
                 resultLabel.setText("Invalid credentials! Please retry or sign up.");
             }
-            
-            
+
         }
-        
+
     }//GEN-LAST:event_loginBtnActionPerformed
 
     private void signUpBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_signUpBtnActionPerformed
         // TODO add your handling code here:
-        if(evt.getSource() == signUpBtn){
+        if (evt.getSource() == signUpBtn) {
             SignUpFrame signupFrame = new SignUpFrame();
             signupFrame.setVisible(true);
             this.dispose();

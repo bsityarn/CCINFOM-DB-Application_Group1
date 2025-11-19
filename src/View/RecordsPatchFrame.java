@@ -611,7 +611,7 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
         String patchID = deletePatchIDField.getText();
         
         if (patchID.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Enter a tester ID to delete");
+            JOptionPane.showMessageDialog(this, "Enter a patch ID to delete");
         }
         else {
             try {
@@ -619,10 +619,10 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
                 String success = Patch.deletePatch(patchID);
                 
                 if (success.equals("Valid")) {
-                    JOptionPane.showMessageDialog(this, "Tester Deleted");
+                    JOptionPane.showMessageDialog(this, "Patch Deleted");
                 }
                 else {
-                    JOptionPane.showMessageDialog(this, "Tester not found.");
+                    JOptionPane.showMessageDialog(this, "Patch not found.");
                 }
             }
             catch (Exception Ex) {
@@ -731,13 +731,15 @@ public class RecordsPatchFrame extends javax.swing.JFrame {
         String result = Patch.activate(patchID);
 
         if (result.equals("Valid")) {
-            JOptionPane.showMessageDialog(this, "Tester activated successfully!", "Activated Tester", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Patch activated successfully!", "Activated Tester", JOptionPane.INFORMATION_MESSAGE);
         } else if (result.equals("Empty")) {
             JOptionPane.showMessageDialog(this, "Please fill in the information", "Error", JOptionPane.ERROR_MESSAGE);
         } else if (result.equals("Missing")) {
-            JOptionPane.showMessageDialog(this, "Tester does not exist", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Patch does not exist", "Error", JOptionPane.ERROR_MESSAGE);
         } else if (result.equals("Invalid")) {
             JOptionPane.showMessageDialog(this, "Invalid information", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (result.equals("Already Active")) {
+            JOptionPane.showMessageDialog(this, "Patch is already activated", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_ActivateBtnActionPerformed
 

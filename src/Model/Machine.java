@@ -7,6 +7,7 @@ package Model;
 import java.sql.*;
 import java.util.Vector;
 import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author Bernard Llagas
@@ -17,11 +18,11 @@ public class Machine {
     private String machineName;
     private String deviceType;
     private String status;
+    private String currentVersion;
 
     // -----------------------------------------------------
     // CHECKERS
     // -----------------------------------------------------
-
     public static boolean checkMachineExists(String machineID) {
         String query = "SELECT 1 FROM machines WHERE machineID = ?";
         boolean result = false;
@@ -32,7 +33,9 @@ public class Machine {
             stmt.setString(1, machineID);
 
             ResultSet rs = stmt.executeQuery();
-            if (rs.next()) result = true;
+            if (rs.next()) {
+                result = true;
+            }
 
             rs.close();
             stmt.close();
@@ -54,7 +57,9 @@ public class Machine {
             stmt.setString(1, machineName);
 
             ResultSet rs = stmt.executeQuery();
-            if (rs.next()) result = true;
+            if (rs.next()) {
+                result = true;
+            }
 
             rs.close();
             stmt.close();
@@ -77,7 +82,9 @@ public class Machine {
             stmt.setString(1, machineID);
 
             ResultSet rs = stmt.executeQuery();
-            if (rs.next()) result = true;
+            if (rs.next()) {
+                result = true;
+            }
 
             rs.close();
             stmt.close();
@@ -88,7 +95,7 @@ public class Machine {
 
         return result;
     }
-    
+
     // -----------------------------------------------------
     // DISPLAY METHODS
     // -----------------------------------------------------
@@ -178,7 +185,6 @@ public class Machine {
     public static DefaultTableModel displayReport() {
         return displayTable();
     }
-
 
     // -----------------------------------------------------
     // ADD MACHINE
@@ -326,7 +332,6 @@ public class Machine {
     // -----------------------------------------------------
     // RETRIEVE MACHINE INFO
     // -----------------------------------------------------
-
     public static Machine getInfo(String machineID) {
 
         String query = "SELECT * FROM machines WHERE machineID = ?";
@@ -357,37 +362,72 @@ public class Machine {
         return result;
     }
 
+    public static Machine getByID(String machineID) {
+        Machine result = new Machine();
+        String query = "SELECT * FROM machines WHERE machineID=?";
+        try (Connection conn = MySQLConnector.connectDB(); PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, machineID);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                result.setMachineID(rs.getString("machineID"));
+                result.setMachineName(rs.getString("machineName"));
+                result.setDeviceType(rs.getString("deviceType"));
+                result.setStatus(rs.getString("status"));
+                // add software version if you store it here
+                if (rs.getMetaData().getColumnLabel(1).equalsIgnoreCase("currentVersion")) {
+                    result.setCurrentVersion(rs.getString("currentVersion"));
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+        return result;
+    }
+
+    public String getCurrentVersion() {
+        return currentVersion;
+    }
+
+    public void setCurrentVersion(String version) {
+        this.currentVersion = version;
+    }
+
     // -----------------------------------------------------
     // GETTERS
     // -----------------------------------------------------
+    public String getMachineID() {
+        return machineID;
+    }
 
-    public String getMachineID() { 
-        return machineID; 
+    public String getMachineName() {
+        return machineName;
     }
-    public String getMachineName() { 
-        return machineName; 
+
+    public String getDeviceType() {
+        return deviceType;
     }
-    public String getDeviceType() { 
-        return deviceType; 
-    }
-    public String getStatus() { 
-        return status; 
+
+    public String getStatus() {
+        return status;
     }
 
     // -----------------------------------------------------
     // SETTERS
     // -----------------------------------------------------
+    public void setMachineID(String machineID) {
+        this.machineID = machineID;
+    }
 
-    public void setMachineID(String machineID) { 
-        this.machineID = machineID; 
+    public void setMachineName(String machineName) {
+        this.machineName = machineName;
     }
-    public void setMachineName(String machineName) { 
-        this.machineName = machineName; 
+
+    public void setDeviceType(String deviceType) {
+        this.deviceType = deviceType;
     }
-    public void setDeviceType(String deviceType) { 
-        this.deviceType = deviceType; 
-    }
-    public void setStatus(String status) { 
-        this.status = status; 
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

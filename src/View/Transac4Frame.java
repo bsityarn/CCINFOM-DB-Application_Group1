@@ -4,6 +4,11 @@
  */
 package View;
 
+import Model.Maintenance;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author marcquizon
@@ -94,7 +99,7 @@ public class Transac4Frame extends javax.swing.JFrame {
         jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel8.setText("Work type:");
 
-        workTypeComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Deployment", "Rollback" }));
+        workTypeComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Deploy", "Rollback" }));
         workTypeComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 workTypeComboBoxActionPerformed(evt);
@@ -277,6 +282,38 @@ public class Transac4Frame extends javax.swing.JFrame {
 
     private void editConfirmBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editConfirmBtnActionPerformed
         // TODO add your handling code here:
+        String maintenanceID = editMaintenanceIDField.getText();
+    String patchID = patchIDField.getText();
+    String workType = workTypeComboBox.getSelectedItem().toString();
+    String description = descriptionField.getText();
+    String status = statusComboBox.getSelectedItem().toString();
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    String targetDeadline = sdf.format(jDateChooser1.getDate());
+
+    // Only set dateFinished if status is set to "Done"
+    String dateFinished = null;
+    if ("Done".equals(status)) {
+        dateFinished = sdf.format(new java.util.Date()); // Sets to today
+    }
+
+    // Call your update function. Update its parameters to accept dateFinished!
+    String result = Maintenance.transac4Update(
+            maintenanceID,
+            workType,
+            patchID,
+            targetDeadline,
+            description,
+            status,
+            dateFinished // Pass the current date if Done
+    );
+
+    if ("Success".equals(result)) {
+        JOptionPane.showMessageDialog(this, "Maintenance record updated!");
+    } else if ("Invalid".equals(result)) {
+        JOptionPane.showMessageDialog(this, "Invalid Maintenance ID!", "Error", JOptionPane.ERROR_MESSAGE);
+    } else {
+        JOptionPane.showMessageDialog(this, "Failed to update record.", "Error", JOptionPane.ERROR_MESSAGE);
+    }
     }//GEN-LAST:event_editConfirmBtnActionPerformed
 
     private void descriptionFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_descriptionFieldActionPerformed
@@ -304,8 +341,58 @@ public class Transac4Frame extends javax.swing.JFrame {
 
     private void editEnterBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editEnterBtnActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_editEnterBtnActionPerformed
+        String maintenanceID = editMaintenanceIDField.getText();
+        Maintenance info = Maintenance.getInfo(maintenanceID);
 
+        if (info == null || info.getMaintenanceID() == null) {
+            JOptionPane.showMessageDialog(this, "Maintenance record not found!", "Error", JOptionPane.ERROR_MESSAGE);
+            // Clear fields and disable confirm
+            disableEditControls();
+            return;
+        }
+
+        // Fill fields
+        patchIDField.setText(info.getPatchID());
+        workTypeComboBox.setSelectedItem(info.getWorkType());
+        descriptionField.setText(info.getDescription());
+        statusComboBox.setSelectedItem(info.getStatus());
+
+        // Parse deadline
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            Date deadline = sdf.parse(info.getTargetDeadline());
+            jDateChooser1.setDate(deadline);
+        } catch (Exception ex) {
+            jDateChooser1.setDate(null);
+        }
+
+        // If record is "Done", block edits
+        if ("Done".equals(info.getStatus())) {
+            JOptionPane.showMessageDialog(this, "You cannot edit a Maintenance record with status Done.", "Error", JOptionPane.ERROR_MESSAGE);
+            disableEditControls();
+        } else {
+            enableEditControls();
+        }
+    }//GEN-LAST:event_editEnterBtnActionPerformed
+    
+    private void disableEditControls() {
+        patchIDField.setEnabled(false);
+        workTypeComboBox.setEnabled(false);
+        descriptionField.setEnabled(false);
+        jDateChooser1.setEnabled(false);
+        statusComboBox.setEnabled(false);
+        editConfirmBtn.setEnabled(false);
+    }
+
+    private void enableEditControls() {
+        patchIDField.setEnabled(true);
+        workTypeComboBox.setEnabled(true);
+        descriptionField.setEnabled(true);
+        jDateChooser1.setEnabled(true);
+        statusComboBox.setEnabled(true);
+        editConfirmBtn.setEnabled(true);
+    }
+    
     /**
      * @param args the command line arguments
      */

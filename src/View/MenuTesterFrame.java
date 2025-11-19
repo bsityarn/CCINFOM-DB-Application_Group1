@@ -203,7 +203,7 @@ public class MenuTesterFrame extends javax.swing.JFrame {
     private void transac2BtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_transac2BtnActionPerformed
         // TODO add your handling code here:
         if (evt.getSource() == transac2Btn) {
-            Transac2Frame transac2Frame = new Transac2Frame();
+            Transac2Frame transac2Frame = new Transac2Frame(displayIDnumber);
             transac2Frame.setVisible(true);
             this.dispose();
         }

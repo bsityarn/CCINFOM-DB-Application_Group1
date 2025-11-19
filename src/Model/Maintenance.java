@@ -5,6 +5,9 @@
 package Model;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 import javax.swing.table.DefaultTableModel;
 
@@ -15,6 +18,7 @@ import javax.swing.table.DefaultTableModel;
 public class Maintenance {
 
     private String maintenanceID;
+    private String machineID;
     private String workType;
     private String patchID;
     private String technicianIDassigned;
@@ -23,14 +27,14 @@ public class Maintenance {
     private String dateFinished;
     private String status;
     private String description;
+
     public static DefaultTableModel displayRecord(String maintenanceID) {
         DefaultTableModel model = new DefaultTableModel();
         StringBuilder query = new StringBuilder();
         query.append(" SELECT * FROM maintenance ");
         query.append(" WHERE maintenanceID = ? ");
 
-        try (Connection conn = MySQLConnector.connectDB();
-             PreparedStatement statement = conn.prepareStatement(query.toString())) {
+        try (Connection conn = MySQLConnector.connectDB(); PreparedStatement statement = conn.prepareStatement(query.toString())) {
 
             statement.setString(1, maintenanceID);
 
@@ -45,8 +49,7 @@ public class Maintenance {
                     columnNames.add(metaData.getColumnName(i));
                 }
 
-
-                model.setColumnIdentifiers(columnNames); 
+                model.setColumnIdentifiers(columnNames);
 
                 int rowCount = 0;
                 while (rs.next()) {
@@ -74,9 +77,7 @@ public class Maintenance {
         StringBuilder query = new StringBuilder();
         query.append(" SELECT * FROM maintenance ");
 
-        try (Connection conn = MySQLConnector.connectDB();
-             PreparedStatement statement = conn.prepareStatement(query.toString())) {
-
+        try (Connection conn = MySQLConnector.connectDB(); PreparedStatement statement = conn.prepareStatement(query.toString())) {
 
             // Execute query inside the try block
             try (ResultSet rs = statement.executeQuery()) {
@@ -89,8 +90,7 @@ public class Maintenance {
                     columnNames.add(metaData.getColumnName(i));
                 }
 
-
-                model.setColumnIdentifiers(columnNames); 
+                model.setColumnIdentifiers(columnNames);
 
                 int rowCount = 0;
                 while (rs.next()) {
@@ -146,7 +146,7 @@ public class Maintenance {
 
         return noOfTasks;
     }
-    
+
     public static String checkPatchStatus(String patchID) {
         StringBuilder query = new StringBuilder();
         query.append(" SELECT status  ");
@@ -402,7 +402,7 @@ public class Maintenance {
 
             // Prepare SQL statement to be executed
             PreparedStatement statement2 = conn.prepareStatement(query2.toString());
-            
+
             statement2.setString(1, status);
             statement2.setString(2, machineID);
 
@@ -425,13 +425,13 @@ public class Maintenance {
         String incrementedID = "";
         String compatibilityResult = checkTechCompatibility(technicianIDassigned, patchID);
         String patchStatus = checkPatchStatus(patchID);
-        
-        if(workType.equals("Deploy")){
-            if(patchStatus.equals("Not Working") || patchStatus.equals("Inactive")){
+
+        if (workType.equals("Deploy")) {
+            if (patchStatus.equals("Not Working") || patchStatus.equals("Inactive")) {
                 return "Cannot Deploy Inactive/Not Working patch";
             }
-        }else if(workType.equals("Rollback")){
-            if(patchStatus.equals("Working")){
+        } else if (workType.equals("Rollback")) {
+            if (patchStatus.equals("Working")) {
                 return "Cannot Rollback a Working patch";
             }
         }
@@ -559,6 +559,137 @@ public class Maintenance {
         }
 
         return resultMaintenance;
+    }
+
+    public static String transac4Update(String maintenanceID, String workType, String patchID, String targetDeadline, String description, String status, String dateFinished) {
+        String query = "UPDATE maintenance SET workType= ?, patchID= ?, targetDeadline= ?, description= ?, status= ?, dateFinished= ? WHERE maintenanceID= ?";
+        try (Connection conn = MySQLConnector.connectDB(); PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, workType);
+            stmt.setString(2, patchID);
+            stmt.setString(3, targetDeadline);
+            stmt.setString(4, description);
+            stmt.setString(5, status);
+            stmt.setString(6, dateFinished);
+            stmt.setString(7, maintenanceID);
+
+            int updated = stmt.executeUpdate();
+            if (updated > 0) {
+                return "Success";
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            return "Failed";
+        }
+        return "Invalid";
+    }
+
+    // 1. Get all deployment and rollback maintenance records
+    public static ArrayList<Maintenance> getDeploymentAndRollbackRecords() {
+        ArrayList<Maintenance> list = new ArrayList<>();
+        String query = "SELECT * FROM maintenance WHERE workType IN ('Deploy', 'Rollback')";
+        try (Connection conn = MySQLConnector.connectDB(); PreparedStatement stmt = conn.prepareStatement(query); ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                Maintenance m = new Maintenance();
+                m.setMaintenanceID(rs.getString("maintenanceID"));
+                m.setWorkType(rs.getString("workType"));
+                m.setPatchID(rs.getString("patchID"));
+                m.setTechnicianIDassigned(rs.getString("technicianIDassigned"));
+                m.setDateAssigned(rs.getString("dateAssigned"));
+                m.setStatus(rs.getString("status"));
+                m.setDescription(rs.getString("description"));
+                // You might need machineID, add getter/setter if needed
+                if (rs.getMetaData().getColumnLabel(1).equalsIgnoreCase("machineID")) {
+                    m.setMachineID(rs.getString("machineID"));
+                }
+                list.add(m);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return list;
+    }
+
+    // 2. COUNT unique patches used in maintenance
+    public static int getUniquePatchCount() {
+        String query = "SELECT COUNT(DISTINCT patchID) AS cnt FROM maintenance";
+        try (Connection conn = MySQLConnector.connectDB(); PreparedStatement stmt = conn.prepareStatement(query); ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("cnt");
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return 0;
+    }
+
+    // 3. Number of machines deployed per patch
+    public static Map<String, Integer> countDeploymentsPerPatch() {
+        Map<String, Integer> result = new HashMap<>();
+        String query = "SELECT patchID, COUNT(*) as count FROM maintenance WHERE workType='Deploy' GROUP BY patchID";
+        try (Connection conn = MySQLConnector.connectDB();
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) result.put(rs.getString("patchID"), rs.getInt("count"));
+        } catch (Exception ex) { ex.printStackTrace(); }
+        return result;
+    }
+
+
+    // 4. Pending deployments count
+    public static int countPendingDeployments() {
+        String query = "SELECT COUNT(*) as pc FROM maintenance WHERE status='Pending' OR status='In Progress'";
+        try (Connection conn = MySQLConnector.connectDB(); PreparedStatement stmt = conn.prepareStatement(query); ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("pc");
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return 0;
+    }
+
+    // 5. Latest previous working patch for rollback (per machine)
+    public static Map<String, String> getLatestWorkingPatchPerMachine() {
+        Map<String, String> result = new HashMap<>();
+        String query = "SELECT machineID, MAX(patchID) as patchID "
+                + "FROM maintenance WHERE status='Done' AND workType='Deploy' "
+                + "GROUP BY machineID";
+        try (Connection conn = MySQLConnector.connectDB(); PreparedStatement stmt = conn.prepareStatement(query); ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                result.put(rs.getString("machineID"), rs.getString("patchID"));
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return result;
+    }
+    
+    //additional getLatestWorkingPatchPerTechnician
+    public static Map<String, String> getLatestWorkingPatchPerTechnician() {
+        Map<String, String> result = new HashMap<>();
+        String query = "SELECT technicianIDassigned, MAX(patchID) as patchID FROM maintenance WHERE status='Done' AND workType='Deploy' GROUP BY technicianIDassigned";
+        try (Connection conn = MySQLConnector.connectDB();
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                result.put(rs.getString("technicianIDassigned"), rs.getString("patchID"));
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return result;
+    }
+
+    public String getMachineID() {
+        return machineID;
+    }
+
+    public String getTechnicianID() {
+        return this.technicianIDassigned;
+    }
+
+    public void setMachineID(String machineID) {
+        this.machineID = machineID;
     }
 
     //Getters
